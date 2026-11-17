@@ -42,7 +42,7 @@ Each step is one branch and one PR. Steps that change a running agent need José
 | # | Step | Done when | Status |
 |---|---|---|---|
 | 0 | **Incident response.** Rotate the classic GitHub token and the Gmail app password. Check gists, cron jobs, Tania's memory and the brain's git log for changes nobody asked for. Reset the poisoned memory. Write a blameless postmortem. | Old credentials are revoked, nothing unexplained is left, postmortem written | done |
-| 1 | **Set up ticket-bay-bot.** New Linux user, rootless Docker, Hermes home, Discord bot, OpenRouter key with a limit. GitHub App scoped to ticket-bay, with a host-side script that mints a 1-hour token per run. Gmail fetched on the host; the agent gets the email as a file. Tools `memory`, `cronjob` and `code_execution` off. Move bug-loop and pr-triage to it. | From its sandbox, `ls ~/brain` fails and a search finds no long-lived secret | todo |
+| 1 | **Set up ticket-bay-bot.** New Linux user, rootless Docker, Hermes home, Discord bot, OpenRouter key with a limit. GitHub App scoped to ticket-bay, with a host-side script that mints a 1-hour token per run. Gmail fetched on the host; the agent gets the email as a file. Tools `memory`, `cronjob` and `code_execution` off. Move bug-loop and pr-triage to it. | From its sandbox, `ls ~/brain` fails and a search finds no long-lived secret | done |
 | 1b | **MCP server for ticket-bay-bot (optional).** Connect the TicketBay app's MCP server with a read-only key and a tool include-list without `my_orders` (customer data would bring back the private-data leg), or only against an app with seed data. Add its address to the egress allowlist once step 3 is in. | The bot answers "which events are coming up?" through MCP, and has no tool that returns customer data | todo |
 | 2 | **Reduce Tania to the brain.** Remove the ticket-bay jobs, the gh token, the Gmail mount and the ticket-bay checkout. Move her to brain-server. Brain deploy key held by `sync-brain` on the host only. `skills/` and `AGENTS.md` mounted read-only; `sync-brain` refuses and alerts on commits that touch them. | Triage still runs; a commit touching `skills/` is refused and alerted | todo |
 | 3 | **Egress control.** Internal Docker network for both agents; the only way out is a proxy with an allowlist. Dependencies installed in a build step with `npm ci --ignore-scripts`. | A Python fetch of `example.com` fails from the sandbox; `api.github.com` works | todo |
@@ -55,7 +55,6 @@ Each step is one branch and one PR. Steps that change a running agent need José
 - Guidelines: should Tania's triage file into `guidelines/` directly, or into a proposals folder that
   José promotes? Her model once filed a capture as a guideline.
 - Lesson 8.5 (email 2, steps 14 and 15) and 8.6: run them on ticket-bay-bot after step 1.
-- OpenRouter balance: was 10 USD before DeepSeek; check before step 1.
 
 ## Rules for this repo
 
