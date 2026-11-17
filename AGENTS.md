@@ -7,6 +7,8 @@ PR triage), split by trust boundary.
 - **Running agents:** ask José before resuming, triggering (`hermes cron run`) or switching on any job,
   every time. After an interrupted command, check what partly ran before saying nothing ran: remote
   commands keep running.
+- **Hook setup, once per clone:** `git config core.hooksPath .githooks`. The pre-commit hook runs
+  gitleaks on staged changes; CI runs it on the full history.
 - **No secrets or personal data:** no keys, webhook URLs, inbox address, Discord IDs, IP addresses,
   private repo names.
 - **Never copy the course kit** (`~/code/ai-agent-engineer-course-kit`): its license forbids it. Read
