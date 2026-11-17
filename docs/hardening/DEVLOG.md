@@ -4,7 +4,9 @@
 
 | Branch | Step | State |
 |---|---|---|
-| `fix/step-0-incident-response` | 0 | in progress |
+| `fix/step-0-incident-response` | 0 | merged (#1) |
+| `ci/secret-scan-gate` | 0 | merged (#2) |
+| `docs/step-0-close` | 0 | in progress |
 
 ## 2026-11-17: safety audit and plan
 
@@ -92,3 +94,12 @@ the app-password file from the VPS.
   reports no login. The sandbox mounts in `config.yaml` stay until steps 1 and 2 rewrite them.
 - The stopped Lima VM still holds copies of the same dead credentials. They go when the VM is deleted.
 - Left for step 0: the postmortem (José).
+
+## 2026-11-17: secret-scan gate, repo public, step 0 done
+
+- Added a gitleaks gate before making the repo public: a pre-commit hook on staged changes
+  (`.githooks/pre-commit`) and a CI job that scans every commit on every branch, so a secret added
+  and later removed still fails. Rules in `.gitleaks.toml`. Merged as #2.
+- Switched the repo to public after the gate was in.
+- Postmortem merged with the step 0 log as #1. Step 0's done-when holds: old credentials revoked,
+  nothing unexplained left, postmortem written.
