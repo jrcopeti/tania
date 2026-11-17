@@ -6,7 +6,8 @@
 |---|---|---|
 | `fix/step-0-incident-response` | 0 | merged (#1) |
 | `ci/secret-scan-gate` | 0 | merged (#2) |
-| `docs/step-0-close` | 0 | in progress |
+| `docs/step-0-close` | 0 | merged (#3) |
+| `docs/step-1-ticket-bay-bot` | 1 | in progress |
 
 ## 2026-11-17: safety audit and plan
 
@@ -103,3 +104,53 @@ the app-password file from the VPS.
 - Switched the repo to public after the gate was in.
 - Postmortem merged with the step 0 log as #1. Step 0's done-when holds: old credentials revoked,
   nothing unexplained left, postmortem written.
+
+## 2026-11-18: step 1, ticket-bay-bot
+
+Ops on the VPS, no code branch. José gave each secret through his own terminal; none went through
+the chat or this repo.
+
+**Host:**
+- New Linux user `ticket-bay-bot` with linger and its own rootless Docker. Both agents' home folders
+  are now `750`, so neither user can read the other's files.
+- Hermes v0.23.2, installed at the same commit as Tania's. Its own gateway service, SOUL.md without
+  the brain, and its own clones of ticket-bay and dmoka/skills (root-owned, read-only). Root's daily
+  skills pull now covers both clones.
+- Sandbox image built from Tania's Dockerfile, with a build argument for the commit email so commits
+  show as `ticket-bay-bot[bot]`.
+- OpenRouter: spend before step 1 was 0.13 USD. The bot has its own key with a credit limit. Fallback
+  chain Ling → Ernie; north-mini-code dropped because it failed the injection test.
+
+**Credentials, all host-side:**
+- GitHub App `ticket-bay-bot`, owned by José, installed on the ticket-bay fork only (contents and pull
+  requests). A host script mints a 1-hour installation token per run: read-only for triage, write for
+  bug-loop. The private key stays in a folder the sandbox doesn't mount; only the token file is mounted,
+  read-only. Checked: the token sees one repo, and gets 404 on the brain repo and on gists.
+- Gmail: a new app password, used only by `support-inbox` on the host. Before each bug-loop run a host
+  script claims the oldest open email, writes it as text to a folder the sandbox mounts read-only,
+  posts the picked-up ping through the webhook, and mints the token. The prompt now reads that file.
+- Discord: its own bot and home channel on the ticket-bay server; only José is allowed.
+
+**Sandbox:**
+- Mounts: `dev`, `pr-review`, the prompts folder (read-only), the mail folder (read-only), the token
+  folder (read-only). No brain, no brain skills, no gh login, no mail password.
+- `agent.disabled_toolsets` turns off memory, cronjob and code_execution, plus web, browser, vision,
+  image_gen, tts, connections, delegation, computer_use, session_search and kanban. Cron jobs can't
+  widen this list. Left on: terminal, file, skills, todo, clarify. Memory is off too.
+- Hooks: the guard and the test gate, approved. The picked-up hook is gone: the host script pings.
+
+**Jobs moved (José said yes):**
+- bug-loop and pr-triage-morning removed from Tania, created on the bot, then resumed with pull-repos.
+- The tailnet review address now points at the bot's own review-page server.
+- On an empty inbox or an empty PR queue the host script prints `{"wakeAgent": false}`, so the agent
+  doesn't start: no model call, no Discord message. Test runs of all three jobs: skipped or silent.
+
+**Done-when check, from inside the bot's sandbox:**
+- `ls /home/agent/brain`: No such file or directory. `/home` holds only `ticket-bay-bot`.
+- A search of the container for OpenRouter keys, `ghp_`/`gho_`/`github_pat_` tokens, private keys,
+  Discord webhooks and bot tokens found only patterns and variable names in skill docs. The only real
+  credential is the 1-hour `ghs_` token. The container's environment holds no secret.
+
+**Known gaps, for later steps:**
+- The guard blocks `curl`, but the model offered a Python HTTP client instead: step 3 (egress).
+- Tania still has her ticket-bay clone, `gh` mount and Gmail mount, and pulls ticket-bay daily: step 2.
