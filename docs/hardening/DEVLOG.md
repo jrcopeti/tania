@@ -7,7 +7,8 @@
 | `fix/step-0-incident-response` | 0 | merged (#1) |
 | `ci/secret-scan-gate` | 0 | merged (#2) |
 | `docs/step-0-close` | 0 | merged (#3) |
-| `docs/step-1-ticket-bay-bot` | 1 | in progress |
+| `docs/step-1-ticket-bay-bot` | 1 | merged (#4) |
+| `docs/step-2-tania-brain-only` | 2 | in progress |
 
 ## 2026-11-17: safety audit and plan
 
@@ -154,3 +155,59 @@ the chat or this repo.
 **Known gaps, for later steps:**
 - The guard blocks `curl`, but the model offered a Python HTTP client instead: step 3 (egress).
 - Tania still has her ticket-bay clone, `gh` mount and Gmail mount, and pulls ticket-bay daily: step 2.
+
+## 2026-11-18: step 2, Tania down to the brain
+
+**Three gaps the plan missed.** A read-only `skills/` mount isn't enough, because the host runs git
+and code in the folder the sandbox writes:
+- `sync-brain` ran the brain's own `sync.mjs`, which Tania can edit, with the push key in reach.
+- `.git/hooks` and `.git/config` were writable, so a hook or `core.fsmonitor` would run on the host.
+- Hermes loads `.hermes.md` before `AGENTS.md` (only one wins), and `AGENTS.md`/`CLAUDE.md` from any
+  folder the agent works in. A planted file becomes her next prompt.
+
+**New `sync-brain.sh`** ([vps/tania/sync-brain.sh](../../vps/tania/sync-brain.sh)), on the host. It runs
+nothing from the brain, turns git hooks and fsmonitor off, fetches from a fixed URL (not the repo's
+`origin`), and checks the pushed tree against freshly fetched `main`, so faked refs don't hide a
+change. Only `inbox/ sources/ notes/ guidelines/ decisions/ projects/ intents/ index.md` go out;
+anything else is refused and reported every run until it's gone. Instruction files are moved to
+`~/brain-quarantine` with an alert. 29 tests, run on the VPS (git 2.56) and in CI.
+
+**On the VPS (José said yes):**
+- Brain deploy key in `~/.config/brain-deploy`, never mounted. GitHub host key pinned and checked
+  against GitHub's published fingerprint. Brain remote switched to SSH.
+- Sandbox mounts: the brain only. Read-only over it: `skills/`, `AGENTS.md`, `CLAUDE.md`, `taste.md`,
+  `README.md`, `sync.mjs`, `install.mjs`, `.github/`, `test/`, `.git/hooks`, `.git/config`.
+- Removed: the ticket-bay clone (clean, all pushed), worktrees, Tania's dmoka/skills clone and its
+  line in root's skills-pull cron, `pr-review`, the ticket-bay tools and prompts, the `gh` config and
+  credential helpers, the ticket-bay webhook, the empty bug-inbox folder, the bug-loop and test-gate
+  hooks, and the `pull-repos` job. Skills now come from the brain only.
+- Toolsets unchanged on José's call: Tania keeps cronjob, web, browser and memory. With the email job
+  gone, her untrusted input is what José captures; the push guard limits what an injection could do.
+- brain-triage now runs at 09:00 and 21:00.
+- Old container removed, gateway restarted. Backups next to `config.yaml`, `jobs.json`,
+  `sync-brain.sh`, and `/root/skills-pull.bak-step2`.
+
+**Checked** with a throwaway container from her image and the same mounts: writes to every read-only
+path above fail (also replacing `sync.mjs` with `mv`, a pre-push hook, `git config core.fsmonitor`);
+writing `inbox/` and `git mv` into `sources/` work. `/home` holds only `agent/brain`.
+
+**Gotchas:**
+- Deleting a host folder that a running container has as its working dir breaks `docker exec` with
+  "current working directory is outside of container mount namespace root -- possible container
+  breakout detected". It's runc refusing a deleted cwd, not a breakout. Remove the container.
+- Single-file read-only mounts (`AGENTS.md`, `.git/config`) pin the inode. When the host's git
+  replaces the file, the sandbox keeps the old copy until the container is recreated. Hermes reads
+  `AGENTS.md` on the host, so only the sandbox's copy is stale.
+
+**Discord and push key (José said yes):**
+- José added the deploy key (write) to the brain repo, invited Tania's bot to the brain server,
+  kicked her from the old one and deleted the unused webhook. Home channel moved; gateway reconnected.
+- `terminal.cwd` still pointed at the deleted `/workspace/dev`; now `/home/agent/brain`.
+- Her real sandbox, created by José's first Discord message, has the same mounts as the test container:
+  every protected path `rw=false` under both `/workspace/brain` and `/home/agent/brain`.
+
+**Done-when, live:** a host commit adding `skills/zz-step2-guard-test.md`, then sync-brain resumed and
+run once. It pulled the Mac's commits from while it was paused, refused the push, and posted the
+refusal to the brain channel; GitHub's `main` didn't move. Test commit removed; sync-brain stays on.
+
+**Left for step 2:** brain-triage's first run with the new mounts (09:00) files the inbox and pushes.
