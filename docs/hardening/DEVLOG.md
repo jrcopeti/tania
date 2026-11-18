@@ -725,3 +725,13 @@ Review run against the 5b spec. Fixed:
 Not changed: notes under `skills/` aren't watched (José's call: public, and Tania can't write there).
 28 + 7 tests. Three injected bugs (no offsets, no URL-decode after base64, no home-reference check)
 each turned tests red.
+
+## 2026-11-18: step 5b fixes on the VPS (José said yes)
+
+- 28 + 7 tests pass on the VPS. Hook installed (same sha256 as the commit). An edited hook keeps its
+  approval but `hermes hooks doctor` warns "modified since approval": revoked and approved again
+  (`hermes chat --accept-hooks -q "reply with: ok"`). Gateway restarted at 19:48, after sync-brain's
+  19:45 run; doctor all ✓, 0.2 s on its synthetic payload.
+- New no-agent job `tripwire-health` (every 15 min, delivered to Discord), script in
+  `~/.hermes/scripts/`. It finds `hermes` itself (a job's PATH may not have `~/.local/bin`); silent
+  when run by hand with a bare PATH. First run 20:09.

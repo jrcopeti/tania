@@ -5,7 +5,7 @@
 set -u
 STATE=${TRIPWIRE_STATE:-$HOME/.local/state/exfil-tripwire}
 WEBHOOK=${TRIPWIRE_WEBHOOK_FILE:-$HOME/.config/exfil-tripwire/webhook}
-HERMES=${HERMES:-hermes}
+HERMES=${HERMES:-$(command -v hermes || echo "$HOME/.local/bin/hermes")}
 say() { echo "⚠️ tripwire-health: $*"; }
 
 [ -s "$WEBHOOK" ] || say "the webhook file $WEBHOOK is missing or empty: tripwire alerts can't reach #alerts."
