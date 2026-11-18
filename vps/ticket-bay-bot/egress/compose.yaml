@@ -5,11 +5,16 @@ services:
     image: ubuntu/squid:6.13-25.04_beta@sha256:3de2e64f0ca6efdac3e98557607dc0f23050037f3885016d5d5bfcf9950501b8
     volumes:
       - ./squid.conf:/etc/squid/squid.conf:ro
+      # Kept across container recreation; squid-denials.sh reads it with docker exec.
+      - logs:/var/log/squid
     networks:
       sandbox:
         aliases: [egress]
       outside: {}
     restart: unless-stopped
+
+volumes:
+  logs: {}
 
 networks:
   sandbox:
