@@ -51,12 +51,15 @@ Each step is one branch and one PR. Steps that change a running agent need José
 | 1 | **Set up ticket-bay-bot.** New Linux user, rootless Docker, Hermes home, Discord bot, OpenRouter key with a limit. GitHub App scoped to ticket-bay, with a host-side script that mints a 1-hour token per run. Gmail fetched on the host; the agent gets the email as a file. Tools `memory`, `cronjob` and `code_execution` off. Move bug-loop and pr-triage to it. | From its sandbox, `ls ~/brain` fails and a search finds no long-lived secret | done |
 | 1b | **MCP server for ticket-bay-bot (optional).** Run TicketBay with seed data as its own Linux user, and connect its MCP server with no key (public tools only) and a tool include-list without `my_orders` (customer data would bring back the private-data leg). | The bot answers "which events are coming up?" through MCP, and has no tool that returns customer data | done |
 | 2 | **Reduce Tania to the brain.** Remove the ticket-bay jobs, the gh token, the Gmail mount and the ticket-bay checkout. Move her to brain-server. Brain deploy key held by `sync-brain` on the host only. `skills/` and `AGENTS.md` mounted read-only; `sync-brain` refuses and alerts on commits that touch them. | Triage still runs; a commit touching `skills/` is refused and alerted | done |
-| 3 | **Egress control.** Tania's sandbox gets no network, and brain-triage runs without the web and browser toolsets. ticket-bay-bot's sandbox joins an internal Docker network whose only way out is a squid allowlist (`github.com`, `api.github.com`, `registry.npmjs.org`); npm install scripts are off. | A Python fetch of `example.com` fails from both sandboxes; `api.github.com` works from the bot's; brain-triage's session has no web or browser tool | in progress |
+| 3 | **Egress control.** Tania's sandbox gets no network, and brain-triage runs without the web and browser toolsets. ticket-bay-bot's sandbox joins an internal Docker network whose only way out is a squid allowlist (`github.com`, `api.github.com`, `registry.npmjs.org`); npm install scripts are off. | A Python fetch of `example.com` fails from both sandboxes; `api.github.com` works from the bot's; brain-triage's session has no web or browser tool | done |
 | 4 | **Supply chain.** Pin `dmoka/skills` to a commit and bump it only after reading the diff. The pull runs as an unprivileged user, not root. Pin the Hermes version. Turn on Dependabot alerts (not version-update PRs) on the ticket-bay fork. | No root cron jobs; every external input is pinned; Dependabot alerts are on | todo |
 | 5 | **Detection.** Tool-call logs shipped off the VPS. A canary token in the brain. A kill-switch runbook. | Using the canary sends an alert | todo |
 | 6 | **Verification.** Injection test suite (the email that worked, lesson 8.5's email 2, new ones) run against both agents. Safety audit rerun with probes. Before/after table, ADRs and postmortem written by José. | The done-when at the top holds | todo |
 
 ## Open
+
+- ticket-bay-bot's test gate: Hermes stops waiting for a hook after 30 s (`plugins.hook_callback_timeout`),
+  so on a slow suite a red verdict comes too late to send the agent back. Raise the timeout.
 
 - Guidelines: should Tania's triage file into `guidelines/` directly, or into a proposals folder that
   José promotes? Her model once filed a capture as a guideline.

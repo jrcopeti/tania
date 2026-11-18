@@ -401,5 +401,15 @@ the bug on `lesson/8.5-start`; `main` already has the fix. The bug-loop prompt n
   `hermes cron edit <id> --prompt "$(cat <file>)"`. The claimed email can't be unclaimed, so the test
   needs it sent again.
 
-**Left for step 3:**  a bug-loop run that opens a real PR through squid
-(`git push`, `gh pr create`), and the prompt put back to `main`.
+- bug-loop on the course email again (José sent it twice; the first copy was claimed by the `main`
+  run), with the job's prompt pointed at `lesson/8.5-start`: PR #15 by `ticket-bay-bot[bot]` against
+  that branch, the one-line fix (`n > 10` → `n >= 10`) and one new regression test. CI green on unit,
+  property, typecheck, mutation, REST API and secret scan. Squid logged `github.com` and
+  `api.github.com` for the push and the PR, and the npm registry. The prompt is back to `main` in both
+  the job and the file.
+- The test gate ran GREEN and removed the worktree, but 18 s after Hermes stopped waiting: Hermes caps
+  hook callbacks at `plugins.hook_callback_timeout` (default 30 s), whatever the hook's own timeout.
+  A red verdict that late can't send the agent back. Not caused by step 3; fix with José's yes.
+
+**Done-when holds:** a Python fetch of `example.com` fails from both sandboxes, `api.github.com`
+works from the bot's, and brain-triage's sessions offer no web or browser tool. Step 3 done.
