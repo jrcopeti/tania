@@ -24,7 +24,8 @@ injection test suite passes against both agents.
   on GitHub, she gets her own App (`tania-brain`), never ticket-bay-bot's.
 - **José's skills live in the brain.** Personal skills used across projects (capture, triage, lint,
   ask-brain) are written on the Mac and pushed; every agent gets them through `install.mjs` links,
-  and Tania pulls them read-only. Tania never writes a skill: she leaves a note in the inbox instead.
+  and Tania pulls them read-only. Tania never writes a brain skill: she leaves a note in the inbox instead.
+  Her own Hermes skills (`~/.hermes/skills`) are another matter: see the next decision.
   Project skills stay in their project; ticket-bay-bot's skills come from `dmoka/skills`.
 - **No Renovate on the ticket-bay fork.** Upstream owns its dependency versions; updating them in the
   fork makes it drift from the lessons. Renovate (proposes) + ticket-bay-bot (reviews) + José (merges)
@@ -42,6 +43,10 @@ injection test suite passes against both agents.
   An injected run can save something every later run reads; that's accepted for the learning. A daily
   diff of its memory and skills goes to Discord, and José undoes what looks planted. Tania gets the
   same diff, twice a day after brain-triage, which keeps `skill_manage` (in the `skills` toolset).
+  **Tania keeps `skill_manage`** (José, 2026-11-18), after she used it to write a skill that described
+  the canary. Her skills in `~/.hermes/skills` are hers to write; the diff is the control, and José
+  edits what shouldn't be there. Emptying her memory alone doesn't undo what she learned: check her
+  skills and `~/.hermes/skills/.curator_ledger.jsonl` too.
 - **Step 5 detects, it doesn't record.** Shipping tool-call logs off the VPS keeps evidence safe from
   root on the host but alerts on nothing: dropped. Squid's denials are added: a blocked request from the
   bot's sandbox is the clearest sign of an injected run. The canary's file is named nowhere in this
@@ -95,11 +100,6 @@ Each step is one branch and one PR. Steps that change a running agent need José
 
 - Steps 0–4 shipped without a code review (step 5's found a leak path in tested code). Review what
   they put on the VPS against each step's done-when, fixes on their own branch. After step 5.
-
-- Tania writes skills: she still has `skill_manage` (in the `skills` toolset), and on 2026-11-18
-  wrote one that described the canary. The decisions say "Tania never writes a skill" and also
-  "keeps `skill_manage`"; only the twice-daily memory-diff checks it. Take `skill_manage` away, or
-  keep it and accept that the diff is the control? Decide before step 6.
 
 - Later detection options, not planned: ship tool-call logs off the VPS (evidence that survives root on
   the host).

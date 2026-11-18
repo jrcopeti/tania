@@ -763,3 +763,5 @@ each turned tests red.
   fetching through another service, a generic list of logging hosts kept. The rest is as she wrote
   it. Original in a root-only backup. The `blocked-page-recovery` paragraph is left. The 21:30
   memory-diff will show both skills; the cleaned text is what it should show.
+- José: Tania keeps `skill_manage`; the memory-diff stays the only check on her skills. Recorded in
+  the plan, open question closed.
