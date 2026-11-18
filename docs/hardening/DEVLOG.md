@@ -765,3 +765,14 @@ each turned tests red.
   memory-diff will show both skills; the cleaned text is what it should show.
 - José: Tania keeps `skill_manage`; the memory-diff stays the only check on her skills. Recorded in
   the plan, open question closed.
+
+## 2026-11-18: a late alert from the retired AWS key canary
+
+- 20:45: `#alerts` got an alert from the fake AWS key dropped in step 5 (`safety_net: True`,
+  `service_used: sts`, no IP or user agent). Its trigger history shows the use at 16:05 Berlin
+  (15:05 UTC): José's own `sts get-caller-identity` from the Mac. Expected, 4h40m late.
+- How: AWS doesn't log `sts get-caller-identity` the usual way, so canarytokens.org reports it later
+  from a backup check (AWS's "last used" record for the key). That record names the service, not
+  where the request came from. It keeps only the most recent use, so the trigger history is the check.
+- Nothing on the VPS touched `archive/` today; Tania's web calls were httpbin.org and mindstudio.ai.
+- The key is still in the brain's git history, and its token stays on: it watches that copy.
