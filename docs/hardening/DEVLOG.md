@@ -330,3 +330,37 @@ but loopback).
   1024 it uses 13 MB.
 
 Nothing live changed; the test containers and networks are removed.
+
+## 2026-11-18: step 3, switched over (José said yes)
+
+**Tania:**
+- `terminal.docker_network: false`. Her live sandbox, created through `hermes chat`, has
+  `NetworkMode=none` and only `lo`; a Python fetch of `example.com` and of `api.github.com` both fail
+  with no DNS.
+- brain-triage: `enabled_toolsets: [terminal, file, skills, todo]`, set in `jobs.json` with the gateway
+  stopped (`hermes cron edit` has no toolsets flag). Web, browser, memory and cronjob are left out.
+- brain-triage's prompt now says to skip `node sync.mjs`: the host pushes.
+- New [sync-brain.sh](../../vps/tania/sync-brain.sh): after its fetch it sets `origin/main` to
+  GitHub's `main`, and after a push to the pushed commit. Two new tests; 31 pass on the VPS, and the
+  "nothing to push" test fails on the old script. git already moved `origin/main` on push when the URL
+  matched `origin`, but never on fetch.
+
+**ticket-bay-bot:**
+- Squid from a root-owned `~/egress` (mode 750, files 640): `restart: unless-stopped`, and the
+  bot's rootless Docker is enabled, so it comes back after a reboot.
+- `terminal.docker_extra_args: ["--network", "tbb-sandbox"]`, and `terminal.docker_env` with
+  `HTTPS_PROXY`, `https_proxy` and `NPM_CONFIG_IGNORE_SCRIPTS: "true"`.
+- Live sandbox: on `tbb-sandbox` only. `example.com` gets 403 from squid, and with the proxy variables
+  unset there's no DNS. `api.github.com` returns 200, `git ls-remote origin` works, and npm reports
+  `ignore-scripts` true. Squid's log shows the one denial and the three tunnels.
+
+Backups: `config.yaml.bak-step3-*` for both agents, plus `jobs.json` and `sync-brain.sh` for Tania.
+
+**Gotchas:**
+- `hermes config set` parses values as YAML: `true` becomes a boolean. Quote env values in
+  `docker_env`.
+- `sudo -iu <user> bash -c "set -e ..."` with nested quotes broke once and left the bot's gateway
+  stopped for a minute. A script file passed to `sudo -iu <user> bash` is safer.
+
+**Left for step 3:** the first scheduled runs: brain-triage at 21:00 (its session's tool list should hold
+no web or browser tool), and pr-triage and bug-loop tomorrow morning through squid.
