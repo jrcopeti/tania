@@ -36,5 +36,5 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Test ticket-bay-bot's memory diff
-        run: bash vps/ticket-bay-bot/test-memory-diff.sh
+      - name: Test the agents' memory diff
+        run: bash vps/shared/test-memory-diff.sh

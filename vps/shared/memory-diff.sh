@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
-# Daily, from pull-repos.sh: print what ticket-bay-bot saved to its memory or skills since yesterday.
-# Memory and skill_manage are on so it can learn; this is how José sees what it learned, and undoes a
-# bad entry with the checkout line it prints. The snapshot repo is outside the sandbox's mounts.
+# Daily, as a Hermes no-agent job (ticket-bay-bot: from pull-repos.sh; Tania: its own job): print what
+# the agent saved to its memory or skills since the last run. Memory and skill_manage stay on so it
+# learns; this is how José sees what it saved, and undoes a bad entry with the restore line it prints.
+# The snapshot repo is outside the sandbox's mounts.
 # Silent when nothing changed. The first run only takes the baseline.
 set -u
 H=${HERMES_HOME:-$HOME/.hermes}
@@ -22,5 +23,5 @@ out=$(g add -A -- memories skills 2>&1) || { echo "⚠️ memory-diff: git add f
 g diff --cached --quiet && exit 0
 d=$(g diff --cached --stat=80 && echo && g diff --cached --unified=1 -- memories skills)
 g -c user.name=audit -c user.email=audit@localhost commit -qm "$(date -u +%FT%H:%MZ)" 2>&1 || echo "⚠️ memory-diff: commit failed"
-echo "🧠 ticket-bay-bot saved this since the last check (undo: git --git-dir=$A --work-tree=$H restore --source=HEAD~1 -- <path>):"
+echo "🧠 saved to memory or skills since the last check (undo: git --git-dir=$A --work-tree=$H restore --source=HEAD~1 -- <path>):"
 if [ ${#d} -gt $MAX ]; then echo "${d:0:$MAX}"; echo "… cut. Full diff: git --git-dir=$A show HEAD"; else echo "$d"; fi

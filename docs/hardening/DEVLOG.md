@@ -495,7 +495,7 @@ the file tool.
   `hermes cron edit`) and `publish-pr-review` point at the new path. Sandbox container removed, gateway
   restarted, Discord back, the nine dmoka skills listed as external. `~/dev/skills` deleted.
 - [pull-repos.sh](../../vps/ticket-bay-bot/pull-repos.sh) reads `/var/lib/skills-sync/status` and runs
-  [memory-diff.sh](../../vps/ticket-bay-bot/memory-diff.sh), which snapshots `~/.hermes/memories` and
+  [memory-diff.sh](../../vps/shared/memory-diff.sh), which snapshots `~/.hermes/memories` and
   `~/.hermes/skills` into `~/.memory-audit.git` (not mounted in the sandbox) and prints the diff with the
   line to undo it. Baseline taken: 304 files.
 - Tania: `updates.check: false`. No restart; it only stops the banner.
@@ -527,7 +527,24 @@ and the bot, which reads strangers' email, talks to it over MCP. Not changed: se
   `scripts/memories` and `scripts/skills`. My first check ran from `/tmp` and missed it. Fixed: the
   script `cd`s to the Hermes home and puts git's error in its message. Also fixed: the undo line used
   `checkout HEAD~1`, which can't remove a memory file that's new; it's `restore --source=HEAD~1` now.
-  [test-memory-diff.sh](../../vps/ticket-bay-bot/test-memory-diff.sh) starts every run in `scripts/`
+  [test-memory-diff.sh](../../vps/shared/test-memory-diff.sh) starts every run in `scripts/`
   (8 cases, in CI). `skills/.hub/audit.log` is left out as Hermes bookkeeping.
 - Fixed script deployed and run as the bot from `~/.hermes/scripts`: it reported the two new (empty)
   hub files, then stayed silent. Not yet seen through Hermes itself: the next 07:55 run.
+
+## 2026-11-18: memory diff for Tania too (José said yes)
+
+- brain-triage keeps the `skills` toolset, so `skill_manage` can write `~/.hermes/skills` from a run
+  that reads captured pages; chats can write memory. Neither reaches the brain's git, and her triage
+  summary is the model's own account. Step 3 chose those toolsets without checking what `skills`
+  holds; found while answering whether Tania's memory is on.
+- `memory-diff.sh` moved to [vps/shared](../../vps/shared/memory-diff.sh), message made agent-neutral
+  (each agent posts to its own server). Same copy on both agents.
+- Tania: new no-agent job `memory-diff` (`631bffe94f19`), 09:30 and 21:30, half an hour after each
+  brain-triage. Baseline: `USER.md` and the bundled skills. Backup `jobs.json.bak-memorydiff-*`.
+- A command José rejected had already run on the VPS (script, baseline, job); a second try made a
+  duplicate job, removed (`44ebf34ce8d8`). Checked what ran only after `cron list` showed two.
+- End to end on both agents (José said yes to two runs each): a test file in `~/.hermes/skills`, the
+  job run (bot: `pull-repos`, Tania: `memory-diff`), then the file deleted and the job run again. Each
+  run posted the diff, the add and then the deletion, and the log shows all four delivered to Discord.
+  Test file gone; Tania's next scheduled run is 21:30.

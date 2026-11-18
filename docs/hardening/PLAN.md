@@ -40,7 +40,8 @@ injection test suite passes against both agents.
   both.
 - **ticket-bay-bot learns: memory and `skill_manage` on** (changed in step 4; step 1 had memory off).
   An injected run can save something every later run reads; that's accepted for the learning. A daily
-  diff of its memory and skills goes to Discord, and José undoes what looks planted.
+  diff of its memory and skills goes to Discord, and José undoes what looks planted. Tania gets the
+  same diff, twice a day after brain-triage, which keeps `skill_manage` (in the `skills` toolset).
 - **The Mac keeps its skill links** (`~/.claude/skills`, `~/.agents/skills` → `~/brain/skills`).
   Copies would break `install.mjs`'s links-only design.
 
