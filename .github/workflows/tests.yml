@@ -18,3 +18,23 @@ jobs:
 
       - name: Test Tania's brain push guard
         run: bash vps/tania/test-sync-brain.sh
+
+  skills-update:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Test ticket-bay-bot's skills update
+        run: bash vps/skills-sync/test-skills-update.sh
+
+  memory-diff:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Test ticket-bay-bot's memory diff
+        run: bash vps/ticket-bay-bot/test-memory-diff.sh

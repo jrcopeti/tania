@@ -1,0 +1,108 @@
+#!/usr/bin/env bash
+# Tests for skills-update.sh against a throwaway "upstream" and checkout. A stub skills guard flags
+# EVIL (high) and MEH (low), and fails on BOOM, so these test the update rules, not Hermes's patterns.
+# Run: bash vps/skills-sync/test-skills-update.sh
+set -u
+SCRIPT=$(cd "$(dirname "$0")" && pwd)/skills-update.sh
+T=$(mktemp -d)
+trap 'rm -rf "$T"' EXIT
+export GIT_AUTHOR_NAME=test GIT_AUTHOR_EMAIL=test@localhost GIT_COMMITTER_NAME=test GIT_COMMITTER_EMAIL=test@localhost
+export GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1
+NOW=$(date +%s) DAY=86400
+pass=0 fail=0
+
+mkdir -p "$T/guard/tools" && touch "$T/guard/tools/__init__.py"
+cat > "$T/guard/tools/skills_guard.py" <<'EOF'
+from dataclasses import dataclass
+@dataclass
+class Finding:
+    pattern_id: str
+    severity: str
+    file: str
+    line: int
+@dataclass
+class ScanResult:
+    findings: list
+def scan_skill(d, source=""):
+    out = []
+    for p in sorted(d.rglob("*")):
+        if p.is_file():
+            for i, line in enumerate(p.read_text().splitlines(), 1):
+                if "BOOM" in line:
+                    raise RuntimeError("boom")
+                for word, sev in (("EVIL", "high"), ("MEH", "low")):
+                    if word in line:
+                        out.append(Finding(word.lower(), sev, str(p.relative_to(d)), i))
+    return ScanResult(out)
+EOF
+
+setup() {
+  rm -rf "$T/w" && W=$T/w && mkdir -p "$W/state"
+  git init -q --bare -b main "$W/up.git"
+  git init -q -b main "$W/dev"
+  mkdir -p "$W/dev/skills/a" && echo "# a" > "$W/dev/skills/a/SKILL.md"
+  push_all seed
+  git clone -q "$W/up.git" "$W/repo" && git -C "$W/repo" checkout -q --detach
+  PIN=$(head_of repo)
+}
+push_all() { git -C "$W/dev" add -A && git -C "$W/dev" commit -qm "$1" && git -C "$W/dev" push -q "$W/up.git" HEAD:main; }
+upstream() { echo "$2" >> "$W/dev/skills/a/$1" && push_all "$1"; UP=$(head_of dev); }
+head_of() { git -C "$W/$1" rev-parse HEAD; }
+run() { SKILLS_REPO=$W/repo HERMES_GUARD=$T/guard SKILLS_STATE=$W/state SKILLS_NOW=$1 bash "$SCRIPT"; out=$(cat "$W/state/status"); }
+check() { local name=$1; shift; if "$@"; then echo "ok   $name"; pass=$((pass + 1)); else echo "FAIL $name"; echo "     status: ${out:-<none>}"; fail=$((fail + 1)); fi; }
+says() { grep -qF -- "$1" <<<"$out"; }
+at() { [ "$(head_of repo)" = "$1" ]; }
+
+# --- the wait
+setup; run "$NOW"
+check "first run: ok, stays on the pin" eval '[ "$out" = ok ] && at "$PIN"'
+
+setup; upstream SKILL.md "clean change"; run "$NOW"
+check "a commit first seen today is not taken" eval '[ "$out" = ok ] && at "$PIN"'
+
+setup; upstream SKILL.md "clean change"; run $((NOW - 8 * DAY)); run "$NOW"
+check "a clean commit first seen 8 days ago is taken" eval 'says "skills updated" && at "$UP"'
+
+setup; upstream SKILL.md "clean change"; run $((NOW - 6 * DAY)); run "$NOW"
+check "a commit first seen 6 days ago is not taken" eval '[ "$out" = ok ] && at "$PIN"'
+
+setup; echo old >> "$W/dev/skills/a/SKILL.md"
+GIT_COMMITTER_DATE="@$((NOW - 30 * DAY)) +0000" GIT_AUTHOR_DATE="@$((NOW - 30 * DAY)) +0000" push_all backdated; run "$NOW"
+check "a backdated commit first seen today is not taken" eval '[ "$out" = ok ] && at "$PIN"'
+
+setup; upstream SKILL.md "first"; old=$UP; run $((NOW - 8 * DAY)); upstream SKILL.md "second"; run "$NOW"
+check "takes the newest commit past the wait, not upstream's head" eval 'says "skills updated" && at "$old"'
+
+setup; upstream SKILL.md "clean"; run $((NOW - 8 * DAY)); run "$NOW"; run $((NOW + 60))
+check "nothing new after an update: ok" eval '[ "$out" = ok ] && at "$UP"'
+
+# --- the scan
+setup; upstream run.sh "EVIL"; run $((NOW - 8 * DAY)); run "$NOW"
+check "a new high finding blocks, naming the file" eval 'says "🚫" && says "a/run.sh" && at "$PIN"'
+
+setup; upstream SKILL.md "MEH"; run $((NOW - 8 * DAY)); run "$NOW"
+check "a new low finding doesn't block" eval 'says "skills updated" && at "$UP"'
+
+setup; upstream probe.sh "EVIL"; git -C "$W/repo" fetch -q && git -C "$W/repo" checkout -q --detach origin/main; PIN=$(head_of repo)
+sed -i.bak '1i\
+moved down' "$W/dev/skills/a/probe.sh" && rm "$W/dev/skills/a/probe.sh.bak" && push_all move; UP=$(head_of dev)
+run $((NOW - 8 * DAY)); run "$NOW"
+check "a finding the pin already has doesn't block, even on another line" eval 'says "skills updated" && at "$UP"'
+
+setup; mkdir -p "$W/dev/skills/b" && echo EVIL > "$W/dev/skills/b/SKILL.md" && push_all newskill; run $((NOW - 8 * DAY)); run "$NOW"
+check "a new skill with a finding blocks" eval 'says "🚫" && says "b/SKILL.md" && at "$PIN"'
+
+setup; upstream SKILL.md "BOOM"; run $((NOW - 8 * DAY)); run "$NOW"
+check "a failed scan doesn't update" eval 'says "scan failed" && at "$PIN"'
+
+# --- upstream trouble
+setup; upstream SKILL.md "x"; run $((NOW - 8 * DAY))
+git -C "$W/dev" checkout -q --orphan other && git -C "$W/dev" commit -qm rewritten && git -C "$W/dev" push -qf "$W/up.git" HEAD:main
+run $((NOW - 7 * DAY - 60)); run "$NOW"
+check "rewritten upstream history is refused" eval 'says "history rewritten" && at "$PIN"'
+
+setup; git -C "$W/repo" remote set-url origin "$W/missing.git"; run "$NOW"
+check "a failed fetch is reported" eval 'says "fetch failed" && at "$PIN"'
+
+echo "$pass passed, $fail failed"
+[ "$fail" = 0 ]

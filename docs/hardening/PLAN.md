@@ -38,6 +38,9 @@ injection test suite passes against both agents.
   Her unattended job, brain-triage, runs without web and browser (`enabled_toolsets`), so no job holds
   all three. Discord link previews are a way out no VPS rule closes. Step 5's canary is the check on
   both.
+- **ticket-bay-bot learns: memory and `skill_manage` on** (changed in step 4; step 1 had memory off).
+  An injected run can save something every later run reads; that's accepted for the learning. A daily
+  diff of its memory and skills goes to Discord, and José undoes what looks planted.
 - **The Mac keeps its skill links** (`~/.claude/skills`, `~/.agents/skills` → `~/brain/skills`).
   Copies would break `install.mjs`'s links-only design.
 
@@ -52,7 +55,7 @@ Each step is one branch and one PR. Steps that change a running agent need José
 | 1b | **MCP server for ticket-bay-bot (optional).** Run TicketBay with seed data as its own Linux user, and connect its MCP server with no key (public tools only) and a tool include-list without `my_orders` (customer data would bring back the private-data leg). | The bot answers "which events are coming up?" through MCP, and has no tool that returns customer data | done |
 | 2 | **Reduce Tania to the brain.** Remove the ticket-bay jobs, the gh token, the Gmail mount and the ticket-bay checkout. Move her to brain-server. Brain deploy key held by `sync-brain` on the host only. `skills/` and `AGENTS.md` mounted read-only; `sync-brain` refuses and alerts on commits that touch them. | Triage still runs; a commit touching `skills/` is refused and alerted | done |
 | 3 | **Egress control.** Tania's sandbox gets no network, and brain-triage runs without the web and browser toolsets. ticket-bay-bot's sandbox joins an internal Docker network whose only way out is a squid allowlist (`github.com`, `api.github.com`, `registry.npmjs.org`); npm install scripts are off. | A Python fetch of `example.com` fails from both sandboxes; `api.github.com` works from the bot's; brain-triage's session has no web or browser tool | done |
-| 4 | **Supply chain.** Pin `dmoka/skills` to a commit and bump it only after reading the diff. The pull runs as an unprivileged user, not root. Pin the Hermes version. Turn on Dependabot alerts (not version-update PRs) on the ticket-bay fork. | No root cron jobs; every external input is pinned; Dependabot alerts are on | todo |
+| 4 | **Supply chain.** `dmoka/skills` in a folder the bot can't write, owned by an unprivileged `skills-sync` user. It updates itself after a 7-day wait, and only if Hermes's skills guard finds nothing new. Hermes pinned. Dependabot alerts (not version-update PRs) on the ticket-bay fork. | No root cron jobs; every external input is pinned or gated; Dependabot alerts are on | done |
 | 5 | **Detection.** Tool-call logs shipped off the VPS. A canary token in the brain. A kill-switch runbook. | Using the canary sends an alert | todo |
 | 6 | **Verification.** Injection test suite (the email that worked, lesson 8.5's email 2, new ones) run against both agents. Safety audit rerun with probes. Before/after table, ADRs and postmortem written by José. | The done-when at the top holds | todo |
 
@@ -60,6 +63,12 @@ Each step is one branch and one PR. Steps that change a running agent need José
 
 - ticket-bay-bot's test gate: Hermes stopped waiting for a hook after 30 s, so a red verdict came too late.
   Timeout raised to 300 s on 2026-11-18; check on the next bug-loop run that edits code.
+
+- Dependabot on the fork: critical `next`, `better-auth` and MCP SDK alerts are in what `ticket-bay-app`
+  runs on the VPS, and the bot reaches it over MCP. Upgrade the app's checkout, or accept it as a
+  course fixture? Decide before step 6.
+- Step 4 proofs still to see: the first 07:55 message with a memory diff, and the first skills update
+  or block (no upstream commit since the pin yet).
 
 - Guidelines: should Tania's triage file into `guidelines/` directly, or into a proposals folder that
   José promotes? Her model once filed a capture as a guideline.
