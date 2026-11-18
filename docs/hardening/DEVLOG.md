@@ -214,6 +214,14 @@ refusal to the brain channel; GitHub's `main` didn't move. Test commit removed; 
 
 **Left for step 2:** brain-triage's first run with the new mounts (09:00) files the inbox and pushes.
 
+**2026-11-18 09:04, closed:** brain-triage filed all six inbox items, moved the originals to
+`sources/`, and lint came back clean. Her `node sync.mjs` committed but couldn't push from the sandbox
+("Host key verification failed", no key), as intended. The host's sync-brain pushed the commit to `main`
+as `Tania` (`66602ba`); it touches only notes, decisions, projects, sources and `index.md`. Step 2 done.
+- She reported "the local `origin/main` ref is 7 commits stale". That's expected: sync-brain fetches
+  from a fixed URL, not `origin`, so the clone's `origin/main` never moves. It misleads her report.
+- Every triage run will try that push and say so. Step 3's `--network=none` turns it into a DNS error.
+
 ## 2026-11-18: step 1b, TicketBay's MCP server for ticket-bay-bot
 
 **Two calls by José:**
