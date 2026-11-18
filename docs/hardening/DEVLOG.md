@@ -11,7 +11,7 @@
 | `docs/step-2-tania-brain-only` | 2 | merged (#5) |
 | `docs/step-1b-ticket-bay-mcp` | 1b | merged (#6) |
 | `docs/step-3-egress` | 3 | merged (#7) |
-| `docs/step-4-supply-chain` | 4 | in progress |
+| `docs/step-4-supply-chain` | 4 | PR open (#8) |
 
 ## 2026-11-17: safety audit and plan
 
