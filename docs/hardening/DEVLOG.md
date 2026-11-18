@@ -775,4 +775,5 @@ each turned tests red.
   from a backup check (AWS's "last used" record for the key). That record names the service, not
   where the request came from. It keeps only the most recent use, so the trigger history is the check.
 - Nothing on the VPS touched `archive/` today; Tania's web calls were httpbin.org and mindstudio.ai.
-- The key is still in the brain's git history, and its token stays on: it watches that copy.
+- José disabled the AWS key token afterwards. The key is still in the brain's git history, now
+  unwatched; a use of it alerts nobody. The URL canary is the only canary left.

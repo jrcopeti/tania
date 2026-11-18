@@ -12,9 +12,6 @@ bot's kill switch, then rebuild the VPS.
 - from anywhere else: the content already left, and someone is using it. Unless it was you: your own
   open, or a preview of the link on your Mac or phone.
 
-**An AWS key alert with `safety_net: True`** comes hours after the use, with no IP or user agent.
-Open the token's manage page and read the time of use in its history before acting.
-
 **A tripwire alert** names the tool, the session and the notes the call carried. The call went
 ahead: treat the notes named as gone. A search you asked for with a note's words in it fires it too.
 Every alert is also in `/home/agent/.local/state/exfil-tripwire/alerts.log`, kept even when Discord
