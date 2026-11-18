@@ -1,6 +1,7 @@
 # Kill switch: Tania
 
-**When:** a canary alert in brain-server `#alerts`, or a memory diff with something nobody saved.
+**When:** a canary or exfil-tripwire alert in brain-server `#alerts`, or a memory diff with something
+nobody saved.
 ticket-bay-bot keeps running; it shares nothing with Tania but the host. If the host itself looks
 compromised (a root login you don't know, a changed `/etc`, an unknown process), run this and the
 bot's kill switch, then rebuild the VPS.
@@ -10,6 +11,14 @@ bot's kill switch, then rebuild the VPS.
 - user agent `Discordbot`: she put it in a Discord reply and the link preview fetched it;
 - from anywhere else: the content already left, and someone is using it. Unless it was you: your own
   open, or a preview of the link on your Mac or phone.
+
+**An AWS key alert with `safety_net: True`** comes hours after the use, with no IP or user agent.
+Open the token's manage page and read the time of use in its history before acting.
+
+**A tripwire alert** names the tool, the session and the notes the call carried. The call went
+ahead: treat the notes named as gone. A search you asked for with a note's words in it fires it too.
+Every alert is also in `/home/agent/.local/state/exfil-tripwire/alerts.log`, kept even when Discord
+didn't get it.
 
 ## 1. Stop
 
