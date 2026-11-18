@@ -8,7 +8,8 @@
 | `ci/secret-scan-gate` | 0 | merged (#2) |
 | `docs/step-0-close` | 0 | merged (#3) |
 | `docs/step-1-ticket-bay-bot` | 1 | merged (#4) |
-| `docs/step-2-tania-brain-only` | 2 | in progress |
+| `docs/step-2-tania-brain-only` | 2 | merged (#5) |
+| `docs/step-1b-ticket-bay-mcp` | 1b | in progress |
 
 ## 2026-11-17: safety audit and plan
 
@@ -211,3 +212,41 @@ run once. It pulled the Mac's commits from while it was paused, refused the push
 refusal to the brain channel; GitHub's `main` didn't move. Test commit removed; sync-brain stays on.
 
 **Left for step 2:** brain-triage's first run with the new mounts (09:00) files the inbox and pushes.
+
+## 2026-11-18: step 1b, TicketBay's MCP server for ticket-bay-bot
+
+**Two calls by José:**
+- The app runs as a third Linux user, `ticket-bay-app`, with its own rootless Docker and linger.
+  Neither agent's user owns it.
+- No key. Without one, the server runs only the public tools (`list_events`, `get_event`,
+  `quote_price`, `search_docs`); every private tool, `my_orders` included, answers 401. The plan said
+  a read-only key, but that would put a secret on the VPS and let `my_orders` work if the include-list
+  ever slipped.
+
+**On the VPS:**
+- Root-owned clone of the fork in `/opt/ticket-bay-app/src`, checked out at one commit. The image is
+  built from it with [vps/ticket-bay-app/Dockerfile](../../vps/ticket-bay-app/Dockerfile), so the code
+  that runs is not the bot's `dev` clone, which the bot can write.
+- [compose.yaml](../../vps/ticket-bay-app/compose.yaml): Postgres (not published) and the app on
+  `127.0.0.1:3100`. The Postgres password and auth secret are random, in the app user's `~/app/.env`
+  (mode 600); they reach nothing outside these two containers.
+- Seed data only: 8 events, about 300 fake orders. The seed places events relative to the day it runs,
+  so they pass with time; rerun it if "upcoming" gets thin.
+- Image is 2.24 GB, because the seed and migrate scripts need the dev dependencies.
+
+**Checked from the host:** `tools/list` without a key shows all eight tools (the server lists them);
+`list_events` returns the seed events; `my_orders` returns HTTP 401. From inside the bot's sandbox,
+the app's port can't be reached (loopback refused, the host gateway times out): only the bot's Hermes
+process, on the host, connects.
+
+**Bot connected (José said yes):**
+- `mcp_servers.ticketbay` added to the bot's `config.yaml`: the loopback URL, no headers, and
+  `tools.include` with the four public tools. Backup in `config.yaml.bak-step1b`. Gateway restarted.
+- `hermes mcp test ticketbay`: connects with no auth, discovers 8 tools; `hermes mcp list` shows
+  4 selected.
+- **Done-when:** `hermes chat -q "which events are coming up?"`, run as the bot, called
+  `list_events` through MCP and listed the four upcoming seed events. Hermes wraps the result as
+  untrusted data. The tool catalog stored for that session holds only `get_event`, `list_events`,
+  `quote_price` and `search_docs`: no tool that returns customer data.
+- The MCP client is the bot's Hermes process on the host, not the sandbox. Step 3's sandbox allowlist
+  doesn't need the app's address; if step 3 also limits the host process, it does.
