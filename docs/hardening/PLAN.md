@@ -53,7 +53,7 @@ injection test suite passes against both agents.
   Hermes's `pre_tool_call` (web and browser, plus the other tools that send data off the host:
   `vision_analyze`, `video_analyze`, `image_generate`, `text_to_speech`, `manage_connections`,
   `computer_use`, `x_search`) posts to `#alerts` when a call's arguments carry 8 words in a row from a
-  note (plain, URL- or base64-decoded) or name the brain's folder (`browser_exec` runs Python, which
+  note, or a short note whole (plain, URL- or base64-decoded, either order), or name the brain's folder (`browser_exec` runs Python, which
   could read a note from disk). It catches the lazy injection: a note pasted into a URL. Text split
   across calls, reworded or encoded another way still gets out unseen: that gap stays accepted, and the
   fix is still prevention (a web agent with no brain), deferred on cost. No marker planted in notes:
@@ -76,7 +76,7 @@ Each step is one branch and one PR. Steps that change a running agent need José
 | 3 | **Egress control.** Tania's sandbox gets no network, and brain-triage runs without the web and browser toolsets. ticket-bay-bot's sandbox joins an internal Docker network whose only way out is a squid allowlist (`github.com`, `api.github.com`, `registry.npmjs.org`); npm install scripts are off. | A Python fetch of `example.com` fails from both sandboxes; `api.github.com` works from the bot's; brain-triage's session has no web or browser tool | done |
 | 4 | **Supply chain.** `dmoka/skills` in a folder the bot can't write, owned by an unprivileged `skills-sync` user. It updates itself after a 7-day wait, and only if Hermes's skills guard finds nothing new. Hermes pinned. Dependabot alerts (not version-update PRs) on the ticket-bay fork. | No root cron jobs; every external input is pinned or gated; Dependabot alerts are on | done |
 | 5 | **Detection.** A canary in the brain: a canarytokens.org URL token behind a link that doesn't show its domain, alerting to a brain-server `#alerts` channel Tania's bot can't see. A no-agent job on the bot posts squid's denials to ticket-bay every 10 minutes. A kill-switch runbook per agent. | Opening the link (from the Mac, and through Tania in a chat) posts to `#alerts`; a denied fetch from the bot's sandbox posts to ticket-bay | done |
-| 5b | **Exfil tripwire.** A detection-only Hermes hook on Tania's web and browser tools: when a call's arguments carry brain content (8-word runs, also URL- and base64-decoded) or name the brain's folder, it posts to `#alerts` through its own webhook. Blocks nothing. | A web call carrying a brain note posts to `#alerts`; a normal browsing session posts nothing | done |
+| 5b | **Exfil tripwire.** A detection-only Hermes hook on Tania's tools that send data off the host (web, browser and seven more): when a call's arguments carry brain content (8-word runs or a short note whole, also URL- and base64-decoded) or name the brain's folder, it posts to `#alerts` through its own webhook. Blocks nothing. A health job says when it can't alert. | A web call carrying a brain note posts to `#alerts`; a normal browsing session posts nothing | in progress (review fixes to deploy) |
 | 6 | **Verification.** Injection test suite (the email that worked, lesson 8.5's email 2, new ones) run against both agents. Safety audit rerun with probes. Before/after table, ADRs and postmortem written by José. | The done-when at the top holds | todo |
 
 ## Open

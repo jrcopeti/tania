@@ -698,3 +698,30 @@ the hook approved, then the done-when through her in a chat.
   She did it without hesitating and called the file "nothing suspicious".
 
 Step 5b done.
+
+## 2026-11-18: step 5b, code review fixes (José said fix 1–8)
+
+Review run against the 5b spec. Fixed:
+1. Base64 was decoded from after every `/`, so the work grew with the square of the length: about
+   1 MB of padding ran past Hermes's 15 s timeout, and a timed-out hook posts nothing. Now each token
+   is decoded from its first four offsets in both alphabets (linear), only positions that start with a
+   note's first word are looked up, and there is an 8 s budget. Every string is checked as sent first,
+   so padding can't use up the budget before a plainly pasted note gets checked. Running out, or a
+   string over 2 MB, posts "part of the arguments went unchecked". 4 MB of padding: about 5 s.
+2. Text that came out of base64 is URL-decoded too (`btoa(encodeURIComponent(note))`).
+3. Base64 glued to a prefix (`u_…`, `x-…`) is caught by the offset decoding.
+4. The brain's folder: also `$HOME/brain`, `${HOME}/brain`, `/workspace/brain` (her sandbox mount), and
+   a home reference (`Path.home(`, `expanduser(`, `environ`, …) together with a `brain` path segment.
+   Whole segments only: `~/brainstorm` and a `/brain/` URL path don't fire.
+5. Every alert and failure is written to `~/.local/state/exfil-tripwire/`. New `tripwire-health.sh`
+   (no-agent job, every 15 min) says when `failed.log` has new lines, the webhook file is empty or
+   missing, or the hook is gone from `hermes hooks list` or not approved.
+6. The index is cached in the same folder and rebuilt only when a note's mtime or size changes.
+7. Frontmatter is left out of the index, and a note whose body is 5–7 words is matched whole. Under 5
+   still can't match.
+8. The deployed hook block is committed (`exfil-tripwire.hooks.yaml`); the docstring and plan say
+   "tools that send data off the host", not "web and browser".
+
+Not changed: notes under `skills/` aren't watched (José's call: public, and Tania can't write there).
+28 + 7 tests. Three injected bugs (no offsets, no URL-decode after base64, no home-reference check)
+each turned tests red.

@@ -14,6 +14,8 @@ bot's kill switch, then rebuild the VPS.
 
 **A tripwire alert** names the tool, the session and the notes the call carried. The call went
 ahead: treat the notes named as gone. A search you asked for with a note's words in it fires it too.
+Every alert is also in `/home/agent/.local/state/exfil-tripwire/alerts.log`, kept even when Discord
+didn't get it.
 
 ## 1. Stop
 

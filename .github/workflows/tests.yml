@@ -58,3 +58,6 @@ jobs:
 
       - name: Test Tania's exfil tripwire
         run: bash vps/tania/test-exfil-tripwire.sh
+
+      - name: Test the tripwire's health check
+        run: bash vps/tania/test-tripwire-health.sh
