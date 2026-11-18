@@ -10,7 +10,8 @@
 | `docs/step-1-ticket-bay-bot` | 1 | merged (#4) |
 | `docs/step-2-tania-brain-only` | 2 | merged (#5) |
 | `docs/step-1b-ticket-bay-mcp` | 1b | merged (#6) |
-| `docs/step-3-egress` | 3 | PR open |
+| `docs/step-3-egress` | 3 | merged (#7) |
+| `docs/step-4-supply-chain` | 4 | PR open (#8) |
 
 ## 2026-11-17: safety audit and plan
 
@@ -421,3 +422,129 @@ works from the bot's, and brain-triage's sessions offer no web or browser tool. 
   Discord reconnected. Proof is the next bug-loop run that edits code: the gate's GREEN or RED should
   come back without the "timed out after 30s" warning.
 - Test PRs #14 and #15 closed with a comment, branches deleted.
+
+## 2026-11-18: step 4, inventory and design (nothing changed on the VPS yet)
+
+**Hermes:** one git install per Linux user (`~/.hermes/hermes-agent`, owned by that user, launcher in
+`~/.local/bin`). Both are on a detached HEAD at `v0.23.2` (`ae2a81c`), so neither moves unless someone
+runs `hermes update`. No cron job, timer or crontab updates them; `updates.check: true` only prints a
+banner. Nothing to pin except writing the commit down and checking it.
+
+**Crontabs:** none for root, `agent`, `ticket-bay-bot` or `ticket-bay-app`. `/etc/cron.d/skills-pull` is
+the only non-system entry: root runs `git pull --ff-only` in `/home/ticket-bay-bot/dev/skills` daily
+at 07:50. Unpinned: whatever `dmoka/skills` `main` holds at 07:50 is loaded the next run (now `1a6af1f`).
+
+**A gap the plan missed: the bot can replace its own skills.** The clone is root-owned, but its parent
+`~/dev` belongs to `ticket-bay-bot` and is mounted read-write in the sandbox. Owning the parent means
+the sandbox can rename `dev/skills` and put its own folder there. Hermes loads skills from
+`~/dev/skills/skills` (`skills.external_dirs`), so an injected bug-loop run could plant a skill that
+every later run follows: the persistence that turning off `memory` was meant to stop. Checked as the
+host user (`test -w ~/dev` passes); not tried from the sandbox. Root's pull then refuses the
+bot-owned folder (git's dubious-ownership check), so the planted copy would stay.
+
+**Where the bot uses the clone:** `skills.external_dirs`, the pr-triage prompt (in `jobs.json` and
+`~/tools/pr-triage-prompt.txt`; it runs `skills/pr-triage/scripts` in the sandbox) and
+`~/tools/publish-pr-review` (`skills/pr-tour/scripts/render.mjs`).
+
+**Dependabot on `jrcopeti/ticket-bay`:** alerts off (`vulnerability-alerts` returns 404), security
+updates off, no `dependabot.yml`.
+
+**Proposed:**
+- New system user `skills-sync`, no login. It owns `/opt/dmoka-skills`, a clone checked out detached at
+  `1a6af1f`. Mounted read-only into the bot's sandbox at the same path; `external_dirs`, the pr-triage
+  prompt and `publish-pr-review` point there. The old `~/dev/skills` is removed.
+- `/etc/cron.d/skills-pull` runs as `skills-sync` and only fetches. It writes the pinned commit and the
+  count of new upstream commits to the status file `pull-repos.sh` already reports. Bumping is by hand:
+  read `git diff <pin>..origin/main`, then check out the new commit.
+- Hermes: `updates.check: false` on both agents; the pin (`ae2a81c`) recorded here and checked at
+  done-when.
+- Dependabot alerts on for the fork (alerts only, no `dependabot.yml`).
+
+**Second gap: the bot can still write skills.** The `skills` toolset, left on in step 1, is
+`skills_list`, `skill_view` and `skill_manage`, and `skill_manage` can create and edit skills in
+`~/.hermes/skills`. That's the same persistence as `memory`, through another tool. No skill has been
+written there since setup. Hermes v0.23.2 turns toolsets off, not single tools, so the choice is the
+whole `skills` toolset: the prompts already give the scripts' paths, so the bot can read a skill with
+the file tool.
+
+## 2026-11-18: step 4, switched over (José said yes)
+
+**José's calls, changing the design above:**
+- Skills update on their own, without José reading each diff. Instead of a hand bump: a 7-day wait
+  counted from our own fetch log (commit dates can be backdated), then Hermes's skills guard on the
+  incoming commit. The pin already has findings (`agent-safety-audit` and `legacy-testing` read SSH
+  dirs and dump env vars, on purpose), so only findings the pin doesn't have block.
+- Memory on for ticket-bay-bot, and `skill_manage` stays on, so it learns. Accepted risk: an injected
+  run can save a memory every later run reads. A daily diff of what it saved goes to Discord.
+
+**Done, in order:**
+- System user `skills-sync` (no login, home `/var/lib/skills-sync`). `/opt/dmoka-skills` is its clone,
+  detached at `1a6af1f`; same files as the old clone. `/opt/hermes-guard`: root-owned sparse checkout of
+  hermes-agent `tools/` at `ae2a81c`, the commit both agents run, so the scan runs on the system Python
+  without touching either agent's install.
+- [skills-update.sh](../../vps/skills-sync/skills-update.sh) and
+  [scan-diff.py](../../vps/skills-sync/scan-diff.py) in `/usr/local/lib/skills-sync`. First run by hand:
+  `ok`, upstream logged. With the real guard, a line reading `~/.ssh` added to a copy of a skill gives
+  `high ssh_dir_access` and blocks. Tests: [test-skills-update.sh](../../vps/skills-sync/test-skills-update.sh),
+  14 cases, in CI.
+- `/etc/cron.d/skills-pull` runs it as `skills-sync` at 07:50. Root's old line is in
+  `/root/skills-pull.bak-step4`; its status file and logs are gone.
+- ticket-bay-bot (backups `*.bak-step4-*`): `external_dirs` → `/opt/dmoka-skills/skills`, sandbox mount
+  `/opt/dmoka-skills:/opt/dmoka-skills:ro`, `memory_enabled: true`, `memory` out of
+  `disabled_toolsets`, `updates.check: false`. pr-triage prompt (file and `jobs.json`, via
+  `hermes cron edit`) and `publish-pr-review` point at the new path. Sandbox container removed, gateway
+  restarted, Discord back, the nine dmoka skills listed as external. `~/dev/skills` deleted.
+- [pull-repos.sh](../../vps/ticket-bay-bot/pull-repos.sh) reads `/var/lib/skills-sync/status` and runs
+  [memory-diff.sh](../../vps/shared/memory-diff.sh), which snapshots `~/.hermes/memories` and
+  `~/.hermes/skills` into `~/.memory-audit.git` (not mounted in the sandbox) and prints the diff with the
+  line to undo it. Baseline taken: 304 files.
+- Tania: `updates.check: false`. No restart; it only stops the banner.
+- Dependabot alerts on `jrcopeti/ticket-bay` (204). Security-update PRs and `dependabot.yml` stay off.
+
+**Checked:** from a container with the bot's sandbox image and the same mounts (no agent run), the
+skills are readable, and `touch` and `mv` on `/opt/dmoka-skills` fail with "Read-only file system". The
+bot's host user can't write `/opt` or `/opt/dmoka-skills`. No crontab for any user; the only cron.d
+entry outside the system ones runs as `skills-sync`. Both Hermes installs are on `ae2a81c`.
+
+**Bumping Hermes** now means three places: both installs and `/opt/hermes-guard` (`git checkout` to
+the same commit). **Taking a blocked skills commit anyway:**
+`sudo -u skills-sync git -C /opt/dmoka-skills checkout --detach <sha>`, after reading it.
+
+**Dependabot's first count:** 6 critical, 14 high (half each runtime and development). Runtime ones
+include `next` (two unauthenticated RCEs, fixed in 16.4.1), `better-auth` (sign in as another user,
+1.7.7) and `@modelcontextprotocol/server` (2.3.0). `ticket-bay-app` on the VPS runs these versions,
+and the bot, which reads strangers' email, talks to it over MCP. Not changed: see Open in the plan.
+
+## 2026-11-18: step 4, end-to-end checks (José said yes to one pull-repos run)
+
+- skills-update on the VPS, as `skills-sync` in cron's bare environment, against a throwaway copy of the
+  repo (live clone untouched): a clean commit first seen 8 days ago was taken; the next one, adding a
+  line that reads `~/.ssh`, was blocked by the real skills guard (`high ssh_dir_access`). Cron reloaded
+  `/etc/cron.d/skills-pull` without complaint.
+- pull-repos run once with a test line in the skills status: it reached Discord. Status back to `ok`.
+- That run also posted `⚠️ memory-diff: git add failed`. Hermes starts cron scripts in
+  `~/.hermes/scripts`, inside the snapshot's work tree, so `memories` and `skills` resolved to
+  `scripts/memories` and `scripts/skills`. My first check ran from `/tmp` and missed it. Fixed: the
+  script `cd`s to the Hermes home and puts git's error in its message. Also fixed: the undo line used
+  `checkout HEAD~1`, which can't remove a memory file that's new; it's `restore --source=HEAD~1` now.
+  [test-memory-diff.sh](../../vps/shared/test-memory-diff.sh) starts every run in `scripts/`
+  (8 cases, in CI). `skills/.hub/audit.log` is left out as Hermes bookkeeping.
+- Fixed script deployed and run as the bot from `~/.hermes/scripts`: it reported the two new (empty)
+  hub files, then stayed silent. Not yet seen through Hermes itself: the next 07:55 run.
+
+## 2026-11-18: memory diff for Tania too (José said yes)
+
+- brain-triage keeps the `skills` toolset, so `skill_manage` can write `~/.hermes/skills` from a run
+  that reads captured pages; chats can write memory. Neither reaches the brain's git, and her triage
+  summary is the model's own account. Step 3 chose those toolsets without checking what `skills`
+  holds; found while answering whether Tania's memory is on.
+- `memory-diff.sh` moved to [vps/shared](../../vps/shared/memory-diff.sh), message made agent-neutral
+  (each agent posts to its own server). Same copy on both agents.
+- Tania: new no-agent job `memory-diff` (`631bffe94f19`), 09:30 and 21:30, half an hour after each
+  brain-triage. Baseline: `USER.md` and the bundled skills. Backup `jobs.json.bak-memorydiff-*`.
+- A command José rejected had already run on the VPS (script, baseline, job); a second try made a
+  duplicate job, removed (`44ebf34ce8d8`). Checked what ran only after `cron list` showed two.
+- End to end on both agents (José said yes to two runs each): a test file in `~/.hermes/skills`, the
+  job run (bot: `pull-repos`, Tania: `memory-diff`), then the file deleted and the job run again. Each
+  run posted the diff, the add and then the deletion, and the log shows all four delivered to Discord.
+  Test file gone; Tania's next scheduled run is 21:30.
