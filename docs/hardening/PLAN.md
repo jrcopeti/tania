@@ -49,10 +49,15 @@ injection test suite passes against both agents.
   go to Discord, in a channel Tania's bot can't read or delete. It is a link, not a fake secret: the
   brain's rules forbid secrets, so Tania flags one; Hermes masks AWS key IDs before she sees them; and a
   bare `canarytokens.com` URL gives itself away. A fake AWS key was tried and dropped: its alert never came.
-- **Gap accepted: Tania's web tool sending out notes other than the canary.** An injected page in a
-  chat can name a note and have her put it in a URL on an ordinary-looking domain; nothing fires.
-  Watching her URLs is noise, and matching brain text in them is beaten by encoding or chunking.
-  The fix is prevention (a web agent with no brain), already deferred on cost.
+- **Step 5b watches Tania's web and browser calls for brain text, and blocks nothing.** A hook on
+  Hermes's `pre_tool_call` posts to `#alerts` when a call's arguments carry 8 words in a row from a
+  note (plain, URL- or base64-decoded) or name the brain's folder (`browser_exec` runs Python, which
+  could read a note from disk). It catches the lazy injection: a note pasted into a URL. Text split
+  across calls, reworded or encoded another way still gets out unseen: that gap stays accepted, and the
+  fix is still prevention (a web agent with no brain), deferred on cost. No marker planted in notes:
+  text runs already catch a copied note, Tania would see the marker, and a page can tell her to strip
+  it. Published or rule files (`skills/`, `AGENTS.md`, `CLAUDE.md`, `README.md`) don't count. Its own
+  webhook, so a hijacked Tania who finds it can delete only the tripwire's posts, not the canary's.
 - **The Mac keeps its skill links** (`~/.claude/skills`, `~/.agents/skills` → `~/brain/skills`).
   Copies would break `install.mjs`'s links-only design.
 
@@ -69,7 +74,7 @@ Each step is one branch and one PR. Steps that change a running agent need José
 | 3 | **Egress control.** Tania's sandbox gets no network, and brain-triage runs without the web and browser toolsets. ticket-bay-bot's sandbox joins an internal Docker network whose only way out is a squid allowlist (`github.com`, `api.github.com`, `registry.npmjs.org`); npm install scripts are off. | A Python fetch of `example.com` fails from both sandboxes; `api.github.com` works from the bot's; brain-triage's session has no web or browser tool | done |
 | 4 | **Supply chain.** `dmoka/skills` in a folder the bot can't write, owned by an unprivileged `skills-sync` user. It updates itself after a 7-day wait, and only if Hermes's skills guard finds nothing new. Hermes pinned. Dependabot alerts (not version-update PRs) on the ticket-bay fork. | No root cron jobs; every external input is pinned or gated; Dependabot alerts are on | done |
 | 5 | **Detection.** A canary in the brain: a canarytokens.org URL token behind a link that doesn't show its domain, alerting to a brain-server `#alerts` channel Tania's bot can't see. A no-agent job on the bot posts squid's denials to ticket-bay every 10 minutes. A kill-switch runbook per agent. | Opening the link (from the Mac, and through Tania in a chat) posts to `#alerts`; a denied fetch from the bot's sandbox posts to ticket-bay | done |
-| 5b | **Exfil tripwire.** A detection-only Hermes hook on Tania's web and browser tools: when a call's arguments carry brain content (text runs, also URL- and base64-decoded, or a marker planted in every note), it posts to `#alerts`. Blocks nothing. | A web call carrying a brain note posts to `#alerts`; a normal browsing session posts nothing | todo |
+| 5b | **Exfil tripwire.** A detection-only Hermes hook on Tania's web and browser tools: when a call's arguments carry brain content (8-word runs, also URL- and base64-decoded) or name the brain's folder, it posts to `#alerts` through its own webhook. Blocks nothing. | A web call carrying a brain note posts to `#alerts`; a normal browsing session posts nothing | in progress |
 | 6 | **Verification.** Injection test suite (the email that worked, lesson 8.5's email 2, new ones) run against both agents. Safety audit rerun with probes. Before/after table, ADRs and postmortem written by José. | The done-when at the top holds | todo |
 
 ## Open
@@ -90,7 +95,7 @@ Each step is one branch and one PR. Steps that change a running agent need José
   they put on the VPS against each step's done-when, fixes on their own branch. After step 5.
 
 - Later detection options, not planned: ship tool-call logs off the VPS (evidence that survives root on
-  the host); flag Tania's outgoing URLs that carry brain text (catches the lazy injection only).
+  the host).
 
 - Guidelines: should Tania's triage file into `guidelines/` directly, or into a proposals folder that
   José promotes? Her model once filed a capture as a guideline.

@@ -644,3 +644,24 @@ mailbox and skipped (`wakeAgent=false`); the second picked it up.
   removed (her `MEMORY.md` is empty) and José starts a new chat with `/new`. A canary her memory knows
   is one a hijacked Tania skips.
 
+
+## 2026-11-18: step 5b, the exfil tripwire (code, not deployed)
+
+- `vps/tania/exfil-tripwire.py`, a shell hook for Hermes's `pre_tool_call` on `web_.*|browser_.*`.
+  It reads the brain on the host each call (about 37k words, 0.2 s), splits every note into 8-word
+  runs, and looks for them in every string of the call's arguments: as sent, URL-decoded (up to three
+  times), and base64-decoded (standard and URL-safe, padding optional, also after any `/` in a path).
+  Naming the brain's folder fires too: `browser_exec` runs Python, which could open a note from disk
+  and send it with nothing of the note in its arguments.
+- It prints `{}` and exits 0 whatever happens, so it never blocks. If it breaks it posts that the call
+  went unchecked. The alert names the tool, the session and the notes, never the arguments (a URL in
+  Discord gets previewed, which would finish the leak).
+- José's calls: no marker planted in notes; `skills/`, `AGENTS.md`, `CLAUDE.md` and `README.md` don't
+  count (published or rules); `sources/` and `inbox/` do.
+- Hermes docs name the payload's arguments `tool_input`; the course's v0.22.3 tests used `args`. The
+  hook reads either; `hermes hooks test` on the VPS settles which.
+- 14 tests (`test-exfil-tripwire.sh`), in CI.
+
+To do on the VPS, with José's yes: check Tania's web and browser tool names, `hermes hooks test` with a
+note in a URL, a second webhook in `#alerts` (the canary's webhook could delete the canary's alerts),
+the hook approved, then the done-when through her in a chat.
