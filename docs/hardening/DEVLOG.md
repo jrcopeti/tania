@@ -10,7 +10,7 @@
 | `docs/step-1-ticket-bay-bot` | 1 | merged (#4) |
 | `docs/step-2-tania-brain-only` | 2 | merged (#5) |
 | `docs/step-1b-ticket-bay-mcp` | 1b | merged (#6) |
-| `docs/step-3-egress` | 3 | in progress |
+| `docs/step-3-egress` | 3 | PR open |
 
 ## 2026-11-17: safety audit and plan
 
@@ -413,3 +413,11 @@ the bug on `lesson/8.5-start`; `main` already has the fix. The bug-loop prompt n
 
 **Done-when holds:** a Python fetch of `example.com` fails from both sandboxes, `api.github.com`
 works from the bot's, and brain-triage's sessions offer no web or browser tool. Step 3 done.
+
+## 2026-11-18: after step 3 (José said yes)
+
+- ticket-bay-bot: `plugins.hook_callback_timeout: 300` (Hermes clamps it at 600), so the test gate's
+  verdict arrives before the agent finishes. Backup `config.yaml.bak-hooktimeout-*`. Gateway restarted,
+  Discord reconnected. Proof is the next bug-loop run that edits code: the gate's GREEN or RED should
+  come back without the "timed out after 30s" warning.
+- Test PRs #14 and #15 closed with a comment, branches deleted.

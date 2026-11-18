@@ -58,8 +58,8 @@ Each step is one branch and one PR. Steps that change a running agent need José
 
 ## Open
 
-- ticket-bay-bot's test gate: Hermes stops waiting for a hook after 30 s (`plugins.hook_callback_timeout`),
-  so on a slow suite a red verdict comes too late to send the agent back. Raise the timeout.
+- ticket-bay-bot's test gate: Hermes stopped waiting for a hook after 30 s, so a red verdict came too late.
+  Timeout raised to 300 s on 2026-11-18; check on the next bug-loop run that edits code.
 
 - Guidelines: should Tania's triage file into `guidelines/` directly, or into a proposals folder that
   José promotes? Her model once filed a capture as a guideline.
