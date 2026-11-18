@@ -389,5 +389,17 @@ the bug on `lesson/8.5-start`; `main` already has the fix. The bug-loop prompt n
 `origin/lesson/8.5-start` and opens its PR against that branch, for one run. Original saved as
 `bug-loop-prompt.txt.bak-main`, to restore after the run.
 
-**Left for step 3:** pr-triage after its fix, a bug-loop run that opens a real PR through squid
+**Test runs, continued:**
+- pr-triage fixed (José said yes): the pre-script prints `OPEN PULL REQUESTS: <n>`. Rerun on #14: the
+  agent started, rated it low (comment-only, `groupDiscount` unchanged), noted it's a test PR, and
+  published the queue and tour pages.
+- bug-loop on the course email: it worked from `main`, where the bug is fixed, and answered "could not
+  reproduce" (unit tests green, no code changed, worktree and branch removed). It noted the defect is
+  only on `lesson/8.5-start`. Squid logged only `api.github.com`, `github.com` and the npm registry.
+- Why `main`: a Hermes cron job keeps its prompt in `jobs.json`. `~/tools/bug-loop-prompt.txt` is the
+  file it was made from, and editing it changes nothing. Set the job's prompt from the file with
+  `hermes cron edit <id> --prompt "$(cat <file>)"`. The claimed email can't be unclaimed, so the test
+  needs it sent again.
+
+**Left for step 3:**  a bug-loop run that opens a real PR through squid
 (`git push`, `gh pr create`), and the prompt put back to `main`.
