@@ -71,8 +71,8 @@ Each step is one branch and one PR. Steps that change a running agent need José
   reachable (they need plain HTTP); through Tania's host-side browser, `127.0.0.1:3100` is. Proposed,
   not started (José: not now): a `vps/runtime-patches` branch on the fork off `974f482` bumping only
   those three packages, the VPS app rebuilt from it, the fork's `main` untouched.
-- Step 4 proofs still to see: the first 07:55 message with a memory diff, and the first skills update
-  or block (no upstream commit since the pin yet).
+- Step 4 proof still to see: the first real skills update or block (no upstream commit since the pin
+  yet).
 
 - Guidelines: should Tania's triage file into `guidelines/` directly, or into a proposals folder that
   José promotes? Her model once filed a capture as a guideline.
