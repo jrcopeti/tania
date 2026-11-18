@@ -9,7 +9,8 @@
 | `docs/step-0-close` | 0 | merged (#3) |
 | `docs/step-1-ticket-bay-bot` | 1 | merged (#4) |
 | `docs/step-2-tania-brain-only` | 2 | merged (#5) |
-| `docs/step-1b-ticket-bay-mcp` | 1b | in progress |
+| `docs/step-1b-ticket-bay-mcp` | 1b | merged (#6) |
+| `docs/step-3-egress` | 3 | in progress |
 
 ## 2026-11-17: safety audit and plan
 
@@ -250,3 +251,45 @@ process, on the host, connects.
   `quote_price` and `search_docs`: no tool that returns customer data.
 - The MCP client is the bot's Hermes process on the host, not the sandbox. Step 3's sandbox allowlist
   doesn't need the app's address; if step 3 also limits the host process, it does.
+
+## 2026-11-18: step 3, design (nothing changed on the VPS yet)
+
+**What each sandbox needs from the network** (read from the prompts, hooks and skills):
+- Tania: nothing. `sync-brain` pushes and pulls on the host, the brain skills make no network calls, and
+  the web and browser tools run in the Hermes process on the host, not in the sandbox.
+- ticket-bay-bot: `github.com` (git fetch and push), `api.github.com` (`gh`), `registry.npmjs.org`
+  (`npm ci` in each run's new worktree). All 765 packages in the lockfile resolve from that registry.
+
+**Hermes's own egress proxy doesn't fit.** v0.23.2 ships `hermes egress` (iron-proxy): a host-side
+allowlist proxy that swaps model-provider keys. It routes the sandbox through `HTTPS_PROXY` but leaves it
+on a bridge with a route to the host, so a client that ignores the variable goes straight out. The
+sandbox also holds no provider key to swap.
+
+**Proposed:**
+- Tania: `terminal.docker_network: false`, so Hermes starts her sandbox with `--network=none`.
+- ticket-bay-bot: an internal network in its rootless Docker (`docker network create --internal`, no
+  route out, no outside DNS) and one squid container on that network and the default bridge. Squid
+  allows CONNECT to port 443 of the three hosts above and nothing else. The sandbox joins only the
+  internal network (`docker_extra_args`) and gets `HTTPS_PROXY` pointing at squid (`docker_env`).
+- npm: `NPM_CONFIG_IGNORE_SCRIPTS=true` in the bot's sandbox, so its plain `npm ci` runs no install
+  scripts. The eight packages with scripts are four esbuild copies (the binary comes from an optional
+  dependency), protobufjs (a version notice), fsevents (macOS only), and cpu-features and ssh2 (native
+  add-ons for testcontainers' Docker client, which the unit tests don't load). To check in a throwaway
+  container before switching.
+
+**Tania's web and browser (José's call):** they run in her Hermes process on the host, and he needs
+them on any site, so an allowlist can't cut them. Considered: a third agent for web work with no brain
+(too costly now); a host hook that sends URLs off a list to José for approval (too weak: browser clicks,
+form fills and page scripts get past it); routing her host process through squid (opening arbitrary
+pages would stop working). Chosen: chats keep web and browser as an accepted risk; brain-triage, her
+only unattended job and the one that reads captures, runs with `enabled_toolsets` without them. Hermes
+layers `agent.disabled_toolsets` on top, so a job's list can only narrow. Recorded in the plan.
+
+For reference, the course's M8 employee holds the brain, `gh`, the bug inbox, web and browser in one
+agent, guarded by a regex hook. That is the setup the audit flagged.
+
+**Still open:**
+- npm: allow the registry with install scripts off (above), or bake `node_modules` into the image as the
+  plan first said.
+- With `github.com` allowed and a write token, the bot can still push what it reads to its fork. What it
+  reads is one email and the repo.
