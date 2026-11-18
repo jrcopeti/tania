@@ -288,8 +288,37 @@ layers `agent.disabled_toolsets` on top, so a job's list can only narrow. Record
 For reference, the course's M8 employee holds the brain, `gh`, the bug inbox, web and browser in one
 agent, guarded by a regex hook. That is the setup the audit flagged.
 
-**Still open:**
-- npm: allow the registry with install scripts off (above), or bake `node_modules` into the image as the
-  plan first said.
-- With `github.com` allowed and a write token, the bot can still push what it reads to its fork. What it
-  reads is one email and the repo.
+**npm (José's call):** registry allowed, install scripts off (`NPM_CONFIG_IGNORE_SCRIPTS=true` in the
+sandbox). Baking `node_modules` into the image would break a fix that adds a dependency and needs a
+rebuild per lockfile change.
+
+**Still open:** with `github.com` allowed and a write token, the bot can still push what it reads to its
+fork. What it reads is one email and the repo.
+
+## 2026-11-18: step 3, throwaway tests (José said yes)
+
+Files: [compose.yaml](../../vps/ticket-bay-bot/egress/compose.yaml) and
+[squid.conf](../../vps/ticket-bay-bot/egress/squid.conf). Squid 6.13 (`ubuntu/squid`, pinned by
+digest) on `tbb-sandbox` (internal) and `tbb-outside`. Run in the bot's rootless Docker under test
+names, with a throwaway container from its sandbox image on the internal network:
+
+| Check | Result |
+|---|---|
+| Python `urlopen` of `example.com` through squid | 403 from squid |
+| The same with the proxy variables unset | no DNS |
+| Raw socket to a public IP on port 443 | network unreachable |
+| Plain HTTP through squid; CONNECT to `github.com:22` | 403 |
+| Python `urlopen` of `api.github.com` through squid | 200 |
+| `git ls-remote https://github.com/...` | works |
+| `npm ci` with scripts off, then `npm run test:unit` | 602 packages, 369 tests pass, esbuild binary present |
+
+Tania's image with `--network=none`: `example.com` and `api.github.com` both fail (no DNS, no interface
+but loopback).
+
+**Gotchas:**
+- Squid drops to user `proxy`, which can't open `/dev/stdout` or `/dev/stderr`: `stdio:` log targets
+  crash it. The access log stays in `/var/log/squid/access.log` in the container, for step 5 to ship.
+- Without `max_filedescriptors`, squid sizes its tables from Docker's fd limit and takes 660 MB. With
+  1024 it uses 13 MB.
+
+Nothing live changed; the test containers and networks are removed.
