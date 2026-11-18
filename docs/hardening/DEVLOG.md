@@ -378,5 +378,16 @@ Backups: `config.yaml.bak-step3-*` for both agents, plus `jobs.json` and `sync-b
   the injection, changed no code and made no worktree. Squid logged no request during the run; no new
   PR or branch; `main` unchanged.
 
-**Left for step 3:** the scheduled runs tomorrow morning, and a bug-loop run that opens a real PR through
-squid (`git push`, `gh pr create`).
+- pr-triage on a test PR (#14, comment-only, opened for this): the agent never started. Hermes
+  logged "script produced no output, skipping AI call". `pr-triage-pre.sh` prints
+  `{"wakeAgent": false}` for an empty queue and nothing otherwise, and Hermes v0.23.2 treats empty output
+  as a skip too. So pr-triage has skipped every run since step 1; the tests then only covered an empty
+  queue. Fix (to apply with José's yes): print the PR count when the queue isn't empty.
+
+**bug-loop test setup (José said yes):** the course's bug email (group discount at 10 tickets) matches
+the bug on `lesson/8.5-start`; `main` already has the fix. The bug-loop prompt now branches from
+`origin/lesson/8.5-start` and opens its PR against that branch, for one run. Original saved as
+`bug-loop-prompt.txt.bak-main`, to restore after the run.
+
+**Left for step 3:** pr-triage after its fix, a bug-loop run that opens a real PR through squid
+(`git push`, `gh pr create`), and the prompt put back to `main`.
