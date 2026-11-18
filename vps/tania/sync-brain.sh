@@ -33,6 +33,8 @@ g add -A || { say "git add failed"; exit 0; }
 g diff --cached --quiet || g commit -q -m "brain: sync $(date -u +%FT%H:%MZ)" || { say "commit failed"; exit 0; }
 out=$(g fetch -q "$REMOTE" main 2>&1) || { say "fetch failed: $out"; exit 0; }
 base=$(g rev-parse FETCH_HEAD)
+# Only for Tania's view of the clone: this script never reads origin/main back.
+g update-ref refs/remotes/origin/main "$base"
 if ! out=$(g rebase -q "$base" 2>&1); then
   g rebase --abort >/dev/null 2>&1
   say "conflict with GitHub, nothing pushed. Fix it in $B (git rebase $base). $out"
@@ -45,4 +47,5 @@ if [ -n "$bad" ]; then
   echo "Nothing was pushed, and nothing will be until they are gone. See: git -C $B log --stat $base..HEAD"
   exit 0
 fi
-[ "$(g rev-parse HEAD)" = "$base" ] || out=$(g push -q "$REMOTE" HEAD:main 2>&1) || say "push failed: $out"
+[ "$(g rev-parse HEAD)" = "$base" ] && exit 0
+if out=$(g push -q "$REMOTE" HEAD:main 2>&1); then g update-ref refs/remotes/origin/main HEAD; else say "push failed: $out"; fi

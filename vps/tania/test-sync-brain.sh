@@ -41,6 +41,13 @@ check "triage's git mv inbox -> sources is pushed" eval 'remote_has sources/x.md
 setup; echo change >> "$B/index.md"; sync
 check "index.md is pushed" eval 'silent && [ "$(git -C "$W/remote.git" show main:index.md | wc -l)" = 2 ]'
 
+setup; echo new > "$B/notes/new.md"; sync
+check "origin/main follows GitHub after a push" eval '[ "$(in_b rev-parse origin/main)" = "$(remote_head)" ]'
+
+setup; git clone -q "$W/remote.git" "$W/mac"; echo mac > "$W/mac/notes/m.md"
+git -C "$W/mac" add -A && git -C "$W/mac" commit -qm mac && git -C "$W/mac" push -q; sync
+check "origin/main follows GitHub with nothing to push" eval 'silent && [ "$(in_b rev-parse origin/main)" = "$(remote_head)" ]'
+
 setup; head=$(remote_head); sync
 check "nothing changed: silent, no push" eval 'silent && [ "$(remote_head)" = "$head" ]'
 
