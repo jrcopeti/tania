@@ -100,20 +100,12 @@ Each step is one branch and one PR. Steps that change a running agent need José
 
 - Steps 0–4 review: three fixes merged (#12) and deployed 2026-11-19. The rest, in this order (one
   branch and one PR each; anything that changes the VPS needs José's yes):
-  1. `fix/sync-brain-push-guard`: **redesigned, tested, not deployed.** The audit proved 13 more
-     breaks, all from one cause: host git ran in a `.git` she writes. Redesign (José, 2026-11-19):
-     sync-brain keeps its own clone in `~/.local/share/brain-push`, copies her files in with
-     `brain-files.py` (plain files and folders only, never through a link), pushes only allowed paths,
-     and writes GitHub's changes back the same way. Symlinks and gitlinks refused (José,
-     2026-11-19). Four adversarial rounds; 61 tests, green on git 2.56; 25 fail on `main`. Stopped at
-     four (José). Left, in order:
-     - PR, then deploy with José's yes. The read-only look is done (devlog): ext4, Python 3.12.3,
-       git 2.56.1, the old script in sync.
-     - Deploy: copy `sync-brain.sh` and `brain-files.py` to `~/.hermes/scripts/`, right after a run
-       of the old script (the first run takes her copy as GitHub's `main`).
-     - Live checks: step 2's done-when again (a `skills/` change is refused and alerted); from her
-       real sandbox, a root `HEAD` file, a FIFO and a symlinked folder are refused; a Mac edit to
-       `AGENTS.md` shows in her sandbox without a restart.
+  1. ~~`fix/sync-brain-push-guard`~~ **done** (#13, deployed and checked live 2026-11-19). The host
+     never runs git in a folder Tania writes: sync-brain keeps its own clone in
+     `~/.local/share/brain-push` and copies her files in with `brain-files.py`. Four adversarial
+     rounds; 61 tests on git 2.56. Live: step 2's done-when holds, links, FIFOs and a `HEAD` file
+     from her sandbox are refused, a Mac edit to `AGENTS.md` shows in her sandbox, and her first
+     push went out as `Tania`. Rollback: `sync-brain.sh.bak-redesign-*` (devlog).
   2. The bot's job workdir: bug-loop and pr-triage-morning run from `~/dev/ticket-bay`, which the
      sandbox writes, so a planted `.hermes.md` reaches their next prompt. Move the workdir to a folder
      the sandbox can't write (prompts use absolute paths), or José accepts it like memory. Same
