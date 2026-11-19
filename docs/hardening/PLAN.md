@@ -27,9 +27,11 @@ injection test suite passes against both agents.
   and Tania pulls them read-only. Tania never writes a brain skill: she leaves a note in the inbox instead.
   Her own Hermes skills (`~/.hermes/skills`) are another matter: see the next decision.
   Project skills stay in their project; ticket-bay-bot's skills come from `dmoka/skills`.
-- **No Renovate on the ticket-bay fork.** Upstream owns its dependency versions; updating them in the
-  fork makes it drift from the lessons. Renovate (proposes) + ticket-bay-bot (reviews) + José (merges)
-  is for a repo José owns, such as trip-ai.
+- **The ticket-bay fork gets security patches, not Renovate** (José, 2026-11-19). Upstream owns its
+  dependency versions, so routine updates stay off: the fork would drift from the lessons. A Dependabot
+  alert on what the VPS runs is fixed on the fork's `main` with the smallest version that closes it,
+  by hand, one PR (#17 did `next`, `better-auth` and the MCP SDK). Renovate (proposes) + ticket-bay-bot
+  (reviews) + José (merges) is for a repo José owns, such as trip-ai.
 - **The brain stays one repo.** Tania can't change `skills/` or `AGENTS.md`: they are mounted
   read-only in her sandbox, only `sync-brain` on the host holds the push key, and it refuses commits
   that touch those paths. Splitting out a `brain-skills` repo is a possible later ADR, not needed now.
