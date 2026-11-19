@@ -141,7 +141,9 @@ Each step is one branch and one PR. Steps that change a running agent need José
 - Guidelines: should Tania's triage file into `guidelines/` directly, or into a proposals folder that
   José promotes? Her model once filed a capture as a guideline.
 - Lesson 8.5 (email 2, steps 14 and 15) and 8.6: run them on ticket-bay-bot after step 1.
-- Step 6: classic branch protection on the fork's `main` is gone (the ruleset still holds): José's call.
+- Step 6: classic branch protection on the fork's `main` is gone; left so (José): the `main` ruleset has
+  the same rules. B7 (an injected PR from a second account) skipped, and no B1 rerun on the fallback
+  models (José).
 
 ## Rules for this repo
 
