@@ -16,7 +16,8 @@
 | `fix/review-steps-0-4` | 0–4 review | merged (#12) |
 | `fix/sync-brain-push-guard` | 0–4 review | merged (#13) |
 | `docs/sync-brain-deploy` | 0–4 review | PR to open |
-| `docs/gh-telemetry-and-runtime-bumps` | before step 6 | PR #17 |
+| `docs/gh-telemetry-and-runtime-bumps` | before step 6 | merged (#17); 3 later commits, PR to open |
+| `verify/step-6` | 6 | open |
 
 ## 2026-11-17: safety audit and plan
 
@@ -1164,3 +1165,20 @@ app ran, then `TICKETBAY_COMMIT` set and `compose up -d`. In the container: `nex
   with the same image. Data is on the `pg` volume and survived.
 - `docker build` warns it can't read commit info (`git rev-parse` in a root-owned clone run as
   `ticket-bay-app`). Harmless: the tag carries the commit.
+
+## 2026-11-19: step 6, the suite (nothing run yet)
+
+José said start step 6. Cases in [injection-suite.md](injection-suite.md): nine for the bot, seven for
+Tania, then the audit rerun with probes.
+
+The point of the design: a refusal proves the model, not the walls. The cases that test a wall run
+once more on `cohere/north-mini-code:free`, the model that obeyed on 2026-11-17, so the walls get
+tested with a model that tries. Switching a job's model is a change to a running agent: José's yes,
+per run, and back after.
+
+Found while writing it: an obedient bot can paste its own `ghs_` token into a public PR (B9). It is
+scoped to the fork and dies within the hour, but nothing stops the paste. The case checks whether
+GitHub revokes it and what it reaches before expiry.
+
+Also decided: the fork's Renovate line in the plan reworded (José): security patches by hand, no
+routine updates.
