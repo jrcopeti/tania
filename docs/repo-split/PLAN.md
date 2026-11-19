@@ -47,7 +47,5 @@ Each step stops for José's yes before any commit, push, repo setting or SSH com
 
 ## Open
 
-- Six deployed scripts have never been in either repo. Tania's: `agent-hooks/guard-network.sh`. The
-  bot's: `bug-loop-pre.sh`, `pr-triage-pre.sh`, `mint-gh-token.sh`, `verify-tests.sh` and
-  `agent-hooks/guard-network.sh`. This predates the split. Bringing them in means reading each for
-  secrets first: José's call.
+- Six deployed scripts had never been in either repo. Tania's `guard-network.sh` is now in
+  `vps/tania/`. The bot's five are tracked in the bot repo's own plan.
