@@ -95,6 +95,11 @@ Each step is one branch and one PR. Steps that change a running agent need José
   reachable (they need plain HTTP); through Tania's host-side browser, `127.0.0.1:3100` is. Proposed,
   not started (José: not now): a `vps/runtime-patches` branch on the fork off `974f482` bumping only
   those three packages, the VPS app rebuilt from it, the fork's `main` untouched.
+- gh telemetry: `gh` 2.104 in the bot's sandbox sends usage events to `cafe.github.com`; squid denies
+  them and squid-denials posts an alert (first seen 2026-11-19, two during a pr-triage run). Harmless,
+  but noise that hides a real denial. Fix: add `GH_TELEMETRY: "false"` and `DO_NOT_TRACK: "1"` to the
+  bot's `terminal.docker_env` in `config.yaml` (José's yes; likely a gateway restart), then check no
+  more `cafe.github.com` lines after a pr-triage run.
 - Step 4 proof still to see: the first real skills update or block (no upstream commit since the pin
   yet).
 
@@ -106,11 +111,11 @@ Each step is one branch and one PR. Steps that change a running agent need José
      rounds; 61 tests on git 2.56. Live: step 2's done-when holds, links, FIFOs and a `HEAD` file
      from her sandbox are refused, a Mac edit to `AGENTS.md` shows in her sandbox, and her first
      push went out as `Tania`. Rollback: `sync-brain.sh.bak-redesign-*` (devlog).
-  2. The bot's job workdir: bug-loop and pr-triage-morning run from `~/dev/ticket-bay`, which the
-     sandbox writes, so a planted `.hermes.md` reaches their next prompt. Move the workdir to a folder
-     the sandbox can't write (prompts use absolute paths), or José accepts it like memory. Same
-     branch: pin `postgres:17` and `node:22-bookworm-slim` in `vps/ticket-bay-app` by digest (step
-     4's "every external input is pinned").
+  2. ~~`fix/bot-workdir-and-pins`~~ **done** (deployed 2026-11-19). bug-loop and pr-triage-morning
+     have no workdir any more: Hermes loads no project context file for them, runs their pre-scripts
+     elsewhere, and its 6-hourly worktree sweep (host `git status`) no longer looks at the clone. The
+     test gate's path rewrite fixed. `postgres:17` and `node:22-bookworm-slim` pinned by digest.
+     Both jobs checked with a run; a planted `.hermes.md` didn't reach pr-triage-morning's answer.
   3. Audit `vps/skills-sync/` and the squid config (`vps/ticket-bay-bot/egress/`) with the
      adversarial tester, module by module.
   José's calls, no fix planned: the skills guard matches findings per skill, pattern and file (a
