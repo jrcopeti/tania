@@ -5,7 +5,8 @@
 | Branch | Step | State |
 |---|---|---|
 | `docs/rename-devlog-and-showcase` | plan | merged (#31) |
-| `docs/threat-model` | 2 | open |
+| `docs/threat-model` | 2 | merged (#33) |
+| `docs/before-after` | 4 | open |
 
 ## 2026-11-19: plan
 
@@ -32,3 +33,11 @@
 - Asked whether to cut the `cronjob` toolset in chats, or web and browser. The owner's call: leave
   them all as they are. Not checked: whether a job created from a chat runs with the chat's web
   tools, which would make it an unattended job with all three legs.
+
+## 2026-11-20: before/after table
+
+- Threat model merged (#33). Drafted the before/after table from the two audits, as tables per leg,
+  per session, persistence and detection, plus the Mac skill path that motivated `skills/` read-only.
+- It covers both agents: before hardening one agent ran the bug loop and the brain, so a Telma-only
+  table would hide the main fix (the split). It links ticket-bay-bot's repo for the bot's depth.
+- Says "the owner" throughout. Needs the owner's approval in the PR.

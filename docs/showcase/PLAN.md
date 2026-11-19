@@ -23,9 +23,9 @@ does.
 | # | Doc | Notes | Status |
 |---|---|---|---|
 | 1 | **README** | Written with the `crafting-effective-readmes` skill, "personal" (portfolio) template. Carries the "formerly" line from rename step 7. Shows Telma's brain work only (chat capture, ask-brain, triage summary), with screenshots from José (shot list below); one section introduces ticket-bay-bot and links its repo, which shows the bug loop. Links the threat model, ADRs, postmortem. | |
-| 2 | **Threat model** | [threat-model.md](../threat-model.md): the lethal trifecta per session, which leg each control cuts, and the accepted risks from the hardening plan's Decisions. | in review |
+| 2 | **Threat model** | [threat-model.md](../threat-model.md): the lethal trifecta per session, which leg each control cuts, and the accepted risks from the hardening plan's Decisions. | done (#33) |
 | 3 | **ADRs** | One per lasting decision José picks, for example the two-agent split, the repo split, sync-brain never running git in a sandbox folder, the exfil tripwire. | |
-| 4 | **Before/after table** | From [audit-before.md](../hardening/audit-before.md) and [audit-after.md](../hardening/audit-after.md). | |
+| 4 | **Before/after table** | [before-after.md](../before-after.md), from [audit-before.md](../hardening/audit-before.md) and [audit-after.md](../hardening/audit-after.md). Covers both agents, since one agent did both jobs before. | in review |
 
 ## Open
 
