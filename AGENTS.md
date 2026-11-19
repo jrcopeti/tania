@@ -4,8 +4,9 @@ Showcase repo for Telma, a Hermes agent on a VPS that keeps José's brain. She s
 ticket-bay-bot (jrcopeti/ticket-bay-bot) and nothing else; the repos are split along the same trust
 boundary as the agents.
 
-- **Start here:** `docs/repo-split/PLAN.md`, then `DEVLOG.md` beside it. Keep both current. The
-  hardening history is in `docs/hardening/`.
+- **Start here:** `docs/rename/PLAN.md` (closing) and `docs/showcase/PLAN.md`, each with the
+  `DEVLOG.md` beside it. Keep both current. Finished work: `docs/hardening/` (frozen) and
+  `docs/repo-split/`.
 - **Running agents:** ask José before resuming, triggering (`hermes cron run`) or switching on any job,
   every time. After an interrupted command, check what partly ran before saying nothing ran: remote
   commands keep running.
@@ -14,4 +15,4 @@ boundary as the agents.
 - **No secrets or personal data:** no keys, webhook URLs, inbox address, Discord IDs, IP addresses,
   private repo names.
 - **Public prose** (README, threat model, ADRs, postmortem) is José's to write.
-- **Brain inbox:** recent Telma decisions not yet triaged are in `~/brain/inbox/` (items dated 2026-11-17).
+- **Brain inbox:** recent Telma decisions not yet triaged are in `~/brain/inbox/`.
