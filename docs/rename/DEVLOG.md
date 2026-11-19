@@ -78,7 +78,7 @@
 a search by filename. Nothing changed. False positives skipped: "Mauritania" in `rich`'s emoji
 table, and Polish "zapytania" in a pnpm-cached TypeScript locale.
 
-Still live, each in Open in [PLAN.md](PLAN.md):
+Still live (fixed later that night, see the next entry):
 
 - **The PR-review links are dead.** `tailscale serve` still serves `tania-vps.…:8443`, and the bot's
   pr-triage prompt (in `jobs.json` and `~/tools/pr-triage-prompt.txt`) links there. Since step 6
