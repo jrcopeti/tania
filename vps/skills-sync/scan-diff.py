@@ -4,6 +4,7 @@ Exit 0: nothing new above low. Exit 1: new findings, one per line. Exit 2: the s
 The whole repo is scanned as one unit: the bot's sandbox mounts all of it, and a skill can point at any file.
 Findings are matched on pattern and path, not line, so moved code doesn't count as new."""
 import os
+import re
 import sys
 from collections import namedtuple
 from pathlib import Path
@@ -44,7 +45,16 @@ except Exception as e:
     print(repr(e), file=sys.stderr)
     sys.exit(2)
 
+# The lines end up in a Discord post, and upstream picks the file names: keep them short, with no
+# characters that make mentions, links or markdown.
+def safe(name):
+    name = re.sub(r"[^A-Za-z0-9._/-]", "?", name)
+    return name if len(name) <= 80 else name[:77] + "..."
+
+
 added = [f for k, f in sorted(after.items()) if k not in before and f.severity != "low"]
-for f in added:
-    print(f"{f.severity} {f.pattern_id} in {f.file}:{f.line}")
+for f in added[:5]:
+    print(f"{f.severity} {safe(f.pattern_id)} in {safe(f.file)}:{f.line}")
+if len(added) > 5:
+    print(f"and {len(added) - 5} more")
 sys.exit(1 if added else 0)
