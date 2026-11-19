@@ -1,4 +1,4 @@
-"""Hermes pre_tool_call hook on Tania's tools that send data off the host (matcher in
+"""Hermes pre_tool_call hook on Telma's tools that send data off the host (matcher in
 exfil-tripwire.hooks.yaml): post to #alerts when a call's arguments carry brain text, plain, URL- or
 base64-encoded (either order), or name the brain's folder. Detection only: it always prints {} and
 exits 0, so the call goes ahead. Catches a note sent whole or in long runs; text split across calls,
@@ -206,7 +206,7 @@ def main():
         hits = check(payload.get("tool_input") or payload.get("args") or {})
         if hits:
             what = "carries brain content" if set(hits) - {UNCHECKED} else "was too large to check in full"
-            lines = [f"🚨 exfil-tripwire: Tania's {code(tool)} call {what} "
+            lines = [f"🚨 exfil-tripwire: Telma's {code(tool)} call {what} "
                      f"(session {code(payload.get('session_id') or '?')}). The call went ahead; "
                      "its arguments are not repeated here. See the kill switch."]
             for src, how in sorted(hits.items())[:10]:

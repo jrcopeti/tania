@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""File moves between Tania's brain (her sandbox writes it) and sync-brain's own clone (host only).
+"""File moves between Telma's brain (her sandbox writes it) and sync-brain's own clone (host only).
 
   export BRAIN DEST QUARANTINE [ROOT_NAME...]   copy her files into DEST, move out instruction files
   apply SRC BRAIN < name-status                 write `git diff --name-status -z` changes from SRC
@@ -9,7 +9,7 @@ Every folder in BRAIN is opened relative to its parent and never through a symli
 swaps for a link mid-run can't send a read or a write outside the brain. Prints only problems, as
 Discord text with her names in a code block. Exit 0 ok, 3 refused or failed something, 1 error.
 ROOT_NAME: names at the brain's root that come from GitHub (José's): not quarantined, and nor is
-anything inside them except in Tania's folders (ALLOWED_TOP, sync-brain.sh's ALLOWED).
+anything inside them except in Telma's folders (ALLOWED_TOP, sync-brain.sh's ALLOWED).
 """
 import errno
 import os
@@ -180,7 +180,7 @@ def export(brain, dest, quarantine, root_names):
     finally:
         os.close(root)
     if moved:
-        print("⚠️ sync-brain: moved these out of the brain. Tania may have planted them as instructions: "
+        print("⚠️ sync-brain: moved these out of the brain. Telma may have planted them as instructions: "
               "read them before deleting.\n" + block(moved))
     if refused:
         print("🚫 sync-brain: refused to push. Only plain files and folders go out:\n" + block(refused)
@@ -276,7 +276,7 @@ def apply(src, brain):
     finally:
         os.close(root)
     if failed:
-        print("⚠️ sync-brain: could not update these in Tania's copy of the brain:\n" + block(failed))
+        print("⚠️ sync-brain: could not update these in Telma's copy of the brain:\n" + block(failed))
         return 3
     return 0
 
