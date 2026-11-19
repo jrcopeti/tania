@@ -35,17 +35,18 @@ its copy in one of the two repos.
 
 ## Steps
 
-Each step stops for José's yes before any commit, push, repo setting or SSH command.
+Each step stops for José's yes before any commit, push, repo setting or SSH command. From
+2026-11-19 on, PRs open without asking and José merges them; VPS changes still wait for his yes.
 
 | # | Step | Done when | Status |
 |---|---|---|---|
 | 1 | **Plan.** This file and the devlog, one PR. | Merged | done (#21) |
 | 2 | **Tag.** `pre-split` on `main` after step 1, pushed. | The tag is on GitHub | done (`43a7b25`) |
 | 3 | **Bot repo.** Create `jrcopeti/ticket-bay-bot`, public and empty. Build the import from `pre-split`: the bot's files, with only the forced lines changed and a printed diff against the tag for review. Add the bot's `memory-diff.sh` and its test, `AGENTS.md`, `CLAUDE.md`, `.githooks/`, `.gitleaks.toml`, both workflows (bot jobs only), `docs/hardening/{PLAN,DEVLOG}.md` and `vps/host.md`. Push to `main`, then switch on the ruleset. | CI green (tests and gitleaks on the full history), ruleset active | done (`b2a060d`) |
-| 4 | **Tania without the bot.** Delete the bot's files. Move `vps/shared/` to `vps/tania/`. Remove the bot jobs from `tests.yml`. Pin the links, freeze the hardening PLAN, add `vps/host.md`, link the kill switch, and update `AGENTS.md`. Opened only after step 3 is green. | Merged, CI green, no link to a missing file | in review |
+| 4 | **Tania without the bot.** Delete the bot's files. Move `vps/shared/` to `vps/tania/`. Remove the bot jobs from `tests.yml`. Pin the links, freeze the hardening PLAN, add `vps/host.md`, link the kill switch, and update `AGENTS.md`. Opened only after step 3 is green. | Merged, CI green, no link to a missing file | done (#22) |
 | 5 | **VPS check.** Read-only over SSH: sha256 of every deployed script against its copy in either repo. | Every deployed script matches, or each difference is explained | done |
 
 ## Open
 
-- Six deployed scripts had never been in either repo. Tania's `guard-network.sh` is now in
-  `vps/tania/`. The bot's five are tracked in the bot repo's own plan.
+- Done. The files no repo held are now in one: Tania's `guard-network.sh` and sandbox `Dockerfile`
+  here (#24 and this PR), the bot's in jrcopeti/ticket-bay-bot (#2, #5 and its sandbox PR).

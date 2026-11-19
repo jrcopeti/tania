@@ -19,6 +19,7 @@ Copied by hand; `~` is Tania's home, `/home/agent`.
 | In this repo | On the VPS |
 |---|---|
 | `tania/guard-network.sh` | `~/.hermes/agent-hooks/` |
+| `tania/sandbox/Dockerfile` | `~/sandbox/` |
 
 ## Rules for the whole host
 

@@ -61,3 +61,15 @@ Gotcha: in zsh, a loop variable named `path` overwrites `PATH`, and every comman
   changed. Read first: it holds no secret, only patterns (`/opt/secrets`, `app-password`) it blocks.
 - The bot's deployed copy is identical to this one; it gets its own PR in jrcopeti/ticket-bay-bot.
 - `vps/host.md` now maps the file to its path on the VPS. No test yet: the hook needs a Hermes payload.
+
+## 2026-11-19: second checksum, the split is done
+
+Read-only over SSH, sha256 of every non-test file in both repos against the VPS. All match except
+three, each explained: both `memory-diff.sh` copies (comment lines only, as before) and the bot's
+`support-inbox` (the inbox address, kept out of the repo). Not deployed as files: the
+`exfil-tripwire.hooks.yaml` snippet, which lives inside Hermes's `config.yaml`.
+
+Found: each agent's sandbox `Dockerfile` (`~/sandbox/`) was in no repo. Not course-kit code, no
+secret. Tania's is added here byte for byte; the bot's differs in one line (`AGENT_EMAIL` build arg)
+and goes to its own repo. Every "Done when" condition now holds: CI green and the `main` ruleset on in
+both repos, no dead relative link in either.
