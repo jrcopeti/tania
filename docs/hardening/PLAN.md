@@ -1,5 +1,8 @@
 # Hardening: split Tania by trust boundary
 
+**Frozen at tag `pre-split` (2026-11-19).** ticket-bay-bot moved to its own repo,
+[jrcopeti/ticket-bay-bot](https://github.com/jrcopeti/ticket-bay-bot); see [the repo split](../repo-split/PLAN.md).
+
 **Goal:** no agent on the VPS holds all three legs of the lethal trifecta (private data, untrusted
 input, a way out). Every control is enforced by permissions, mounts or the network, not by prompts
 or command regexes.
@@ -16,7 +19,9 @@ injection test suite passes against both agents.
 - **Two agents, one per trust level.** Tania does the brain only. `ticket-bay-bot` does the bug loop
   and PR triage. Both run on the same VPS, as separate Linux users with their own rootless Docker and
   Hermes home. Each has its own Discord bot and server (brain-server, ticket-bay).
-- **One showcase repo for both agents.** They share the host, the hardening and the threat model.
+- ~~**One showcase repo for both agents.** They share the host, the hardening and the threat model.~~
+  Superseded 2026-11-19 by [the repo split](../repo-split/PLAN.md): one repo per agent, along the
+  trust boundary.
 - **One OpenRouter key per agent,** each with its own credit limit.
 - **GitHub identity: an App, not a machine account.** `ticket-bay-bot` is a GitHub App owned by José's
   account and installed on ticket-bay only; its PRs show as `ticket-bay-bot[bot]`, with 1-hour tokens.

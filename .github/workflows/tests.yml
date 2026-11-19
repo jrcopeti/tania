@@ -19,16 +19,6 @@ jobs:
       - name: Test Tania's brain push guard
         run: bash vps/tania/test-sync-brain.sh
 
-  skills-update:
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-
-      - name: Test ticket-bay-bot's skills update
-        run: bash vps/skills-sync/test-skills-update.sh
-
   memory-diff:
     runs-on: ubuntu-24.04
     steps:
@@ -36,38 +26,8 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Test the agents' memory diff
-        run: bash vps/shared/test-memory-diff.sh
-
-  pull-repos:
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-
-      - name: Test ticket-bay-bot's daily report
-        run: bash vps/ticket-bay-bot/test-pull-repos.sh
-
-  squid-denials:
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-
-      - name: Test ticket-bay-bot's squid-deny alert
-        run: bash vps/ticket-bay-bot/test-squid-denials.sh
-
-  egress:
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-
-      - name: Test ticket-bay-bot's squid allowlist (Docker)
-        run: bash vps/ticket-bay-bot/egress/test-egress.sh
+      - name: Test Tania's memory diff
+        run: bash vps/tania/test-memory-diff.sh
 
   exfil-tripwire:
     runs-on: ubuntu-24.04

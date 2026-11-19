@@ -1,7 +1,8 @@
 # Tania
 
-Showcase repo for two Hermes agents on one VPS: Tania (the brain) and ticket-bay-bot (bug loop and
-PR triage), split by trust boundary.
+Showcase repo for Tania, a Hermes agent on a VPS that keeps José's brain. She shares the host with
+ticket-bay-bot (jrcopeti/ticket-bay-bot) and nothing else; the repos are split along the same trust
+boundary as the agents.
 
 - **Start here:** `docs/repo-split/PLAN.md`, then `DEVLOG.md` beside it. Keep both current. The
   hardening history is in `docs/hardening/`.

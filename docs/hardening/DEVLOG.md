@@ -241,9 +241,9 @@ as `Tania` (`66602ba`); it touches only notes, decisions, projects, sources and 
 
 **On the VPS:**
 - Root-owned clone of the fork in `/opt/ticket-bay-app/src`, checked out at one commit. The image is
-  built from it with [vps/ticket-bay-app/Dockerfile](../../vps/ticket-bay-app/Dockerfile), so the code
+  built from it with [vps/ticket-bay-app/Dockerfile](https://github.com/jrcopeti/tania/blob/pre-split/vps/ticket-bay-app/Dockerfile), so the code
   that runs is not the bot's `dev` clone, which the bot can write.
-- [compose.yaml](../../vps/ticket-bay-app/compose.yaml): Postgres (not published) and the app on
+- [compose.yaml](https://github.com/jrcopeti/tania/blob/pre-split/vps/ticket-bay-app/compose.yaml): Postgres (not published) and the app on
   `127.0.0.1:3100`. The Postgres password and auth secret are random, in the app user's `~/app/.env`
   (mode 600); they reach nothing outside these two containers.
 - Seed data only: 8 events, about 300 fake orders. The seed places events relative to the day it runs,
@@ -312,8 +312,8 @@ fork. What it reads is one email and the repo.
 
 ## 2026-11-18: step 3, throwaway tests (José said yes)
 
-Files: [compose.yaml](../../vps/ticket-bay-bot/egress/compose.yaml) and
-[squid.conf](../../vps/ticket-bay-bot/egress/squid.conf). Squid 6.13 (`ubuntu/squid`, pinned by
+Files: [compose.yaml](https://github.com/jrcopeti/tania/blob/pre-split/vps/ticket-bay-bot/egress/compose.yaml) and
+[squid.conf](https://github.com/jrcopeti/tania/blob/pre-split/vps/ticket-bay-bot/egress/squid.conf). Squid 6.13 (`ubuntu/squid`, pinned by
 digest) on `tbb-sandbox` (internal) and `tbb-outside`. Run in the bot's rootless Docker under test
 names, with a throwaway container from its sandbox image on the internal network:
 
@@ -488,10 +488,10 @@ the file tool.
   detached at `1a6af1f`; same files as the old clone. `/opt/hermes-guard`: root-owned sparse checkout of
   hermes-agent `tools/` at `ae2a81c`, the commit both agents run, so the scan runs on the system Python
   without touching either agent's install.
-- [skills-update.sh](../../vps/skills-sync/skills-update.sh) and
-  [scan-diff.py](../../vps/skills-sync/scan-diff.py) in `/usr/local/lib/skills-sync`. First run by hand:
+- [skills-update.sh](https://github.com/jrcopeti/tania/blob/pre-split/vps/skills-sync/skills-update.sh) and
+  [scan-diff.py](https://github.com/jrcopeti/tania/blob/pre-split/vps/skills-sync/scan-diff.py) in `/usr/local/lib/skills-sync`. First run by hand:
   `ok`, upstream logged. With the real guard, a line reading `~/.ssh` added to a copy of a skill gives
-  `high ssh_dir_access` and blocks. Tests: [test-skills-update.sh](../../vps/skills-sync/test-skills-update.sh),
+  `high ssh_dir_access` and blocks. Tests: [test-skills-update.sh](https://github.com/jrcopeti/tania/blob/pre-split/vps/skills-sync/test-skills-update.sh),
   14 cases, in CI.
 - `/etc/cron.d/skills-pull` runs it as `skills-sync` at 07:50. Root's old line is in
   `/root/skills-pull.bak-step4`; its status file and logs are gone.
@@ -500,8 +500,8 @@ the file tool.
   `disabled_toolsets`, `updates.check: false`. pr-triage prompt (file and `jobs.json`, via
   `hermes cron edit`) and `publish-pr-review` point at the new path. Sandbox container removed, gateway
   restarted, Discord back, the nine dmoka skills listed as external. `~/dev/skills` deleted.
-- [pull-repos.sh](../../vps/ticket-bay-bot/pull-repos.sh) reads `/var/lib/skills-sync/status` and runs
-  [memory-diff.sh](../../vps/shared/memory-diff.sh), which snapshots `~/.hermes/memories` and
+- [pull-repos.sh](https://github.com/jrcopeti/tania/blob/pre-split/vps/ticket-bay-bot/pull-repos.sh) reads `/var/lib/skills-sync/status` and runs
+  [memory-diff.sh](https://github.com/jrcopeti/tania/blob/pre-split/vps/shared/memory-diff.sh), which snapshots `~/.hermes/memories` and
   `~/.hermes/skills` into `~/.memory-audit.git` (not mounted in the sandbox) and prints the diff with the
   line to undo it. Baseline taken: 304 files.
 - Tania: `updates.check: false`. No restart; it only stops the banner.
@@ -533,7 +533,7 @@ and the bot, which reads strangers' email, talks to it over MCP. Not changed: se
   `scripts/memories` and `scripts/skills`. My first check ran from `/tmp` and missed it. Fixed: the
   script `cd`s to the Hermes home and puts git's error in its message. Also fixed: the undo line used
   `checkout HEAD~1`, which can't remove a memory file that's new; it's `restore --source=HEAD~1` now.
-  [test-memory-diff.sh](../../vps/shared/test-memory-diff.sh) starts every run in `scripts/`
+  [test-memory-diff.sh](https://github.com/jrcopeti/tania/blob/pre-split/vps/shared/test-memory-diff.sh) starts every run in `scripts/`
   (8 cases, in CI). `skills/.hub/audit.log` is left out as Hermes bookkeeping.
 - Fixed script deployed and run as the bot from `~/.hermes/scripts`: it reported the two new (empty)
   hub files, then stayed silent. Not yet seen through Hermes itself: the next 07:55 run.
@@ -544,7 +544,7 @@ and the bot, which reads strangers' email, talks to it over MCP. Not changed: se
   that reads captured pages; chats can write memory. Neither reaches the brain's git, and her triage
   summary is the model's own account. Step 3 chose those toolsets without checking what `skills`
   holds; found while answering whether Tania's memory is on.
-- `memory-diff.sh` moved to [vps/shared](../../vps/shared/memory-diff.sh), message made agent-neutral
+- `memory-diff.sh` moved to [vps/shared](https://github.com/jrcopeti/tania/blob/pre-split/vps/shared/memory-diff.sh), message made agent-neutral
   (each agent posts to its own server). Same copy on both agents.
 - Tania: new no-agent job `memory-diff` (`631bffe94f19`), 09:30 and 21:30, half an hour after each
   brain-triage. Baseline: `USER.md` and the bundled skills. Backup `jobs.json.bak-memorydiff-*`.
@@ -565,12 +565,12 @@ Planned with José question by question. Scope cut to what alerts on an attack:
   source has a Discord formatter; its docs only mention email) in a brain-server `#alerts` channel that
   Tania's bot can't see. The file's path is only in the token memos: naming it here or in the brain
   would tell an attacker which file to skip.
-- **Squid denials:** [squid-denials.sh](../../vps/ticket-bay-bot/squid-denials.sh), a no-agent job on
+- **Squid denials:** [squid-denials.sh](https://github.com/jrcopeti/tania/blob/pre-split/vps/ticket-bay-bot/squid-denials.sh), a no-agent job on
   the bot every 10 minutes, posting to ticket-bay. It reads the log with `docker exec`, so no host
   mount and no uid mapping; the log moves to a named volume so recreating squid keeps it. 8 cases in
-  [test-squid-denials.sh](../../vps/ticket-bay-bot/test-squid-denials.sh), in CI.
+  [test-squid-denials.sh](https://github.com/jrcopeti/tania/blob/pre-split/vps/ticket-bay-bot/test-squid-denials.sh), in CI.
 - **Kill switches:** [Tania's](../../vps/tania/kill-switch.md) and
-  [the bot's](../../vps/ticket-bay-bot/kill-switch.md), one per agent so neither touches the other.
+  [the bot's](https://github.com/jrcopeti/tania/blob/pre-split/vps/ticket-bay-bot/kill-switch.md), one per agent so neither touches the other.
 - **Dropped:** shipping tool-call logs off the VPS (forensics, alerts on nothing).
 - **Accepted gap:** an injected page in a chat makes Tania put a non-canary note in a URL. A URL feed
   is noise when the domain looks ordinary, and matching brain text in URLs is beaten by encoding.
