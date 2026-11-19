@@ -10,7 +10,7 @@
 | `docs/rename-step-4` | 4, 5, 5b | merged (#28) |
 | `docs/rename-step-6` | 6 | merged (#29) |
 | `docs/rename-step-7` | 7 | merged (#30) |
-| `docs/rename-devlog-and-showcase` | this devlog, VPS check | PR to open |
+| `docs/rename-devlog-and-showcase` | this devlog, VPS check and fixes | PR open (#31) |
 
 ## 2026-11-19: plan and SSH alias
 
@@ -104,3 +104,28 @@ and root's `tania-backups/`, `probe-tania.sh`, `jobs.json.bak-step6`.
 Self-healing: the tripwire's `index.json` is from before the brain rename, and it rebuilds on the
 next tool call it checks, because the brain's signature changed. Tailscale's cached cert for the
 old name is replaced the next time a cert is issued.
+
+## 2026-11-19: leftovers fixed (José said yes)
+
+No job was running, and both gateways stayed up. Backups are in root's `rename-backups/`, or next to
+the file as `*.bak-rename-20261119-*`.
+
+- **PR-review links.** `tailscale serve` was reset and re-added for `agents-vps` on 8443, still
+  proxying to the bot's server on 8481. HTTP 200 from the Mac; the first request took 22 s while
+  Tailscale issued the new certificate. The bot's `~/tools/pr-triage-prompt.txt` now uses the new
+  name, and `hermes cron edit 8fb96c6b239b --prompt` copied it into `jobs.json`. Checked: the prompt
+  differs from the backup only in the host name.
+- **Bot's `memory-diff.sh`** redeployed from jrcopeti/ticket-bay-bot `main`. Its sha256 matches, mode
+  and owner kept.
+- **Telma's sandbox.** The old image is tagged `agent-sandbox:3-pre-rename` for rollback.
+  `agent-sandbox:3` was rebuilt from `~/sandbox` (same Dockerfile as the repo) with
+  `AGENT_NAME=Telma`. Rather than recreate the running container, `git config --system user.name
+  Telma` was set inside it, so there was no gateway restart.
+- **`pr-review-http.service`** disabled, stopped and its unit moved out. Its folder
+  `/home/agent/pr-review` no longer existed, so it was serving nothing.
+- The brain deploy key's `.pub` comment is now `telma sync-brain`. The key itself is unchanged.
+- Gotcha: `hermes cron list` output has no plain 12-hex job ID to grep. Read the ID from `jobs.json`.
+
+Search again afterwards: no live file in either Hermes home, `~/.config` or `~/tools` names her.
+The only hits are third-party strings in `node_modules` (Polish locale, `tldts` domain list,
+prettier). History and backups are as listed above.
