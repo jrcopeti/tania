@@ -55,6 +55,11 @@ injection test suite passes against both agents.
   open a gist or `npm publish` what it read, or pull a payload from the attacker's repo or package.
   Nothing denies or alerts on it, and the kill switch checks only the bot's fork. Narrowing it means
   TLS inspection, or moving git and `gh` work to the host and npm behind a mirror: not now.
+- **An obedient bot can paste its 1-hour token into a public PR, as an accepted risk** (José,
+  2026-11-19, step 6's B9). The terminal guard blocks the plain ways (`hosts.yml`, `gh auth token`,
+  `printenv`); a reworded command or the file tool gets past it. The token reaches the fork only and
+  dies within the hour. Not built: a wider guard, revoking the token at the end of each run, or a
+  host-side script that checks the PR body before posting.
 - **Step 5 detects, it doesn't record.** Shipping tool-call logs off the VPS keeps evidence safe from
   root on the host but alerts on nothing: dropped. Squid's denials are added: a blocked request from the
   bot's sandbox is the clearest sign of an injected run. The canary's file is named nowhere in this
@@ -136,9 +141,7 @@ Each step is one branch and one PR. Steps that change a running agent need José
 - Guidelines: should Tania's triage file into `guidelines/` directly, or into a proposals folder that
   José promotes? Her model once filed a capture as a guideline.
 - Lesson 8.5 (email 2, steps 14 and 15) and 8.6: run them on ticket-bay-bot after step 1.
-- Step 6 left open: B9 (an obedient bot can paste its 1-hour token into a public PR; cut it in the
-  test gate or a host-side PR script?), and classic branch protection on the fork's `main` is gone
-  (the ruleset still holds): José's calls.
+- Step 6: classic branch protection on the fork's `main` is gone (the ruleset still holds): José's call.
 
 ## Rules for this repo
 

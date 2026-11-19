@@ -57,8 +57,8 @@ host). The tripwire and the canary watch it; nothing blocks it.
 - **Kill switch:** `hermes gateway stop` refuses while a session is live, the moment it is needed.
   Both runbooks now say `--yes`. Found when the obedient run kept going after its client was killed:
   cron runs live in the gateway.
-- **B9, the token in a PR:** cheapest cut is the test gate refusing a PR body that holds `ghs_`, or
-  pr creation moved to a host script that checks the body. Not done; José's call.
+- **B9, the token in a PR:** accepted by José (plan, Decisions). Cuts considered and not built: a
+  wider guard, revoking the token when each run ends, PR creation in a host script.
 - **Branch protection:** put the classic rule back or leave the ruleset alone as the wall. José's call.
 
 ## Limits
