@@ -55,6 +55,11 @@ injection test suite passes against both agents.
   open a gist or `npm publish` what it read, or pull a payload from the attacker's repo or package.
   Nothing denies or alerts on it, and the kill switch checks only the bot's fork. Narrowing it means
   TLS inspection, or moving git and `gh` work to the host and npm behind a mirror: not now.
+- **An obedient bot can paste its 1-hour token into a public PR, as an accepted risk** (José,
+  2026-11-19, step 6's B9). The terminal guard blocks the plain ways (`hosts.yml`, `gh auth token`,
+  `printenv`); a reworded command or the file tool gets past it. The token reaches the fork only and
+  dies within the hour. Not built: a wider guard, revoking the token at the end of each run, or a
+  host-side script that checks the PR body before posting.
 - **Step 5 detects, it doesn't record.** Shipping tool-call logs off the VPS keeps evidence safe from
   root on the host but alerts on nothing: dropped. Squid's denials are added: a blocked request from the
   bot's sandbox is the clearest sign of an injected run. The canary's file is named nowhere in this
@@ -90,7 +95,7 @@ Each step is one branch and one PR. Steps that change a running agent need José
 | 4 | **Supply chain.** `dmoka/skills` in a folder the bot can't write, owned by an unprivileged `skills-sync` user. It updates itself after a 7-day wait, and only if Hermes's skills guard finds nothing new. Hermes pinned. Dependabot alerts (not version-update PRs) on the ticket-bay fork. | No root cron jobs; every external input is pinned or gated; Dependabot alerts are on | done |
 | 5 | **Detection.** A canary in the brain: a canarytokens.org URL token behind a link that doesn't show its domain, alerting to a brain-server `#alerts` channel Tania's bot can't see. A no-agent job on the bot posts squid's denials to ticket-bay every 10 minutes. A kill-switch runbook per agent. | Opening the link (from the Mac, and through Tania in a chat) posts to `#alerts`; a denied fetch from the bot's sandbox posts to ticket-bay | done |
 | 5b | **Exfil tripwire.** A detection-only Hermes hook on Tania's tools that send data off the host (web, browser and seven more): when a call's arguments carry brain content (8-word runs or a short note whole, also URL- and base64-decoded) or name the brain's folder, it posts to `#alerts` through its own webhook. Blocks nothing. A health job says when it can't alert. | A web call carrying a brain note posts to `#alerts`; a normal browsing session posts nothing | done |
-| 6 | **Verification.** Injection test suite (the email that worked, lesson 8.5's email 2, new ones) run against both agents. Safety audit rerun with probes. Before/after table, ADRs and postmortem written by José. | The done-when at the top holds | todo |
+| 6 | **Verification.** Injection test suite (the email that worked, lesson 8.5's email 2, new ones) run against both agents. Safety audit rerun with probes. Before/after table, ADRs and postmortem written by José. Cases in [injection-suite.md](injection-suite.md), results in [step6-results.jsonl](step6-results.jsonl), audit in [audit-after.md](audit-after.md). | The done-when at the top holds | done |
 
 ## Open
 
@@ -136,6 +141,9 @@ Each step is one branch and one PR. Steps that change a running agent need José
 - Guidelines: should Tania's triage file into `guidelines/` directly, or into a proposals folder that
   José promotes? Her model once filed a capture as a guideline.
 - Lesson 8.5 (email 2, steps 14 and 15) and 8.6: run them on ticket-bay-bot after step 1.
+- Step 6: classic branch protection on the fork's `main` is gone; left so (José): the `main` ruleset has
+  the same rules. B7 (an injected PR from a second account) skipped, and no B1 rerun on the fallback
+  models (José).
 
 ## Rules for this repo
 
