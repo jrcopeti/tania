@@ -10,7 +10,8 @@
 | `docs/rename-step-4` | 4, 5, 5b | merged (#28) |
 | `docs/rename-step-6` | 6 | merged (#29) |
 | `docs/rename-step-7` | 7 | merged (#30) |
-| `docs/rename-devlog-and-showcase` | this devlog, VPS check and fixes | PR open (#31) |
+| `docs/rename-new-done` | 5, 5b | PR to open |
+| `docs/rename-devlog-and-showcase` | this devlog, VPS check and fixes | merged (#31) |
 
 ## 2026-11-19: plan and SSH alias
 
@@ -129,3 +130,9 @@ the file as `*.bak-rename-20261119-*`.
 Search again afterwards: no live file in either Hermes home, `~/.config` or `~/tools` names her.
 The only hits are third-party strings in `node_modules` (Polish locale, `tldts` domain list,
 prettier). History and backups are as listed above.
+
+## 2026-11-19: `/new` (José)
+
+After `/new`, a new chat describes her role as written in `SOUL.md`: "keeper of your second brain".
+She captures to `inbox/`, answers from the notes, triages at 09:00 and 21:00, and doesn't touch code
+or projects. Step 5b is done.
