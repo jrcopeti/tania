@@ -45,11 +45,11 @@ merges them.
 
 | # | Step | Done when | Status |
 |---|---|---|---|
-| 1 | **SSH alias.** On the Mac: `Host agents-vps`, key renamed to `~/.ssh/contabo-agents`. | `ssh agents-vps true` works | |
+| 1 | **SSH alias.** On the Mac: `Host agents-vps`, key renamed to `~/.ssh/contabo-agents`. | `ssh agents-vps true` works | Done 2026-11-19. The key's comment is now `jrcopeti-mac-contabo-agents` on the Mac |
 | 2 | **This repo.** Full text swap, `vps/tania/` → `vps/telma/`, CI step names, gitleaks title, test strings and the code they check, `host.md` table, the step6 note in the DEVLOG. One PR. | Merged, CI green, `git grep -i tania` empty | |
 | 3 | **ticket-bay-bot.** The same swap in its 7 files. Check `verify-tests.sh` and `guard-network.sh` use the name in comments or output only. One PR in that repo. | Merged, CI green, `git grep -i tania` empty | |
 | 4 | **GitHub and the Mac.** Rename the repo to `jrcopeti/telma`, edit the 3 PR titles, `git remote set-url`. Move the clone to `~/code/telma` and the Claude project memory to `-Users-jrcopeti-code-telma`. | `git fetch` works from the new folder, the memory loads there | |
-| 5 | **VPS, supervised, no job running.** Stop Telma's gateway. Edit `SOUL.md` and the skill's `author:`. Redeploy `exfil-tripwire.py` and `guard-network.sh` from this repo and the bot's two changed scripts from its repo. Start the gateway, `/new`. | sha256 of each redeployed script matches its repo copy, tripwire-health is quiet, memory-diff shows no change, a new chat says Telma | |
+| 5 | **VPS, supervised, no job running.** Stop Telma's gateway. Edit `SOUL.md` and the skill's `author:`. Redeploy `exfil-tripwire.py` and `guard-network.sh` from this repo and the bot's two changed scripts from its repo. Set the comment of the Mac's key in root's `authorized_keys` to `jrcopeti-mac-contabo-agents`. Start the gateway, `/new`. | sha256 of each redeployed script matches its repo copy, tripwire-health is quiet, memory-diff shows no change, a new chat says Telma | |
 | 6 | **Brain.** Full rewrite, filenames included, between sync-brain runs and with no brain-triage running. Then the lint skill. | Lint clean, `grep -ri tania` empty | |
 | 7 | **José.** Discord bot display name, Contabo panel label, README line. | Done | |
 | 8 | **Final check.** The grep in "Done when". | Empty | |
