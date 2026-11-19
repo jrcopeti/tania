@@ -1073,3 +1073,35 @@ PTR was looked up, and squid-denials reports every denial. The old config fails 
 `~/.hermes/scripts/squid-denials.sh`, copy the new ones in, `docker compose up -d` in the egress
 folder (recreates squid on the new image; the log volume stays), then from the sandbox: `api.github.com`
 200, `example.com` 403, and a `CONNECT <some IP>:443` 403 with no PTR query.
+
+## 2026-11-19: skills-sync and squid fixes deployed (José said yes), squid image not
+
+**Before:** all five deployed files matched `main` (sha256). No agent run active; skills status `ok`,
+checkout `1a6af1f`, nothing new upstream. Files staged in `/root/deploy-review`, hashes matching the
+branch.
+
+**skills-sync** (16:26): `test-skills-update.sh` run on the VPS as `skills-sync` first: one case failed
+there only. Its absolute link pointed into the bot's home, which `skills-sync` can't read, so Python
+raised a permission error and the scan failed instead of naming the link (still not taken; the real
+guard behaves the same). The test now points at a path that exists nowhere: 29 pass on the Mac and
+the VPS, the UTF-7 cases included (glibc). Old scripts kept as `*.bak-review-20261119-162658` in
+`/usr/local/lib/skills-sync`. One run as `skills-sync`: `ok`, checkout unchanged (no new upstream
+commit, so no scan). The scan checked by hand as `skills-sync` with the real guard and system Python
+3.12, on fresh clones of the pin: pin against itself exit 0 (89 files); with a planted `scripts/sync.sh`
+reading `~/.ssh` and a link to `/etc/hostname`, exit 1 (`high ssh_dir_access`, `critical
+symlink_escape`, `high symlink_outside_repo`). `/opt/new` doesn't exist.
+
+**squid** (16:27): backups `*.bak-review-20261119-162741` (`squid.conf`, `compose.yaml`, and
+`squid-denials.sh` in `~/.hermes/scripts`). The pull of `7.2-26.04_edge` failed: a layer holds a file
+owned by UID 584792, and the bot's rootless Docker has 65,536 subordinate IDs (`231072:65536`), so it
+can't be unpacked. The deploy stopped before `compose up`; the old container kept running. The
+deployed `compose.yaml` was put back from its backup (6.13 pin), and `docker compose restart squid`
+picked up the new `squid.conf`: `dstdomain -n` in the container, `squid -k parse` clean. New
+`squid-denials.sh` in place.
+
+**Live, from the bot's sandbox (raw CONNECT to `egress:3128`):** `api.github.com` 200, `example.com`
+403, a public IP literal 403 with `HIER_NONE` (no lookup). The two denials are this test.
+
+**Not deployed: the image move.** The repo's `compose.yaml` pins 7.2-26.04; the VPS runs 6.13-25.04
+with the fixed config. Unblocking it needs a wider subordinate ID range for the bot (a host change and
+a rootless Docker restart): José's call, in the plan's Open list.
