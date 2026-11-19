@@ -12,16 +12,18 @@ does.
 
 ## Rules
 
-- The prose is José's (see [AGENTS.md](../../AGENTS.md)). Agents may collect facts, links and numbers
-  for him, but never write the text.
+- Agents draft the docs; José approves each one in its PR (José, 2026-11-19, replacing "the prose is
+  José's").
+- One doc per branch and PR, in this order: threat model, before/after table, ADRs, README last, so
+  the README links docs that exist.
 - No secrets or personal data, in screenshots and GIFs too.
 
 ## Steps
 
 | # | Doc | Notes | Status |
 |---|---|---|---|
-| 1 | **README** | Carries the "formerly" line from rename step 7. Links the threat model, ADRs, postmortem and the bot repo. | |
-| 2 | **Threat model** | The lethal trifecta per agent and job, which leg each control cuts, and the accepted risks from the hardening plan's Decisions. | |
+| 1 | **README** | Written with the `crafting-effective-readmes` skill, "personal" (portfolio) template. Carries the "formerly" line from rename step 7. Shows Telma's brain work only (chat capture, ask-brain, triage summary), with screenshots from José (shot list below); one section introduces ticket-bay-bot and links its repo, which shows the bug loop. Links the threat model, ADRs, postmortem. | |
+| 2 | **Threat model** | [threat-model.md](../threat-model.md): the lethal trifecta per session, which leg each control cuts, and the accepted risks from the hardening plan's Decisions. | in review |
 | 3 | **ADRs** | One per lasting decision José picks, for example the two-agent split, the repo split, sync-brain never running git in a sandbox folder, the exfil tripwire. | |
 | 4 | **Before/after table** | From [audit-before.md](../hardening/audit-before.md) and [audit-after.md](../hardening/audit-after.md). | |
 
@@ -34,7 +36,23 @@ Carried over from the frozen hardening plan:
 - Later detection, not planned: ship tool-call logs off the VPS, so the evidence survives root on the
   host.
 
-New:
+- Replace "José" with "the owner" across the docs, the frozen ones included (asked 2026-11-19). The
+  threat model and `AGENTS.md` are done.
 
-- The brain's showcase intent still describes Telma as a coding employee, with a "bug email → PR"
-  demo. Since the split, that loop is ticket-bay-bot's. Decide what each README shows.
+Decided:
+
+- ~~What each README shows.~~ Telma's shows the brain work; the bug-loop demo is ticket-bay-bot's
+  (José, 2026-11-19). The brain's showcase intent still says "bug email → PR": update it in the brain.
+
+## Screenshot shot list (José captures)
+
+PNGs, or one short GIF, into `docs/assets/`. An agent checks each one for personal data before it's
+committed. Blur or crop: Discord server and channel names other than Telma's, user names and avatars
+other than hers and José's, IPs, URLs of private repos, webhook URLs, the canary's link or file name,
+and any note with personal content.
+
+1. **Capture:** a chat where José says "save this" with a link, and her reply that it's in the inbox.
+2. **Ask-brain:** "what does my brain say about …?" and her answer, with links to the notes.
+3. **Triage summary:** a brain-triage post in Discord: what she filed, and where.
+4. **An alert:** the T6 canary or tripwire post in `#alerts` (crop the source IP).
+5. **Optional GIF:** 20 to 30 seconds of 1 then 2.
