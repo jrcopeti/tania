@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Every 15 min (Hermes no-agent job on Tania, on the host): say when the exfil tripwire can't alert.
+# Every 15 min (Hermes no-agent job on Telma, on the host): say when the exfil tripwire can't alert.
 # Its alerts go to #alerts through a webhook; when that fails, only its local log knows. Also says
 # when the hook is no longer in Hermes's config or approved. Silent when all is well.
 set -u

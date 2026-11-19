@@ -1,6 +1,6 @@
 # Safety audit before hardening (2026-11-17)
 
-Setup: one Hermes agent (Tania) on a VPS, running all jobs in one shared Docker sandbox.
+Setup: one Hermes agent (Telma) on a VPS, running all jobs in one shared Docker sandbox.
 Audit was read-only (inventory and config reads); no probes were run.
 
 **Verdict:** the bug-loop job has all three legs. It reads strangers' emails; its sandbox can read the

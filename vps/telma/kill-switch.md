@@ -1,14 +1,14 @@
-# Kill switch: Tania
+# Kill switch: Telma
 
 **When:** a canary or exfil-tripwire alert in brain-server `#alerts`, or a memory diff with something
 nobody saved.
-ticket-bay-bot keeps running; it shares nothing with Tania but the host. If the host itself looks
+ticket-bay-bot keeps running; it shares nothing with Telma but the host. If the host itself looks
 compromised (a root login you don't know, a changed `/etc`, an unknown process), run this and
 [the bot's kill switch](https://github.com/jrcopeti/ticket-bay-bot/blob/main/vps/ticket-bay-bot/kill-switch.md),
 then rebuild the VPS (see [host.md](../host.md)).
 
 **Read the canary alert first.** It shows the source IP and user agent:
-- from the VPS's IP: Tania's browser tool opened the link;
+- from the VPS's IP: Telma's browser tool opened the link;
 - from a hosting company's IP with a desktop Chrome user agent, and a tripwire alert for `web_extract`
   in the same minute: her `web_extract` opened it. With no web backend set, Hermes sends it through
   keyless Exa, whose crawler does the fetch (step 6: FDCservers, Chrome on macOS);
@@ -31,8 +31,8 @@ sudo -iu agent bash -c 'docker ps -aq --filter name=hermes- | xargs -r docker rm
 
 ## 2. Cut credentials
 
-- GitHub, brain repo → Settings → Deploy keys: delete Tania's key. Nothing can push to the brain now.
-- OpenRouter → Keys: disable Tania's key.
+- GitHub, brain repo → Settings → Deploy keys: delete Telma's key. Nothing can push to the brain now.
+- OpenRouter → Keys: disable Telma's key.
 - Discord developer portal: reset her bot token, only if a session shows it was read.
 
 ## 3. Look

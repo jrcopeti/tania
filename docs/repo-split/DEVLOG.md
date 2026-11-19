@@ -25,16 +25,16 @@
   title, and `tests.yml` (bot jobs only). New: `AGENTS.md`, `vps/host.md`, `docs/hardening/{PLAN,DEVLOG}.md`.
 - Before the push, every test ran from the new tree, Docker egress included. gitleaks found nothing.
   CI is green on `b2a060d`: secret-scan and the 5 test jobs.
-- Ruleset `main` copied from Tania's: no bypass, deletion and force push blocked, PR and `gitleaks`
+- Ruleset `main` copied from Telma's: no bypass, deletion and force push blocked, PR and `gitleaks`
   required.
 - Gotcha: `tests.yml` jobs have blank lines inside them, so a split on blank lines dropped their
   steps. Split on job headers instead.
 
-## 2026-11-19: Tania without the bot
+## 2026-11-19: Telma without the bot
 
 - Removed `vps/ticket-bay-bot/`, `vps/skills-sync/` and `vps/ticket-bay-app/`. `vps/shared/` became
-  `vps/tania/memory-diff.sh` and its test, with only the header comment and the `Run:` path changed.
-  `tests.yml` keeps Tania's 3 jobs.
+  `vps/telma/memory-diff.sh` and its test, with only the header comment and the `Run:` path changed.
+  `tests.yml` keeps Telma's 3 jobs.
 - 14 links in the hardening DEVLOG now point at `pre-split`, and each path exists at the tag. Every
   relative link in the repo still resolves.
 - Hardening PLAN: a line at the top says it's frozen, and the one-repo decision is marked superseded.
@@ -44,7 +44,7 @@
 ## 2026-11-19: VPS checksum (read-only)
 
 sha256 of 16 deployed files against the two repos, over SSH, nothing changed. 14 match byte for byte:
-Tania's 4 (`sync-brain.sh`, `brain-files.py`, `tripwire-health.sh`,
+Telma's 4 (`sync-brain.sh`, `brain-files.py`, `tripwire-health.sh`,
 `exfil-tripwire.py`), the bot's `pull-repos.sh` and `squid-denials.sh`, skills-sync's two scripts and
 its cron file, the egress `compose.yaml` and `squid.conf`, and the app's `Dockerfile`, `.dockerignore`
 and `compose.yaml` (`/opt/ticket-bay-app`). Both deployed `memory-diff.sh` copies are the `pre-split`
@@ -56,7 +56,7 @@ Gotcha: in zsh, a loop variable named `path` overwrites `PATH`, and every comman
 
 ## 2026-11-19: guard-network.sh into the repo
 
-- Added `vps/tania/guard-network.sh`, copied from `/home/agent/.hermes/agent-hooks/` byte for byte
+- Added `vps/telma/guard-network.sh`, copied from `/home/agent/.hermes/agent-hooks/` byte for byte
   (mode 755). José: publish it despite the course kit's license. It is the kit's hook with 4 lines
   changed. Read first: it holds no secret, only patterns (`/opt/secrets`, `app-password`) it blocks.
 - The bot's deployed copy is identical to this one; it gets its own PR in jrcopeti/ticket-bay-bot.
@@ -70,6 +70,6 @@ three, each explained: both `memory-diff.sh` copies (comment lines only, as befo
 `exfil-tripwire.hooks.yaml` snippet, which lives inside Hermes's `config.yaml`.
 
 Found: each agent's sandbox `Dockerfile` (`~/sandbox/`) was in no repo. Not course-kit code, no
-secret. Tania's is added here byte for byte; the bot's differs in one line (`AGENT_EMAIL` build arg)
+secret. Telma's is added here byte for byte; the bot's differs in one line (`AGENT_EMAIL` build arg)
 and goes to its own repo. Every "Done when" condition now holds: CI green and the `main` ruleset on in
 both repos, no dead relative link in either.

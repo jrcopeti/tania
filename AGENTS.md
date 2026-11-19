@@ -1,6 +1,6 @@
-# Tania
+# Telma
 
-Showcase repo for Tania, a Hermes agent on a VPS that keeps José's brain. She shares the host with
+Showcase repo for Telma, a Hermes agent on a VPS that keeps José's brain. She shares the host with
 ticket-bay-bot (jrcopeti/ticket-bay-bot) and nothing else; the repos are split along the same trust
 boundary as the agents.
 
@@ -14,4 +14,4 @@ boundary as the agents.
 - **No secrets or personal data:** no keys, webhook URLs, inbox address, Discord IDs, IP addresses,
   private repo names.
 - **Public prose** (README, threat model, ADRs, postmortem) is José's to write.
-- **Brain inbox:** recent Tania decisions not yet triaged are in `~/brain/inbox/` (items dated 2026-11-17).
+- **Brain inbox:** recent Telma decisions not yet triaged are in `~/brain/inbox/` (items dated 2026-11-17).

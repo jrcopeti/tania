@@ -1,6 +1,6 @@
 # Secret scan for this repo: gitleaks' default rules, plus the personal data
 # AGENTS.md bans (email addresses, IPs, Discord IDs and webhooks, Tailscale hosts).
-title = "tania"
+title = "telma"
 
 [extend]
 useDefault = true

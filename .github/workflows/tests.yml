@@ -16,8 +16,8 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Test Tania's brain push guard
-        run: bash vps/tania/test-sync-brain.sh
+      - name: Test Telma's brain push guard
+        run: bash vps/telma/test-sync-brain.sh
 
   memory-diff:
     runs-on: ubuntu-24.04
@@ -26,8 +26,8 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Test Tania's memory diff
-        run: bash vps/tania/test-memory-diff.sh
+      - name: Test Telma's memory diff
+        run: bash vps/telma/test-memory-diff.sh
 
   exfil-tripwire:
     runs-on: ubuntu-24.04
@@ -36,8 +36,8 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Test Tania's exfil tripwire
-        run: bash vps/tania/test-exfil-tripwire.sh
+      - name: Test Telma's exfil tripwire
+        run: bash vps/telma/test-exfil-tripwire.sh
 
       - name: Test the tripwire's health check
-        run: bash vps/tania/test-tripwire-health.sh
+        run: bash vps/telma/test-tripwire-health.sh

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Every 15 min (Hermes no-agent job, on the host): push what Tania changed in the brain, pull the rest.
+# Every 15 min (Hermes no-agent job, on the host): push what Telma changed in the brain, pull the rest.
 # Her sandbox writes the brain, .git included, so host git never runs there. This keeps its own clone
 # in $P, copies her files into it with brain-files.py (plain files only, never through a link), pushes
 # only ALLOWED paths, then writes GitHub's changes back into her copy the same way.
@@ -37,7 +37,7 @@ refuse_outside() {
     g diff --raw --no-renames "$1" "$2" -- | awk '$2 ~ /^1[26]0000$/ { sub(/^[^\t]*\t/, ""); print }'
     g diff --name-only --no-renames -z "$1" "$2" -- | python3 "$FILES" gitfiles || echo "(gitfiles check failed)")
   [ -z "$bad" ] && return
-  echo "🚫 sync-brain: refused to push. These paths are outside what Tania may change:"
+  echo "🚫 sync-brain: refused to push. These paths are outside what Telma may change:"
   block <<<"$bad"
   echo "Nothing was pushed, and nothing will be until they are gone."
   exit 0
@@ -101,7 +101,7 @@ if [ "$base" != "$given" ]; then
   else
     conflicts=$(g diff --name-only --diff-filter=U)
     g rebase --abort >/dev/null 2>&1
-    echo "⚠️ sync-brain: conflict with GitHub, nothing pushed. Tania and the Mac both changed these:"
+    echo "⚠️ sync-brain: conflict with GitHub, nothing pushed. Telma and the Mac both changed these:"
     block <<<"$conflicts"
     echo "Copy GitHub's version over hers in $B, then redo her change."
     exit 0
