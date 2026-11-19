@@ -117,8 +117,12 @@ Each step is one branch and one PR. Steps that change a running agent need José
      test gate's path rewrite fixed. `postgres:17` and `node:22-bookworm-slim` pinned by digest.
      Both jobs checked with a run; a planted `.hermes.md` didn't reach pr-triage-morning's answer.
   3. Audit `vps/skills-sync/` and the squid config (`vps/ticket-bay-bot/egress/`) with the
-     adversarial tester, module by module.
-  José's calls, no fix planned: the skills guard matches findings per skill, pattern and file (a
+     adversarial tester, module by module. skills-sync audited and fixed, not deployed (devlog
+     2026-11-19): the scan saw `git archive`'s copy, which upstream's `export-ignore` can trim, and
+     only `skills/`, `shared/`, `tools/`. Now both commits are checked out with a throwaway index and
+     scanned whole; links that leave the repo block; trees over 50 MB aren't unpacked; a commit upstream force-pushed away during the wait is
+     never taken (José). Squid: in progress.
+  José's calls, no fix planned: the skills guard matches findings per pattern and path (a
   second `~/.ssh` read in the same file passes); the test gate runs `git rev-parse` and
   `worktree remove` on the host in sandbox-written repos (no exec seen, low).
   Dropped: the memory-diff cut splitting a character (both gateways run `LANG=C.UTF-8`) and Discord's

@@ -2,30 +2,41 @@
 # Daily, as skills-sync: move the bot's dmoka/skills checkout to the newest upstream commit first seen
 # at least 7 days ago, unless the skills guard finds something in it the current checkout doesn't have.
 # The wait counts from our own fetch log, not commit dates, which the committer sets.
+# Both trees are scanned as git checks them out (not `git archive`, which honours upstream's
+# export-ignore), whole, with a size cap so upstream can't fill the disk.
 # Writes one line to $S/status: "ok" when nothing happened, otherwise what did. pull-repos.sh posts it.
 set -uo pipefail
 R=${SKILLS_REPO:-/opt/dmoka-skills}
 G=${HERMES_GUARD:-/opt/hermes-guard}
 S=${SKILLS_STATE:-/var/lib/skills-sync}
 DAYS=${SKILLS_COOLDOWN_DAYS:-7}
+MAX_MB=${SKILLS_MAX_MB:-50}
 NOW=${SKILLS_NOW:-$(date +%s)}
 HERE=$(cd "$(dirname "$0")" && pwd)
 g() { git -C "$R" -c core.hooksPath=/dev/null -c core.fsmonitor=false "$@"; }
 status() { echo "$*" > "$S/status.tmp" && mv "$S/status.tmp" "$S/status"; }
+# Write tree $2 into $tmp/$1 with a throwaway index, so the repo's own index and HEAD are untouched.
+unpack() { GIT_INDEX_FILE=$tmp/$1.index g read-tree "$2" && GIT_INDEX_FILE=$tmp/$1.index g checkout-index -a --prefix="$tmp/$1/"; }
 
 out=$(g fetch -q origin main 2>&1) || { status "⚠️ skills: fetch failed, not updated: $out"; exit 0; }
 up=$(g rev-parse FETCH_HEAD)
 [ "$up" = "$(tail -n1 "$S/seen" 2>/dev/null | cut -d' ' -f2)" ] || echo "$NOW $up" >> "$S/seen"
-target=$(awk -v t=$((NOW - DAYS * 86400)) '$1 <= t { s = $2 } END { print s }' "$S/seen")
+# The newest commit seen long enough ago that upstream still has: one force-pushed away is dropped.
+target=
+for c in $(awk -v t=$((NOW - DAYS * 86400)) '$1 <= t { s[n++] = $2 } END { while (n--) print s[n] }' "$S/seen"); do
+  g merge-base --is-ancestor "$c" "$up" 2>/dev/null && { target=$c; break; }
+done
 cur=$(g rev-parse HEAD)
 
 if [ -z "$target" ] || g merge-base --is-ancestor "$target" "$cur" 2>/dev/null; then status ok; exit 0; fi
 g merge-base --is-ancestor "$cur" "$target" ||
   { status "🚫 skills: upstream ${target:0:7} doesn't build on ${cur:0:7} (history rewritten?). Not updated."; exit 0; }
 
+mb=$(g ls-tree -r -l "$target" | awk '{ s += $4 } END { print int(s / 1048576) }')
+[ "$mb" -lt "$MAX_MB" ] || { status "🚫 skills: ${target:0:7} is ${mb} MB (cap $MAX_MB), not updated"; exit 0; }
 tmp=$(mktemp -d) && trap 'rm -rf "$tmp"' EXIT
-g archive "$target" | tar -x -C "$tmp" || { status "⚠️ skills: could not unpack ${target:0:7}, not updated"; exit 0; }
-new=$(python3 -I "$HERE/scan-diff.py" "$G" "$R" "$tmp")
+unpack old "$cur" && unpack new "$target" || { status "⚠️ skills: could not unpack ${target:0:7}, not updated"; exit 0; }
+new=$(python3 -I "$HERE/scan-diff.py" "$G" "$tmp/old" "$tmp/new")
 case $? in
   0) ;;
   1) status "🚫 skills: ${target:0:7} not taken, the skills guard found new: $(tr '\n' ';' <<<"$new")"; exit 0 ;;

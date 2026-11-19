@@ -975,3 +975,39 @@ message in the run names it. The denial worked; the fix for the noise is in the 
 **Images:** `postgres:17` pinned to `0d938e97…`, the digest the app runs on the VPS (so a
 `compose up` keeps its database image). `node:22-bookworm-slim` pinned to today's `e9f565d3…`: the
 VPS no longer has the image the app was built from. Both used only on a manual rebuild.
+
+## 2026-11-19: skills-sync audited and fixed (not deployed)
+
+Plan Open item 3, first module. A fresh agent attacked `vps/skills-sync/` with upstream as the
+attacker; 7 breaking tests, all failing on the deployed scripts.
+
+**What was wrong.** The guard scanned one copy and the bot got another. `skills-update.sh` unpacked
+the target with `git archive`, which follows the archived tree's `.gitattributes`: one
+`skills/a/run.sh export-ignore` line kept a file out of the scan, and `git checkout` still wrote it
+to `/opt/dmoka-skills`. And `scan-diff.py` scanned only `skills/*`, `shared/` and `tools/`, while the
+sandbox mounts the whole repo, so a skill could tell the bot to run an unscanned `scripts/x.sh`.
+Smaller: a new skill named `shared` or `tools` matched the top-level folder's findings (keys used the
+folder name); a guard that failed to import exited 1 and read as "found new: ;" with no reason.
+
+**Fix.** Both commits (`cur` and `target`) are written with `read-tree` + `checkout-index` into a
+temp folder through a throwaway `GIT_INDEX_FILE`, so the scanned bytes are what checkout writes and
+the repo's index and HEAD are untouched. The whole tree is one unit; findings are keyed on pattern and
+path. Links are checked by the script too: the pinned guard (`ae2a81c`) rates a broken link only
+medium, and a link resolved on the host can point at something else in the sandbox, so any absolute
+link, or one that leaves the repo or points nowhere, is `high symlink_outside_repo`. A tree over
+`SKILLS_MAX_MB` (50; upstream is under 1 MB) isn't unpacked. Import errors and a missing folder are
+exit 2; the status names only the exception type, since a message can quote a file's bytes.
+
+**Checks.** `test-skills-update.sh`: 22 pass before the force-push change (8 new; the 7 attack cases fail on the old scripts).
+Real guard at `ae2a81c` (Python 3.15, local) on `dmoka/skills`: its last 5 commits scan clean as a
+whole repo; a planted `scripts/sync.sh` reading `~/.ssh` blocks (`high ssh_dir_access`), and a link
+to the bot's `.env` blocks (`critical symlink_escape`, `high symlink_outside_repo`).
+
+**Force-pushed commits (José: only take what upstream still has).** `target` was the last logged
+head 7+ days old, even if upstream had since force-pushed it away. Now it is the newest logged head
+7+ days old that is still an ancestor of the fetched head, so a pulled commit is dropped and an older
+one upstream kept can still be taken. Two tests; 24 pass.
+
+**Deploy (needs José's yes):** copy `skills-update.sh` and `scan-diff.py` to
+`/usr/local/lib/skills-sync/` (root-owned), back up the old ones, run once as `skills-sync`, expect
+`ok`.
