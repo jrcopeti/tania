@@ -140,12 +140,9 @@ Each step is one branch and one PR. Steps that change a running agent need José
   length count (Hermes splits long posts and keeps code blocks closed). A model-written memory summary
   job was designed and dropped: José asks Telma for one in a chat when he wants it.
 
-- Later detection options, not planned: ship tool-call logs off the VPS (evidence that survives root on
-  the host).
-
-- Guidelines: should Telma's triage file into `guidelines/` directly, or into a proposals folder that
-  José promotes? Her model once filed a capture as a guideline.
-- Lesson 8.5 (email 2, steps 14 and 15) and 8.6: run them on ticket-bay-bot after step 1.
+- Moved 2026-11-19: Telma's open items (the triage-to-`guidelines/` question, shipping tool-call logs
+  off the VPS) to [the showcase plan](../showcase/PLAN.md); lessons 8.5 and 8.6 on ticket-bay-bot to
+  [jrcopeti/ticket-bay-bot](https://github.com/jrcopeti/ticket-bay-bot/blob/main/docs/hardening/PLAN.md).
 - Step 6: classic branch protection on the fork's `main` is gone; left so (José): the `main` ruleset has
   the same rules. B7 (an injected PR from a second account) skipped, and no B1 rerun on the fallback
   models (José).

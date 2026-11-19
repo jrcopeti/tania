@@ -5,7 +5,9 @@
 | Branch | Step | State |
 |---|---|---|
 | `docs/repo-split` | 1 | merged (#21) |
-| `chore/remove-bot` | 4 | PR to open |
+| `chore/remove-bot` | 4 | merged (#22) |
+| `chore/add-guard-network` | Open | merged (#24) |
+| `chore/sandbox-dockerfile-and-close-split` | Open | merged (#25) |
 
 ## 2026-11-19: plan
 
