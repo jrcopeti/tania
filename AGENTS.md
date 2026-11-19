@@ -14,5 +14,6 @@ boundary as the agents.
   gitleaks on staged changes; CI runs it on the full history.
 - **No secrets or personal data:** no keys, webhook URLs, inbox address, Discord IDs, IP addresses,
   private repo names.
-- **Public prose** (README, threat model, ADRs, postmortem) is José's to write.
+- **Public prose** (README, threat model, ADRs, before/after): agents draft, José approves each
+  doc in its PR (José, 2026-11-19).
 - **Brain inbox:** recent Telma decisions not yet triaged are in `~/brain/inbox/`.
