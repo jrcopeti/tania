@@ -1152,7 +1152,7 @@ permission check, rightly: José's click.
 fresh sandbox: 11 tunnels to `api.github.com` and `github.com`, no `cafe.github.com` (still the 2
 from before). gh telemetry is closed.
 
-**VPS app rebuilt (José said yes, 17:3x).** #17 merged as `e9da215`. The root-owned clone fetched
+**VPS app rebuilt (José said yes, 17:24).** #17 merged as `e9da215`. The root-owned clone fetched
 and checked out at it; `Dockerfile` and `compose.yaml` replaced with the repo's (only the digest
 pins differed; backups `*.bak-bumps-*`, `.env` too). Image built as `ticket-bay-app` while the old
 app ran, then `TICKETBAY_COMMIT` set and `compose up -d`. In the container: `next` 16.4.5,
