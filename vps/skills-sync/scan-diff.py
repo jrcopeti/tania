@@ -13,11 +13,14 @@ Link = namedtuple("Link", "pattern_id severity file line")
 
 # The guard rates a broken symlink medium. Here a link is resolved on the host, but the bot follows it
 # in its sandbox, so one that leaves the repo or points nowhere could read anything there: high.
+# "Leaves" is judged on the path text inside the repo, so `../../../new/x` can't pass by coming back
+# through the scan folder's own name.
 def links(repo):
     root = repo.resolve()
     for p in repo.rglob("*"):
         if p.is_symlink():
-            if os.path.isabs(os.readlink(p)) or not p.exists() or not p.resolve().is_relative_to(root):
+            to = os.path.normpath(os.path.join(os.path.dirname(p.relative_to(repo)), os.readlink(p)))
+            if os.path.isabs(to) or to.split(os.sep)[0] == ".." or not p.exists() or not p.resolve().is_relative_to(root):
                 yield Link("symlink_outside_repo", "high", str(p.relative_to(repo)), 0)
 
 
