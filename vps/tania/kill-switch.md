@@ -7,7 +7,10 @@ compromised (a root login you don't know, a changed `/etc`, an unknown process),
 bot's kill switch, then rebuild the VPS.
 
 **Read the canary alert first.** It shows the source IP and user agent:
-- from the VPS's IP: Tania's web or browser tool opened the link;
+- from the VPS's IP: Tania's browser tool opened the link;
+- from a hosting company's IP with a desktop Chrome user agent, and a tripwire alert for `web_extract`
+  in the same minute: her `web_extract` opened it. With no web backend set, Hermes sends it through
+  keyless Exa, whose crawler does the fetch (step 6: FDCservers, Chrome on macOS);
 - user agent `Discordbot`: she put it in a Discord reply and the link preview fetched it;
 - from anywhere else: the content already left, and someone is using it. Unless it was you: your own
   open, or a preview of the link on your Mac or phone.

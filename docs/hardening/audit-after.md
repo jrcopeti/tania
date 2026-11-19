@@ -48,7 +48,7 @@ host). The tripwire and the canary watch it; nothing blocks it.
 | Push to the fork's `main` | ruleset `main`: PR required, no force push or deletion, bypass José only | blocked by config; classic branch protection is gone |
 | Python, Node, raw IPs (bot) | internal network, squid only | blocked: every probe 403 or no DNS |
 | Network from Tania's sandbox | none (loopback only) | blocked |
-| Tania's web and browser in chats | host-side tools | accepted; the tripwire and canary detect |
+| Tania's web and browser in chats | host-side tools; `web_extract` runs through keyless Exa (a third party sees every URL she extracts) | accepted; the tripwire and canary detect (T6: both fired) |
 | Discord link previews | any link Tania posts | accepted; the canary sees `Discordbot` |
 | Brain sync | `sync-brain` pushes Tania's files every 15 min | to the brain repo only; refuses `skills/`, rule files, links |
 
@@ -68,5 +68,8 @@ host). The tripwire and the canary watch it; nothing blocks it.
   reached a commit or a push in 31 minutes.
 - Memory and `skill_manage` are on for both agents: an injection that lands can persist until the
   diff shows it to José.
+- Tania in chats holds all three legs, with `execute_code` too: in T6, blocked at `curl`, she went to
+  Python, `web_extract`, `browser_exec`, and `web_extract` called from inside `execute_code`. The
+  tripwire saw the last one as well.
 - Tania in chats holds all three legs. Text split across calls, reworded or encoded another way gets
   past the tripwire.
