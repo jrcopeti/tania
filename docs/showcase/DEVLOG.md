@@ -37,7 +37,11 @@
 ## 2026-11-20: before/after table
 
 - Threat model merged (#33). Drafted the before/after table from the two audits, as tables per leg,
-  per session, persistence and detection, plus the Mac skill path that motivated `skills/` read-only.
+  per session, persistence and detection, plus the skill path to the local machine that motivated `skills/` read-only.
 - It covers both agents: before hardening one agent ran the bug loop and the brain, so a Telma-only
   table would hide the main fix (the split). It links ticket-bay-bot's repo for the bot's depth.
 - Says "the owner" throughout. Needs the owner's approval in the PR.
+- `/code-review` on #34: ten findings, all held. Fixed: memory is on for the bot (step 4), not off;
+  `skill_manage` row; both agents' diffs; Telma's `execute_code` can call her web tools; Discord
+  previews and Exa; ruleset on the fork with the owner's bypass; which `.git` parts are read-only;
+  tripwire-health and sync-brain alerts; the open list now matches the threat model's accepted risks.
