@@ -4,7 +4,7 @@
 
 | Branch | Step | State |
 |---|---|---|
-| `docs/rename-devlog-and-showcase` | plan | PR to open |
+| `docs/rename-devlog-and-showcase` | plan | merged (#31) |
 
 ## 2026-11-19: plan
 

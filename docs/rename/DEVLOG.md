@@ -10,7 +10,8 @@
 | `docs/rename-step-4` | 4, 5, 5b | merged (#28) |
 | `docs/rename-step-6` | 6 | merged (#29) |
 | `docs/rename-step-7` | 7 | merged (#30) |
-| `docs/rename-devlog-and-showcase` | this devlog, VPS check and fixes | PR open (#31) |
+| `docs/rename-new-done` | 5, 5b | PR to open |
+| `docs/rename-devlog-and-showcase` | this devlog, VPS check and fixes | merged (#31) |
 
 ## 2026-11-19: plan and SSH alias
 
