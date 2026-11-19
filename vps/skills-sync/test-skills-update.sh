@@ -120,7 +120,9 @@ check "export-ignore doesn't hide a file from the scan" eval 'says "🚫" && say
 setup; mkdir -p "$W/dev/scripts" && echo EVIL > "$W/dev/scripts/x.sh" && push_all outside; age
 check "a finding outside skills/ blocks" eval 'says "🚫" && says "scripts/x.sh" && at "$PIN"'
 
-setup; ln -s /home/ticket-bay-bot/dev/x.sh "$W/dev/skills/a/run.sh" && push_all abslink; age
+# A target that exists nowhere. One skills-sync can't read (the bot's home) makes the scan itself fail
+# on a permission error: also not taken, but the status says "scan failed".
+setup; ln -s /nonexistent-zz/dev/x.sh "$W/dev/skills/a/run.sh" && push_all abslink; age
 check "an absolute symlink blocks" eval 'says "symlink_outside_repo" && at "$PIN"'
 
 setup; ln -s ../../../../etc/passwd "$W/dev/skills/a/run.sh" && push_all rellink; age
