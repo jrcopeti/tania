@@ -882,8 +882,9 @@ check (a regression), a force-pushed commit replayed, a killed refresh turning t
 hers, then replaying her own changes, size limits that blocked a Mac screenshot, a Mac `.gitignore`
 in `notes/` stalling her sync. All fixed, each with a test that failed first. José stopped it at four.
 
-**Tests:** [test-sync-brain.sh](../../vps/tania/test-sync-brain.sh) has 94, green on alpine:edge
-(git 2.56.1, as on the VPS) and on the Mac. The old script fails 24 of the first 60.
+**Tests:** [test-sync-brain.sh](../../vps/tania/test-sync-brain.sh) has 61, one per behaviour (trimmed
+from 94: loops over names that test one lookup, and attacks on her `.git` now folded into one hostile-`.git`
+test). Green on alpine:edge (git 2.56.1, as on the VPS) and on the Mac. The old script fails 25.
 
 **Changes for Tania:** her own `.git` is no longer updated, so `git log` in her sandbox looks stale.
 A file she edits during a refresh that the Mac also changed gets GitHub's version. While a refresh

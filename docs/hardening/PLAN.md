@@ -105,7 +105,7 @@ Each step is one branch and one PR. Steps that change a running agent need José
      sync-brain keeps its own clone in `~/.local/share/brain-push`, copies her files in with
      `brain-files.py` (plain files and folders only, never through a link), pushes only allowed paths,
      and writes GitHub's changes back the same way. Symlinks and gitlinks refused (José,
-     2026-11-19). Four adversarial rounds; 94 tests, green on git 2.56; 24 fail on `main`. Stopped at
+     2026-11-19). Four adversarial rounds; 61 tests, green on git 2.56; 25 fail on `main`. Stopped at
      four (José). Left, in order:
      - PR, then deploy with José's yes. The read-only look is done (devlog): ext4, Python 3.12.3,
        git 2.56.1, the old script in sync.
