@@ -95,17 +95,11 @@ Each step is one branch and one PR. Steps that change a running agent need José
 - ticket-bay-bot's test gate: Hermes stopped waiting for a hook after 30 s, so a red verdict came too late.
   Timeout raised to 300 s on 2026-11-18; check on the next bug-loop run that edits code.
 
-- Dependabot on the fork: critical `next`, `better-auth` and MCP SDK alerts are in what `ticket-bay-app`
-  runs on the VPS, and the bot reaches it over MCP. Upgrade the app's checkout, or accept it as a
-  course fixture? Decide before step 6. Through the bot's MCP tools the Next.js RCEs aren't
-  reachable (they need plain HTTP); through Tania's host-side browser, `127.0.0.1:3100` is. Proposed,
-  not started (José: not now): a `vps/runtime-patches` branch on the fork off `974f482` bumping only
-  those three packages, the VPS app rebuilt from it, the fork's `main` untouched.
-- gh telemetry: `gh` 2.104 in the bot's sandbox sends usage events to `cafe.github.com`; squid denies
-  them and squid-denials posts an alert (first seen 2026-11-19, two during a pr-triage run). Harmless,
-  but noise that hides a real denial. Fix: add `GH_TELEMETRY: "false"` and `DO_NOT_TRACK: "1"` to the
-  bot's `terminal.docker_env` in `config.yaml` (José's yes; likely a gateway restart), then check no
-  more `cafe.github.com` lines after a pr-triage run.
+- Dependabot on the fork: patch it (José, 2026-11-19). PR jrcopeti/ticket-bay#17 bumps `next`,
+  `better-auth` and the MCP server SDK on the fork's `main`; merge, then rebuild the VPS app from it.
+  `zod` and `source-map-js` alerts stay open.
+- gh telemetry: `GH_TELEMETRY` and `DO_NOT_TRACK` deployed in the bot's `docker_env` on 2026-11-19.
+  Proof still to see: a pr-triage run with no new `cafe.github.com` line in squid's log.
 - Step 4 proof still to see: the first real skills update or block (no upstream commit since the pin
   yet).
 

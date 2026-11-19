@@ -16,6 +16,7 @@
 | `fix/review-steps-0-4` | 0–4 review | merged (#12) |
 | `fix/sync-brain-push-guard` | 0–4 review | merged (#13) |
 | `docs/sync-brain-deploy` | 0–4 review | PR to open |
+| `docs/gh-telemetry-and-runtime-bumps` | before step 6 | PR to open |
 
 ## 2026-11-17: safety audit and plan
 
@@ -1116,3 +1117,29 @@ first (so a failure would change nothing), then `compose.yaml` installed and `co
 6.14, `-n` in the config, parse clean, the log volume kept (owner 13). From the sandbox again:
 `api.github.com` 200, `example.com` 403, a public IP 403 with `HIER_NONE`. The repo and the VPS now
 match.
+
+## 2026-11-19: before step 6, gh telemetry and the app's runtime bumps
+
+**gh telemetry (José said yes, 16:54).** Nothing was running (last jobs 15:11 and 15:21). Backup
+`config.yaml.bak-ghtelemetry-*`. `terminal.docker_env` gained `GH_TELEMETRY: "false"` and
+`DO_NOT_TRACK: "1"`. Gateway stopped, the sandbox container `hermes-fa40ff08` (up 24 h) removed,
+gateway started: Discord reconnected at 16:54:42. The container had to go: its environment is
+fixed at creation, so a restart alone would have left it sending. Squid's log had 2
+`cafe.github.com` denials before the change. Proof: the next pr-triage run adds none.
+
+**Dependabot: patch the fork (José's call).** The fork already differs from upstream (the
+devcontainer and box merges), so the runtime bumps go on its `main`, not a side branch. PR
+jrcopeti/ticket-bay#17, off `974f482` (what the VPS runs), smallest versions that close the alerts:
+`next` 16.4.5 (16.4.1 fixes the RCEs; 16.4.5 also clears two cache leaks; brings `sharp` 0.35.5),
+`better-auth` and `@better-auth/api-key` 1.7.7, `@modelcontextprotocol/server` 2.3.0. Caret ranges
+resolved to 1.7.26 and 2.4.0, so the lock was pinned to the minimum instead. Local: typecheck,
+369 unit, 30 HTTP, 245 integration (2 skipped), build, all pass; `drizzle-kit generate` finds no
+schema change. Left open: `zod` (< 4.6.6) and `source-map-js`.
+
+The risk this closes: Tania's browser runs on the host and reaches `127.0.0.1:3100`; a page she
+opens could have her send the Next.js RCE request, giving code execution in the app container the
+bot trusts over MCP, with no brain text for the tripwire to see. The port stays reachable after the
+bump; only the bugs go.
+
+To do, with José's yes: merge #17, check out the merge commit in `/opt/ticket-bay-app/src`, rebuild
+and restart the app, check the bot's MCP tools answer and the app's `next` is 16.4.5.
