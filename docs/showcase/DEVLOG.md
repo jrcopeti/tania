@@ -24,3 +24,5 @@
 - Threat model drafted from the frozen hardening docs (audit-after, injection suite, step 6 results,
   postmortem, kill switch). Checked against the hardening devlog: brain-triage has no memory or
   cronjob tool; chats keep both (José's call in step 2).
+- The public docs say "the owner", not "José": the threat model and `AGENTS.md` changed. The rest of
+  the docs follow later (open item in the plan).

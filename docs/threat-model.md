@@ -1,6 +1,6 @@
 # Threat model: Telma
 
-Telma is a [Hermes](https://hermes-agent.nousresearch.com) agent on a VPS. She keeps José's second
+Telma is a [Hermes](https://hermes-agent.nousresearch.com) agent on a VPS. She keeps the owner's second
 brain, a git repo of notes: she files what he captures, answers questions from it and keeps it tidy.
 This page says what can go wrong, which control stops it, and which risks are accepted.
 
@@ -25,7 +25,7 @@ instructions in emails" is not a control: on 2026-11-17 a model ignored exactly 
 
 | Asset | Where it lives | Why it matters |
 |---|---|---|
-| The brain's notes | her sandbox, the brain repo on GitHub, José's Mac | private: decisions, projects, how José works |
+| The brain's notes | her sandbox, the brain repo on GitHub, the owner's Mac | private: decisions, projects, how the owner works |
 | The brain's skills and rule files (`skills/`, `AGENTS.md`) | the same repo | Claude Code on the Mac runs these skills with full permissions |
 | The brain's push key | the host, outside her sandbox | whoever holds it can write the brain |
 | Her memory and her own skills | her Hermes home | every later session loads them |
@@ -36,7 +36,7 @@ instructions in emails" is not a control: on 2026-11-17 a model ignored exactly 
 ```
  untrusted                         VPS, user "agent"                             trusted
 ┌───────────────┐   ┌───────────────────────────────────────────────┐   ┌──────────────┐
-│ captured pages│──▶│ Hermes (host)                                  │   │ José         │
+│ captured pages│──▶│ Hermes (host)                                  │   │ the owner    │
 │ web pages     │   │  web + browser tools (chats only)  ──────────────▶│ (Discord,    │
 └───────────────┘   │  exfil tripwire hook ─────▶ #alerts            │   │  allowlisted)│
                     │                                                │   └──────────────┘
@@ -56,7 +56,7 @@ instructions in emails" is not a control: on 2026-11-17 a model ignored exactly 
 | Session | Untrusted input | Private data | Way out | Legs |
 |---|---|---|---|---|
 | brain-triage (09:00 and 21:00, unattended) | captured pages in the inbox | the brain | none: no network in the sandbox, no web or browser tool | 2 |
-| Chats with José on Discord | pages she opens | the brain | web and browser tools on the host | **3, accepted** |
+| Chats with the owner on Discord | pages she opens | the brain | web and browser tools on the host | **3, accepted** |
 | sync-brain, memory-diff, tripwire-health | none | the push key (sync-brain) | GitHub, Discord | no model in the loop |
 
 No unattended job holds all three legs. The chats do; see [Accepted risks](#accepted-risks).
@@ -69,8 +69,8 @@ No unattended job holds all three legs. The chats do; see [Accepted risks](#acce
 | 2 | An inbox item tells her to push the brain elsewhere or open a gist | no key and no `gh` login in the sandbox; only sync-brain pushes, to one remote | way out | T3: push fails, no SSH key |
 | 3 | An injected run edits a brain skill, which then runs on the Mac | `skills/` and rule files mounted read-only; sync-brain pushes only allowed folders and refuses the rest | the path to the Mac | T1, and 61 tests in CI |
 | 4 | A planted symlink, gitlink or git hook makes the host leak the push key or run code | host git never runs in a folder she writes; sync-brain keeps its own clone and copies plain files only | the path to the host | sync-brain tests: links, FIFOs and a planted `HEAD` refused |
-| 5 | An injection saves itself to her memory or a skill and comes back every session | brain-triage has no memory tool, but keeps `skill_manage`, and chats have both, so she can learn; a diff after each triage shows José what changed | detection only | T4: nothing saved; [memory-diff](../vps/telma/memory-diff.sh) and its tests |
-| 6 | An injection schedules its own cron job | brain-triage has no cronjob tool; chats keep it, José's call | the unattended path | |
+| 5 | An injection saves itself to her memory or a skill and comes back every session | brain-triage has no memory tool, but keeps `skill_manage`, and chats have both, so she can learn; a diff after each triage shows the owner what changed | detection only | T4: nothing saved; [memory-diff](../vps/telma/memory-diff.sh) and its tests |
+| 6 | An injection schedules its own cron job | brain-triage has no cronjob tool; chats keep it, the owner's call | the unattended path | |
 | 7 | A shell command reads secrets or dumps the environment | secrets are not in the sandbox; a terminal guard blocks `printenv`, raw network tools and known secret paths | private data | step 6 probes found no long-lived secret |
 | 8 | In a chat, a page tells her to put a note in a URL and open it | none: this is the accepted risk; the exfil tripwire posts to `#alerts` | detection only | T5 refused, T7 refused, T6 detected |
 | 9 | In a chat, a page tells her to open every link in the brain | a canary link in the brain alerts when anything opens it | detection only | T6: the canary fired |
@@ -89,7 +89,7 @@ The cases T1 to T7 are in [injection-suite.md](hardening/injection-suite.md), th
   Text split across calls, reworded or encoded another way gets past it.
 - **Discord link previews are a way out** no VPS rule closes. The canary sees them (`Discordbot`).
 - **`web_extract` sends every URL to a third party** (keyless Exa) when no web backend is set.
-- **Memory and her own skills stay writable.** An injection that lands can persist until José reads
+- **Memory and her own skills stay writable.** An injection that lands can persist until the owner reads
   the diff. A chat can also create a cron job.
 - **Triage could still file a capture as a guideline.** The triage skill forbids it, but that is a
   prompt, and her model did it once. Open: see the [showcase plan](showcase/PLAN.md).

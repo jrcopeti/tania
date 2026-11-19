@@ -36,6 +36,9 @@ Carried over from the frozen hardening plan:
 - Later detection, not planned: ship tool-call logs off the VPS, so the evidence survives root on the
   host.
 
+- Replace "José" with "the owner" across the docs, the frozen ones included (asked 2026-11-19). The
+  threat model and `AGENTS.md` are done.
+
 Decided:
 
 - ~~What each README shows.~~ Telma's shows the brain work; the bug-loop demo is ticket-bay-bot's
