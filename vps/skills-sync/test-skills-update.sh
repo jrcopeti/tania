@@ -139,6 +139,10 @@ run $((NOW - 20 * DAY)); run $((NOW - 10 * DAY))
 git -C "$W/dev" rm -q .gitattributes && upstream SKILL.md "PIPE|"; run $((NOW - 9 * DAY)); run "$NOW"
 check "the scan reads a file with the attributes checkout uses" eval 'says "🚫" && at "$A"'
 
+setup; upstream SKILL.md "a|b"; run $((NOW - 20 * DAY)); run $((NOW - 10 * DAY))
+echo "*.md working-tree-encoding=UTF-7" > "$W/dev/.gitattributes" && push_all attrs; UP=$(head_of dev); age
+check "a new .gitattributes rewrites files it didn't change, as the scan saw them" eval 'at "$UP" && grep -qF "a+AHw-b" "$W/repo/skills/a/SKILL.md"'
+
 setup; python3 - "$W/dev" <<'PY'
 import subprocess, sys
 d = sys.argv[1]

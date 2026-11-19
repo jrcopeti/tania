@@ -2,8 +2,10 @@
 # Daily, as skills-sync: move the bot's dmoka/skills checkout to the newest upstream commit first seen
 # at least 7 days ago, unless the skills guard finds something in it the current checkout doesn't have.
 # The wait counts from our own fetch log, not commit dates, which the committer sets.
-# Both trees are scanned as git checks them out (not `git archive`, which honours upstream's
-# export-ignore), whole, with a size cap so upstream can't fill the disk.
+# Both trees are scanned whole, as a fresh `git checkout` writes them in a throwaway clone (not
+# `git archive`, which honours upstream's export-ignore, nor checkout-index, which reads the current
+# checkout's .gitattributes), with a size cap so upstream can't fill the disk. The bot's folder is
+# then rewritten under the target's attributes, so its bytes are the scanned ones.
 # Writes one line to $S/status: "ok" when nothing happened, otherwise what did. pull-repos.sh posts it.
 set -uo pipefail
 R=${SKILLS_REPO:-/opt/dmoka-skills}
@@ -15,8 +17,11 @@ NOW=${SKILLS_NOW:-$(date +%s)}
 HERE=$(cd "$(dirname "$0")" && pwd)
 g() { git -C "$R" -c core.hooksPath=/dev/null -c core.fsmonitor=false "$@"; }
 status() { echo "$*" > "$S/status.tmp" && mv "$S/status.tmp" "$S/status"; }
-# Write tree $2 into $tmp/$1 with a throwaway index, so the repo's own index and HEAD are untouched.
-unpack() { GIT_INDEX_FILE=$tmp/$1.index g read-tree "$2" && GIT_INDEX_FILE=$tmp/$1.index g checkout-index -a --prefix="$tmp/$1/"; }
+# Check commit $2 out into $tmp/$1 from a throwaway clone (no hooks, no templates), then drop its .git.
+unpack() {
+  git clone -q --shared --no-checkout --template= "$R" "$tmp/$1" &&
+    git -C "$tmp/$1" -c core.hooksPath=/dev/null checkout -q --detach "$2" && rm -rf "$tmp/$1/.git"
+}
 
 out=$(g fetch -q origin main 2>&1) || { status "⚠️ skills: fetch failed, not updated: $out"; exit 0; }
 up=$(g rev-parse FETCH_HEAD)
@@ -43,5 +48,7 @@ case $? in
   *) status "⚠️ skills: scan failed, not updated: $new"; exit 0 ;;
 esac
 n=$(g rev-list --count "$cur..$target")
-g checkout -q --detach "$target" || { status "⚠️ skills: checkout of ${target:0:7} failed"; exit 0; }
+# Emptying the index makes reset --hard write every file, so none keeps bytes an older .gitattributes made.
+g checkout -q --detach "$target" && g read-tree --empty && g reset -q --hard ||
+  { status "⚠️ skills: checkout of ${target:0:7} failed"; exit 0; }
 status "skills updated ${cur:0:7} → ${target:0:7} ($n commits, first seen $DAYS+ days ago)"
