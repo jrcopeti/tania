@@ -26,3 +26,9 @@
   cronjob tool; chats keep both (José's call in step 2).
 - The public docs say "the owner", not "José": the threat model and `AGENTS.md` changed. The rest of
   the docs follow later (open item in the plan).
+
+## 2026-11-20: chat tools stay
+
+- Asked whether to cut the `cronjob` toolset in chats, or web and browser. The owner's call: leave
+  them all as they are. Not checked: whether a job created from a chat runs with the chat's web
+  tools, which would make it an unattended job with all three legs.
