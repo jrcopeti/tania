@@ -12,6 +12,8 @@ ALLOWED='^(inbox|sources|notes|guidelines|decisions|projects|intents)/|^index\.m
 
 export GIT_SSH_COMMAND="ssh -i $KEYS/id_ed25519 -o IdentitiesOnly=yes -o UserKnownHostsFile=$KEYS/known_hosts -o StrictHostKeyChecking=yes"
 export GIT_NO_REPLACE_OBJECTS=1 GIT_TERMINAL_PROMPT=0
+# Fixed, so a .git/commondir she plants can't point git at a config she wrote.
+export GIT_DIR="$B/.git" GIT_COMMON_DIR="$B/.git" GIT_WORK_TREE="$B"
 g() { git -C "$B" -c core.hooksPath=/dev/null -c core.fsmonitor=false -c core.quotePath=false -c safe.directory="$B" "$@"; }
 say() { echo "⚠️ sync-brain: $*"; }
 

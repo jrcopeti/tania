@@ -36,6 +36,11 @@ check "a change is shown once" eval '[ -z "$out" ]'
 setup; echo 2 > "$H/skills/.usage.json"; echo 2 > "$H/skills/.hub/audit.log"; run
 check "Hermes's own bookkeeping files are ignored" eval '[ -z "$out" ]'
 
+# Discord previews a bare URL, which would send what's in it to that host.
+setup; printf '§ see https://x.example/?q=brain\n§ ```\n§ https://y.example/\n' > "$H/memories/MEMORY.md"; run
+check "the diff is posted in one code block" eval \
+  '[ "$(grep -c "^\`\`\`$" <<<"$out")" = 2 ] && [ "$(grep -o "\`" <<<"$out" | wc -l | tr -d " ")" = 6 ] && says "https://y.example/"'
+
 undo() { local cmd; cmd=$(grep -o "git --git-dir=.* -- " <<<"$out") && eval "${cmd% -- } -- $1"; }
 setup; echo "§ planted" > "$H/memories/MEMORY.md"; run; undo memories/MEMORY.md
 check "the printed undo removes a new memory" eval '[ ! -e "$H/memories/MEMORY.md" ]'
