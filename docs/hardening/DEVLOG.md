@@ -14,7 +14,8 @@
 | `docs/step-4-supply-chain` | 4 | merged (#8) |
 | `docs/step-5-detection` | 5 | PR to open |
 | `fix/review-steps-0-4` | 0–4 review | merged (#12) |
-| `fix/sync-brain-push-guard` | 0–4 review | PR to open |
+| `fix/sync-brain-push-guard` | 0–4 review | merged (#13) |
+| `docs/sync-brain-deploy` | 0–4 review | PR to open |
 
 ## 2026-11-17: safety audit and plan
 
@@ -895,3 +896,25 @@ GitHub's `main` are both at `82008fd` (José's 10:27 commit, pulled); the last 5
 none alerted; `git status` clean, quarantine empty. Her last push was 2026-11-18 21:05, after that
 evening's triage. Host for the deploy: ext4 (reports holes, so the sparse check works), Python 3.12.3,
 git 2.56.1.
+
+## 2026-11-19: new sync-brain deployed (José said yes)
+
+- #13 merged (`aa27547`). Before it: her clone and GitHub's `main` both at `2cfc1f8` (her new
+  guideline, pushed by the old script at 12:25), `git status` clean. At 12:54, between two runs,
+  `sync-brain.sh` and `brain-files.py` copied to `~/.hermes/scripts/`, owner `agent`, sha256 of each
+  matches the merge. The old script kept as `sync-brain.sh.bak-redesign-20261119-125431`: copying it
+  back is the rollback, since her clone's `.git` is never touched.
+- First scheduled run (13:05): silent; `~/.local/share/brain-push` created; `refs/sync/github` and
+  `refs/sync/given` at `2cfc1f8`. The brain tracks a root `.DS_Store` (from the Mac since 2026-11-17);
+  it's unchanged, so not a difference.
+
+**Live checks**, run with `hermes cron run` (José said yes):
+- From her sandbox: writing `skills/` fails ("Read-only file system"). A root `HEAD` file, a FIFO in
+  `notes/` and a symlink in `notes/` to `/etc`: refused and alerted, nothing pushed, nothing behind
+  the link read. The refusal lists only these: `brain-files.py` stops before the allowlist check.
+- With those gone, a new `skills/zz-live-check.md` on the host: refused and alerted (step 2's
+  done-when); GitHub's `main` didn't move. Removed; the next run silent.
+- A line added to `AGENTS.md` on the Mac and pushed: after a run, her sandbox shows it, with the same
+  inode on host and sandbox (no restart). Reverted the same way; `AGENTS.md` is back to its original.
+- A capture written from inside her sandbox into `inbox/` was pushed by the next run as `Tania`
+  (`f1813c9`), the run silent: the first real push on the new script.
