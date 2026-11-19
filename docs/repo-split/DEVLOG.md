@@ -53,3 +53,11 @@ file. Each repo's copy differs from it in comment lines only. A redeploy is opti
 Found: six deployed scripts that no repo has ever held (Open in [PLAN.md](PLAN.md)).
 
 Gotcha: in zsh, a loop variable named `path` overwrites `PATH`, and every command after it is "not found".
+
+## 2026-11-19: guard-network.sh into the repo
+
+- Added `vps/tania/guard-network.sh`, copied from `/home/agent/.hermes/agent-hooks/` byte for byte
+  (mode 755). José: publish it despite the course kit's license. It is the kit's hook with 4 lines
+  changed. Read first: it holds no secret, only patterns (`/opt/secrets`, `app-password`) it blocks.
+- The bot's deployed copy is identical to this one; it gets its own PR in jrcopeti/ticket-bay-bot.
+- `vps/host.md` now maps the file to its path on the VPS. No test yet: the hook needs a Hermes payload.

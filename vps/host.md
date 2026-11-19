@@ -12,6 +12,14 @@ Tania shares one VPS with ticket-bay-bot. The bot's repo describes the same host
 The bot runs as `ticket-bay-bot`, next to `ticket-bay-app` and `skills-sync`. Both agents' homes are
 `750`, so neither can read the other's files.
 
+## Where each file is deployed
+
+Copied by hand; `~` is Tania's home, `/home/agent`.
+
+| In this repo | On the VPS |
+|---|---|
+| `tania/guard-network.sh` | `~/.hermes/agent-hooks/` |
+
 ## Rules for the whole host
 
 These rules are the same, word for word, in both repos.
