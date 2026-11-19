@@ -98,8 +98,35 @@ Each step is one branch and one PR. Steps that change a running agent need José
 - Step 4 proof still to see: the first real skills update or block (no upstream commit since the pin
   yet).
 
-- Steps 0–4 review: the repo's code is reviewed and three fixes are on `fix/review-steps-0-4`, not
-  deployed yet. The VPS was checked read-only too; what's left are José's calls, listed in the devlog.
+- Steps 0–4 review: three fixes merged (#12) and deployed 2026-11-19. The rest, in this order (one
+  branch and one PR each; anything that changes the VPS needs José's yes):
+  1. `fix/sync-brain-push-guard`: **redesigned, tested, not deployed.** The audit proved 13 more
+     breaks, all from one cause: host git ran in a `.git` she writes. Redesign (José, 2026-11-19):
+     sync-brain keeps its own clone in `~/.local/share/brain-push`, copies her files in with
+     `brain-files.py` (plain files and folders only, never through a link), pushes only allowed paths,
+     and writes GitHub's changes back the same way. Symlinks and gitlinks refused (José,
+     2026-11-19). Four adversarial rounds; 61 tests, green on git 2.56; 25 fail on `main`. Stopped at
+     four (José). Left, in order:
+     - PR, then deploy with José's yes. The read-only look is done (devlog): ext4, Python 3.12.3,
+       git 2.56.1, the old script in sync.
+     - Deploy: copy `sync-brain.sh` and `brain-files.py` to `~/.hermes/scripts/`, right after a run
+       of the old script (the first run takes her copy as GitHub's `main`).
+     - Live checks: step 2's done-when again (a `skills/` change is refused and alerted); from her
+       real sandbox, a root `HEAD` file, a FIFO and a symlinked folder are refused; a Mac edit to
+       `AGENTS.md` shows in her sandbox without a restart.
+  2. The bot's job workdir: bug-loop and pr-triage-morning run from `~/dev/ticket-bay`, which the
+     sandbox writes, so a planted `.hermes.md` reaches their next prompt. Move the workdir to a folder
+     the sandbox can't write (prompts use absolute paths), or José accepts it like memory. Same
+     branch: pin `postgres:17` and `node:22-bookworm-slim` in `vps/ticket-bay-app` by digest (step
+     4's "every external input is pinned").
+  3. Audit `vps/skills-sync/` and the squid config (`vps/ticket-bay-bot/egress/`) with the
+     adversarial tester, module by module.
+  José's calls, no fix planned: the skills guard matches findings per skill, pattern and file (a
+  second `~/.ssh` read in the same file passes); the test gate runs `git rev-parse` and
+  `worktree remove` on the host in sandbox-written repos (no exec seen, low).
+  Dropped: the memory-diff cut splitting a character (both gateways run `LANG=C.UTF-8`) and Discord's
+  length count (Hermes splits long posts and keeps code blocks closed). A model-written memory summary
+  job was designed and dropped: José asks Tania for one in a chat when he wants it.
 
 - Later detection options, not planned: ship tool-call logs off the VPS (evidence that survives root on
   the host).
