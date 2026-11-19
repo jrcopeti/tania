@@ -8,7 +8,7 @@ Tania's kill switch, then rebuild the VPS.
 ## 1. Stop
 
 ```sh
-sudo -iu ticket-bay-bot hermes gateway stop                       # chats and every cron job
+sudo -iu ticket-bay-bot hermes gateway stop --yes                 # chats and every cron job; --yes interrupts live runs
 sudo systemctl --user -M ticket-bay-bot@ disable hermes-gateway   # stays off after a reboot (linger is on)
 sudo -iu ticket-bay-bot bash -c 'docker ps -aq --filter name=hermes- | xargs -r docker rm -f'
 ```
