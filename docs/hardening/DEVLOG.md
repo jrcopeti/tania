@@ -17,7 +17,7 @@
 | `fix/sync-brain-push-guard` | 0–4 review | merged (#13) |
 | `docs/sync-brain-deploy` | 0–4 review | PR to open |
 | `docs/gh-telemetry-and-runtime-bumps` | before step 6 | merged (#17); 3 later commits, PR to open |
-| `verify/step-6` | 6 | open |
+| `verify/step-6` | 6 | PR #19 |
 
 ## 2026-11-17: safety audit and plan
 
