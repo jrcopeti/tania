@@ -98,8 +98,8 @@ Each step is one branch and one PR. Steps that change a running agent need José
 - Step 4 proof still to see: the first real skills update or block (no upstream commit since the pin
   yet).
 
-- Steps 0–4 shipped without a code review (step 5's found a leak path in tested code). Review what
-  they put on the VPS against each step's done-when, fixes on their own branch. After step 5.
+- Steps 0–4 review: the repo's code is reviewed and three fixes are on `fix/review-steps-0-4`, not
+  deployed yet. The VPS was checked read-only too; what's left are José's calls, listed in the devlog.
 
 - Later detection options, not planned: ship tool-call logs off the VPS (evidence that survives root on
   the host).

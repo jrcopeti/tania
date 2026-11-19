@@ -111,6 +111,13 @@ printf '#!/bin/sh\ntouch %s/hook-ran\n' "$W" > "$W/evil-hooks/pre-commit" && chm
 echo ok > "$B/notes/n.md"; sync
 check "a planted core.hooksPath does not run" eval '[ ! -e "$W/hook-ran" ] && remote_has notes/n.md'
 
+# .git/config is read-only in her sandbox, but .git/commondir would make git read another one.
+setup; cp -R "$B/.git" "$W/evil-common"; printf '%s\n' "$W/evil-common" > "$B/.git/commondir"
+printf '[commit]\n\tgpgSign = true\n[gpg]\n\tprogram = %s/evil-gpg\n' "$W" >> "$W/evil-common/config"
+printf '#!/bin/sh\ntouch %s/gpg-ran\nexit 1\n' "$W" > "$W/evil-gpg" && chmod +x "$W/evil-gpg"
+echo ok > "$B/notes/n.md"; sync
+check "a planted .git/commondir does not swap git's config" eval '[ ! -e "$W/gpg-ran" ] && remote_has notes/n.md'
+
 setup; git init -q --bare "$W/evil.git"; in_b remote set-url origin "$W/evil.git"; echo ok > "$B/notes/n.md"; sync
 check "a changed origin URL is ignored" eval 'remote_has notes/n.md && [ -z "$(git -C "$W/evil.git" for-each-ref)" ]'
 

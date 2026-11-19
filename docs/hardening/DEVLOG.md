@@ -13,6 +13,7 @@
 | `docs/step-3-egress` | 3 | merged (#7) |
 | `docs/step-4-supply-chain` | 4 | merged (#8) |
 | `docs/step-5-detection` | 5 | PR to open |
+| `fix/review-steps-0-4` | 0–4 review | PR to open |
 
 ## 2026-11-17: safety audit and plan
 
@@ -777,3 +778,61 @@ each turned tests red.
 - Nothing on the VPS touched `archive/` today; Tania's web calls were httpbin.org and mindstudio.ai.
 - José disabled the AWS key token afterwards. The key is still in the brain's git history, now
   unwatched; a use of it alerts nobody. The URL canary is the only canary left.
+
+## 2026-11-18: review of steps 0–4 (code only, nothing changed on the VPS)
+
+Read the repo's files for steps 0–4 against each step's done-when, then the VPS read-only (José said
+yes): both agents' mounts, hooks, jobs and host scripts, and step 4's owners and cron.
+
+**On the VPS, holds:** Tania's sandbox has no network, and the brain's `.git` is writable except
+`hooks/` and `config` (so fix 1 applies; the deployed `sync-brain.sh` is the old one). No crontab for any
+user; `/etc/cron.d/skills-pull` is root-owned and runs as `skills-sync`; `/opt/dmoka-skills` belongs to
+`skills-sync`, `/opt/hermes-guard` and the scripts to root; skills status `ok`. Both Hermes installs and
+the guard are on `ae2a81c`. Nothing planted in the bot's clone: no hooks, no `commondir`, instruction
+files unchanged. The token-mint, mail-claim and pr-triage scripts run git or gh only outside `~/dev`;
+`publish-pr-review` runs in the sandbox.
+
+**Fixed, each with a test that failed first:**
+1. **sync-brain: a planted `.git/commondir` ran code on the host** (step 2). Tania's sandbox can write
+   `.git/` apart from `hooks/` and `config`. A `commondir` file there makes git read config from another
+   folder, and the `-c` pins cover only hooks and fsmonitor: `commit.gpgSign` with her own
+   `gpg.program` ran as the host user that holds the brain deploy key. Now `GIT_DIR`,
+   `GIT_COMMON_DIR` and `GIT_WORK_TREE` are fixed. 32 tests.
+2. **pull-repos: the host ran `git pull` in the bot's sandbox-writable clone** (steps 1 and 4).
+   `~/dev` is mounted read-write, `.git/hooks` and `.git/config` with it, so an injected bug-loop run
+   could plant a hook or `core.fsmonitor` that ran on the host the next morning: outside squid, with the
+   GitHub App's private key and the bot's other secrets in reach. The pull is gone; bug-loop fetches in
+   the sandbox. New `test-pull-repos.sh`, in CI.
+3. **memory-diff: posted saved text as plain Discord text** (step 4). A URL an agent saved got
+   previewed, which sends whatever is in it. Now in a code block, backticks stripped, as squid-denials
+   does.
+
+**Not fixed, for José:**
+- The bot's cron jobs (bug-loop, pr-triage-morning) have `~/dev/ticket-bay` as their workdir, which the
+  sandbox writes. Hermes loads that folder's `AGENTS.md` (or a planted `.hermes.md`) on the host into the
+  next run's prompt: persistence like memory, but the memory-diff doesn't show it.
+- The test gate (`verify-tests.sh`, host) runs `git rev-parse` and `git worktree remove --force` in
+  sandbox-written repos, so it reads a `.git/config` the sandbox controls. The tests themselves run in
+  the sandbox (`docker exec`). A planted `core.fsmonitor` and hooks didn't run on those two commands
+  (git 2.39 on the Mac); not tried with the VPS's git 2.56.
+- skills guard: findings are matched on skill, pattern and file, so a second `~/.ssh` read added to a
+  file that already has one passes. Counting matches would close it; it would also block more.
+- Step 4's "every external input is pinned": `postgres:17` and `node:22-bookworm-slim` in
+  `vps/ticket-bay-app` aren't pinned by digest (used only on a manual rebuild).
+- Tania can push `guidelines/` and `index.md`, which every Mac agent reads first as rules: the open
+  guidelines question in the plan.
+- Not checked: whether squid looks up DNS for a host it denies (a DNS leak). Its ACLs are names only,
+  so it shouldn't.
+
+To deploy, with José's yes: `sync-brain.sh` (Tania), `pull-repos.sh` and `memory-diff.sh` (both agents).
+
+**Adversarial tester on this diff** (fresh agent, branch diff only): the three fixes held, and each new
+test fails on `main`. Its two blockers, checked: bug-loop's prompt in `jobs.json` runs `git fetch
+origin` before `worktree add … origin/main`, so the clone needs no host pull; Hermes's Discord splitter
+closes and reopens code blocks across chunks, so a long memory-diff stays in its block. It also proved
+two older bugs in sync-brain, same on `main`, for the next branch: a sandbox loop rewriting
+`.git/FETCH_HEAD` gets a `skills/` change pushed (2 of 3 runs), and `.git/COMMIT_EDITMSG` or
+`FETCH_HEAD` as symlinks overwrite host files. Symlinks and gitlinks in allowed folders are pushed.
+
+Next, in order: this branch deployed; sync-brain audited, then fixed on one branch; the bot's job
+workdir moved off the clone and the app's base images pinned; `skills-sync/` and squid audited.
