@@ -1074,7 +1074,7 @@ PTR was looked up, and squid-denials reports every denial. The old config fails 
 folder (recreates squid on the new image; the log volume stays), then from the sandbox: `api.github.com`
 200, `example.com` 403, and a `CONNECT <some IP>:443` 403 with no PTR query.
 
-## 2026-11-19: skills-sync and squid fixes deployed (José said yes), squid image not
+## 2026-11-19: skills-sync and squid fixes deployed (José said yes)
 
 **Before:** all five deployed files matched `main` (sha256). No agent run active; skills status `ok`,
 checkout `1a6af1f`, nothing new upstream. Files staged in `/root/deploy-review`, hashes matching the
@@ -1105,3 +1105,14 @@ picked up the new `squid.conf`: `dstdomain -n` in the container, `squid -k parse
 **Not deployed: the image move.** The repo's `compose.yaml` pins 7.2-26.04; the VPS runs 6.13-25.04
 with the fixed config. Unblocking it needs a wider subordinate ID range for the bot (a host change and
 a rootless Docker restart): José's call, in the plan's Open list.
+
+**Image, second try (José said yes, 16:38).** The 26.04 `_edge` image is a chiseled build run by
+Pebble as UID 584792 (`/run`, `/var/log/squid`, `/var/spool/squid` owned by it; no shell, `find` or
+`head`). Widening the bot's subordinate IDs would also mean a rootless Docker restart, a log volume
+owned by `proxy`, and maybe no `cat` for `squid-denials.sh`. `6.6-24.04_edge` instead: a classic image
+(squid 6.14, Ubuntu 24.04.5 LTS, updated 2026-11-18), nothing above UID 65,535, pinned to
+`d9c34c5a…`. `test-egress.sh` 14 pass on it, the old config fails 3. On the VPS the image was pulled
+first (so a failure would change nothing), then `compose.yaml` installed and `compose up -d`: squid
+6.14, `-n` in the config, parse clean, the log volume kept (owner 13). From the sandbox again:
+`api.github.com` 200, `example.com` 403, a public IP 403 with `HIER_NONE`. The repo and the VPS now
+match.

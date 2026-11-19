@@ -106,10 +106,6 @@ Each step is one branch and one PR. Steps that change a running agent need José
   but noise that hides a real denial. Fix: add `GH_TELEMETRY: "false"` and `DO_NOT_TRACK: "1"` to the
   bot's `terminal.docker_env` in `config.yaml` (José's yes; likely a gateway restart), then check no
   more `cafe.github.com` lines after a pr-triage run.
-- Squid image: the repo pins `ubuntu/squid:7.2-26.04_edge`, but its pull fails in the bot's rootless
-  Docker (a file owned by UID 584792; the bot has 65,536 subordinate IDs). The VPS runs 6.13-25.04
-  (end of life) with the fixed config. Widen `/etc/subuid` and `/etc/subgid` for ticket-bay-bot and
-  restart its Docker (sandbox and squid go down briefly), or pick another image? José's call.
 - Step 4 proof still to see: the first real skills update or block (no upstream commit since the pin
   yet).
 
@@ -126,14 +122,13 @@ Each step is one branch and one PR. Steps that change a running agent need José
      elsewhere, and its 6-hourly worktree sweep (host `git status`) no longer looks at the clone. The
      test gate's path rewrite fixed. `postgres:17` and `node:22-bookworm-slim` pinned by digest.
      Both jobs checked with a run; a planted `.hermes.md` didn't reach pr-triage-morning's answer.
-  3. ~~`audit/skills-sync-and-egress`~~ **done** (#16, deployed 2026-11-19 except the squid
-     image). Both modules attacked by a fresh agent, skills-sync twice. skills-sync: the scan saw a
+  3. ~~`audit/skills-sync-and-egress`~~ **done** (#16, deployed 2026-11-19). Both modules attacked by a fresh agent, skills-sync twice. skills-sync: the scan saw a
      `git archive` copy that upstream's `export-ignore` can trim, of three folders only. Now each
      commit is checked out fresh in a throwaway clone and scanned whole, and the bot's folder is
      rewritten to match; links leaving the repo block; over 50 MB or 5,000 files isn't unpacked; a
      commit upstream force-pushed away during the wait is never taken (José); the status can't carry
      mentions or links. Squid: an IP whose reverse DNS says `github.com` got a tunnel (`dstdomain`
-     without `-n`), and squid-denials skipped `TCP_DENIED_ABORTED`. Whole-platform trust: accepted
+     without `-n`), and squid-denials skipped `TCP_DENIED_ABORTED`; image now 6.6-24.04 LTS. Whole-platform trust: accepted
      risk (Decisions).
   José's calls, no fix planned: the skills guard matches findings per pattern and path (a
   second `~/.ssh` read in the same file passes); the test gate runs `git rev-parse` and
