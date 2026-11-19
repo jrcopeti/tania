@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Tests for skills-update.sh against a throwaway "upstream" and checkout. A stub skills guard flags
-# EVIL (high) and MEH (low), and fails on BOOM, so these test the update rules, not Hermes's patterns.
+# EVIL and PIPE| (high) and MEH (low), and fails on BOOM, so these test the update rules, not Hermes's
+# patterns. PIPE| is there because UTF-7 escapes the pipe: it shows which bytes the scan read.
 # Run: bash vps/skills-sync/test-skills-update.sh
 set -u
 SCRIPT=$(cd "$(dirname "$0")" && pwd)/skills-update.sh
@@ -30,9 +31,9 @@ def scan_skill(d, source=""):
             for i, line in enumerate(p.read_text().splitlines(), 1):
                 if "BOOM" in line:
                     raise RuntimeError("boom")
-                for word, sev in (("EVIL", "high"), ("MEH", "low")):
+                for word, sev in (("EVIL", "high"), ("PIPE|", "high"), ("MEH", "low")):
                     if word in line:
-                        out.append(Finding(word.lower(), sev, str(p.relative_to(d)), i))
+                        out.append(Finding(word.lower().strip("|"), sev, str(p.relative_to(d)), i))
     return ScanResult(out)
 EOF
 
@@ -127,6 +128,31 @@ check "a relative symlink leaving the repo blocks" eval 'says "symlink_outside_r
 
 setup; ln -s ../a/SKILL.md "$W/dev/skills/a/same.md" && push_all inlink; UP=$(head_of dev); age
 check "a symlink inside the repo doesn't block" eval 'says "skills updated" && at "$UP"'
+
+setup; ln -s ../../../new/skills/a/SKILL.md "$W/dev/skills/a/leak.md" && push_all scandirname; age
+check "a link leaving the repo blocks even if it comes back through the scan folder's name" eval 'says "symlink_outside_repo" && at "$PIN"'
+
+# Attributes: A sets UTF-7 for *.md and is taken; B drops that and adds PIPE|. Checkout writes B's
+# SKILL.md with B's attributes (plain), so the scan must read it that way too, not with A's.
+setup; echo "*.md working-tree-encoding=UTF-7" > "$W/dev/.gitattributes"; upstream SKILL.md "benign"; A=$UP
+run $((NOW - 20 * DAY)); run $((NOW - 10 * DAY))
+git -C "$W/dev" rm -q .gitattributes && upstream SKILL.md "PIPE|"; run $((NOW - 9 * DAY)); run "$NOW"
+check "the scan reads a file with the attributes checkout uses" eval 'says "🚫" && at "$A"'
+
+setup; python3 - "$W/dev" <<'PY'
+import subprocess, sys
+d = sys.argv[1]
+blob = subprocess.run(["git", "-C", d, "hash-object", "-w", "--stdin"], input=b"x", capture_output=True).stdout.decode().strip()
+lines = "".join(f"100644 {blob}\tskills/a/many/f{i:04d}\n" for i in range(200))
+subprocess.run(["git", "-C", d, "update-index", "--add", "--index-info"], input=lines.encode(), check=True)
+PY
+git -C "$W/dev" commit -qm many && git -C "$W/dev" push -q "$W/up.git" HEAD:main
+SKILLS_MAX_FILES=100 age
+check "a tree over the file cap is not unpacked (tiny blobs, many names)" eval 'says "files (cap 100)" && at "$PIN"'
+
+setup; echo EVIL > "$W/dev/skills/a/@everyone <@123> [click](http:__x.example) x.sh"
+for i in $(seq 1 30); do echo EVIL > "$W/dev/skills/a/$(printf 'n%.0s' $(seq 1 100))$i.sh"; done; push_all spam; age
+check "the status stays short and carries no mentions or links" eval 'says "🚫" && [ ${#out} -le 1500 ] && ! says "@" && ! says "<" && ! says "]("'
 
 setup; head -c 3000000 /dev/zero > "$W/dev/skills/a/big.txt" && push_all big; UP=$(head_of dev)
 SKILLS_MAX_MB=2 age
