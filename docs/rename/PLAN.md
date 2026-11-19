@@ -58,7 +58,8 @@ merges them.
 
 ## Open
 
-- Root's `step6/tania.tgz` keeps the old name. It holds the four inbox captures from step 6, before
-  triage filed them (not the same files as `telma-filed`). The hardening DEVLOG doesn't name it.
-- Old `*.bak-*` copies in agent's `~/.hermes/scripts/` still say Tania. They are outside the final
-  grep and can go once José is happy with the redeploy.
+- Done 2026-11-19: root's `step6/tania.tgz` (the four step-6 captures before triage) renamed
+  `telma.tgz`; the five pre-rename `*.bak-*` scripts in agent's `~/.hermes/scripts/` deleted (each
+  version is in git history).
+- The six `*.bak-rename-20261119-205327` copies go after the 2026-11-20 09:00 triage and 09:30
+  memory-diff run clean.
