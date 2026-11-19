@@ -24,6 +24,9 @@ check "allowed requests only: silent" eval '[ -z "$out" ]'
 setup; deny cdn-assets.example:443; run
 check "a new denial is shown" eval 'says "🚫 squid blocked 1 request" && says "CONNECT \`cdn-assets.example:443\`" && ! says old.example'
 
+setup; echo "1763470060.200 1511 192.0.2.3 TCP_DENIED_ABORTED/403 0 CONNECT hung-up.example:443 - HIER_NONE/- text/html" >> "$T/access.log"; run
+check "a denial the client hung up on is shown" eval 'says "hung-up.example:443"'
+
 setup; deny cdn-assets.example:443; run; run
 check "a denial is shown once" eval '[ -z "$out" ]'
 

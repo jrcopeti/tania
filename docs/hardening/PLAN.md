@@ -47,6 +47,12 @@ injection test suite passes against both agents.
   the canary. Her skills in `~/.hermes/skills` are hers to write; the diff is the control, and José
   edits what shouldn't be there. Emptying her memory alone doesn't undo what she learned: check her
   skills and `~/.hermes/skills/.curator_ledger.jsonl` too.
+- **The bot's allowlist trusts whole platforms, as an accepted risk** (José, 2026-11-19). Squid sees
+  only the CONNECT host, so any account on `github.com`, `api.github.com` or `registry.npmjs.org` is
+  reachable: an injected email carrying the attacker's own GitHub or npm token could have the bot push,
+  open a gist or `npm publish` what it read, or pull a payload from the attacker's repo or package.
+  Nothing denies or alerts on it, and the kill switch checks only the bot's fork. Narrowing it means
+  TLS inspection, or moving git and `gh` work to the host and npm behind a mirror: not now.
 - **Step 5 detects, it doesn't record.** Shipping tool-call logs off the VPS keeps evidence safe from
   root on the host but alerts on nothing: dropped. Squid's denials are added: a blocked request from the
   bot's sandbox is the clearest sign of an injected run. The canary's file is named nowhere in this
@@ -116,9 +122,15 @@ Each step is one branch and one PR. Steps that change a running agent need José
      elsewhere, and its 6-hourly worktree sweep (host `git status`) no longer looks at the clone. The
      test gate's path rewrite fixed. `postgres:17` and `node:22-bookworm-slim` pinned by digest.
      Both jobs checked with a run; a planted `.hermes.md` didn't reach pr-triage-morning's answer.
-  3. Audit `vps/skills-sync/` and the squid config (`vps/ticket-bay-bot/egress/`) with the
-     adversarial tester, module by module.
-  José's calls, no fix planned: the skills guard matches findings per skill, pattern and file (a
+  3. ~~`audit/skills-sync-and-egress`~~ **done** (#16, deployed 2026-11-19). Both modules attacked by a fresh agent, skills-sync twice. skills-sync: the scan saw a
+     `git archive` copy that upstream's `export-ignore` can trim, of three folders only. Now each
+     commit is checked out fresh in a throwaway clone and scanned whole, and the bot's folder is
+     rewritten to match; links leaving the repo block; over 50 MB or 5,000 files isn't unpacked; a
+     commit upstream force-pushed away during the wait is never taken (José); the status can't carry
+     mentions or links. Squid: an IP whose reverse DNS says `github.com` got a tunnel (`dstdomain`
+     without `-n`), and squid-denials skipped `TCP_DENIED_ABORTED`; image now 6.6-24.04 LTS. Whole-platform trust: accepted
+     risk (Decisions).
+  José's calls, no fix planned: the skills guard matches findings per pattern and path (a
   second `~/.ssh` read in the same file passes); the test gate runs `git rev-parse` and
   `worktree remove` on the host in sandbox-written repos (no exec seen, low).
   Dropped: the memory-diff cut splitting a character (both gateways run `LANG=C.UTF-8`) and Discord's

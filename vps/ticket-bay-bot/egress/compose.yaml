@@ -2,7 +2,9 @@
 # which has no route out; squid sits on both networks and is the only way through.
 services:
   squid:
-    image: ubuntu/squid:6.13-25.04_beta@sha256:3de2e64f0ca6efdac3e98557607dc0f23050037f3885016d5d5bfcf9950501b8
+    # 24.04 LTS, _edge: the _beta tags (25.04 is end of life) stopped getting updates in 2025. Not the
+    # 26.04 image: it runs as UID 584792, which this rootless Docker's 65,536 IDs can't map.
+    image: ubuntu/squid:6.6-24.04_edge@sha256:d9c34c5ab74c6dd41cf1070d9b4221aac072e67e983527ca2d41512958f77506
     volumes:
       - ./squid.conf:/etc/squid/squid.conf:ro
       # Kept across container recreation; squid-denials.sh reads it with docker exec.

@@ -975,3 +975,144 @@ message in the run names it. The denial worked; the fix for the noise is in the 
 **Images:** `postgres:17` pinned to `0d938e97…`, the digest the app runs on the VPS (so a
 `compose up` keeps its database image). `node:22-bookworm-slim` pinned to today's `e9f565d3…`: the
 VPS no longer has the image the app was built from. Both used only on a manual rebuild.
+
+## 2026-11-19: skills-sync audited and fixed (not deployed)
+
+Plan Open item 3, first module. A fresh agent attacked `vps/skills-sync/` with upstream as the
+attacker; 7 breaking tests, all failing on the deployed scripts.
+
+**What was wrong.** The guard scanned one copy and the bot got another. `skills-update.sh` unpacked
+the target with `git archive`, which follows the archived tree's `.gitattributes`: one
+`skills/a/run.sh export-ignore` line kept a file out of the scan, and `git checkout` still wrote it
+to `/opt/dmoka-skills`. And `scan-diff.py` scanned only `skills/*`, `shared/` and `tools/`, while the
+sandbox mounts the whole repo, so a skill could tell the bot to run an unscanned `scripts/x.sh`.
+Smaller: a new skill named `shared` or `tools` matched the top-level folder's findings (keys used the
+folder name); a guard that failed to import exited 1 and read as "found new: ;" with no reason.
+
+**Fix.** Both commits (`cur` and `target`) are written with `read-tree` + `checkout-index` into a
+temp folder through a throwaway `GIT_INDEX_FILE`, so the scanned bytes are what checkout writes and
+the repo's index and HEAD are untouched. The whole tree is one unit; findings are keyed on pattern and
+path. Links are checked by the script too: the pinned guard (`ae2a81c`) rates a broken link only
+medium, and a link resolved on the host can point at something else in the sandbox, so any absolute
+link, or one that leaves the repo or points nowhere, is `high symlink_outside_repo`. A tree over
+`SKILLS_MAX_MB` (50; upstream is under 1 MB) isn't unpacked. Import errors and a missing folder are
+exit 2; the status names only the exception type, since a message can quote a file's bytes.
+
+**Checks.** `test-skills-update.sh`: 22 pass before the force-push change (8 new; the 7 attack cases fail on the old scripts).
+Real guard at `ae2a81c` (Python 3.15, local) on `dmoka/skills`: its last 5 commits scan clean as a
+whole repo; a planted `scripts/sync.sh` reading `~/.ssh` blocks (`high ssh_dir_access`), and a link
+to the bot's `.env` blocks (`critical symlink_escape`, `high symlink_outside_repo`).
+
+**Force-pushed commits (José: only take what upstream still has).** `target` was the last logged
+head 7+ days old, even if upstream had since force-pushed it away. Now it is the newest logged head
+7+ days old that is still an ancestor of the fetched head, so a pulled commit is dropped and an older
+one upstream kept can still be taken. Two tests; 24 pass.
+
+**Deploy (needs José's yes):** copy `skills-update.sh` and `scan-diff.py` to
+`/usr/local/lib/skills-sync/` (root-owned), back up the old ones, run once as `skills-sync`, expect
+`ok`. The first update after that rewrites every file in `/opt/dmoka-skills`.
+
+
+**Second review (fresh agent on Sonnet, scoped to `4fa5b15`): four more, fixed in separate commits
+after the failing tests (`8bdf77f`).**
+- *Attributes:* `checkout-index` in `$R` read the current checkout's `.gitattributes`, `checkout` the
+  target's. A taken commit setting `*.md working-tree-encoding=UTF-7`, then one dropping it and adding
+  `curl … | bash`: scanned UTF-7 (the pipe escaped, nothing matched), delivered plain, and the base
+  refused it, so a regression. Now both commits are checked out fresh in a throwaway `clone --shared`
+  (no hooks, no templates, `.git` removed before the scan). After the bot's checkout, `read-tree
+  --empty` + `reset --hard` rewrites every file, since an incremental checkout leaves untouched files
+  with bytes an older `.gitattributes` made (tested: a commit that only adds UTF-7 rewrites them).
+- *Disk:* the cap summed blob bytes; one 1-byte blob under 30,000 names counted 0 MB and unpacked to
+  120 MB, twice. Now also at most 5,000 files (upstream has 88).
+- *Links:* `../../../new/skills/a/SKILL.md` left the repo but resolved back into the scan folder,
+  named `new`. The target is now judged as a path inside the repo first.
+- *Status (older bug):* upstream's file names went into the Discord status whole (39,322 characters,
+  `@everyone`, a mention, a markdown link). Now five findings at most, names cut to 80 characters and
+  reduced to `[A-Za-z0-9._/-]`.
+
+`test-skills-update.sh`: 29 pass; each new case failed before its fix. Real guard rerun: upstream's
+last 5 commits clean, the planted script and link still block. Not run end to end with the real guard
+(the VPS has Python ≥ 3.11; this Mac's `python3` is 3.9): the deploy check covers it.
+
+## 2026-11-19: egress squid audited and fixed (not deployed)
+
+Plan Open item 3, second module. A fresh agent attacked `vps/ticket-bay-bot/egress/` with a local
+rig: the repo's `squid.conf` in the pinned image on an internal Docker network, a fake resolver, a
+fake attacker server on 443 and a raw-socket client. Nothing left the Mac but image pulls.
+
+**Reverse DNS let an IP through.** A `dstdomain` ACL without `-n` looks up an IP literal's PTR and
+matches the name it gets back, without checking it resolves to that IP. `CONNECT 192.0.2.77:443` (test range),
+with that IP's PTR set to `github.com`, got `200 Connection established`, and a fake token sent down
+the tunnel reached the attacker server; the log line is `TCP_TUNNEL/200`, so no alert. Anyone who
+rents a server and sets its PTR (many hosts allow it) gets a way out. The same lookup leaks bytes on a
+denied request: an IPv6 literal's PTR query carries 16 bytes the attacker picks to the nameserver of
+that range. On the VPS squid sits on `tbb-outside` and uses the host's resolver, so this should hold
+there; not checked live. Fix: `dstdomain -n`: 403, no lookup.
+
+**Denials the alert missed.** When the client hangs up before squid answers, the line is
+`TCP_DENIED_ABORTED/403`, and `squid-denials.sh` matched only `TCP_DENIED/`. It reported 10 of 11.
+Now `TCP_DENIED[/_]*`, with a test.
+
+**Image.** `6.13-25.04_beta` is on Ubuntu 25.04 (end of life January 2026), and the `_beta` tags
+stopped updating in November 2025. Now `7.2-26.04_edge` (26.04 LTS, updated 2026-11-15), pinned to
+`42decc7f…`. Same config parses and passes.
+
+**Accepted risk (José):** the allowlist trusts whole platforms, so the bot can reach other people's
+accounts on them. Written in the plan's Decisions.
+
+**Hunted, held:** subdomains and `raw.githubusercontent.com`, port 22, plain HTTP, squid's manager
+page, `169.254.169.254` and `127.0.0.1`, no ICP/HTCP/SNMP/peers/ICAP/ssl-bump, `tbb-sandbox` internal
+with nothing published.
+
+**Tests.** The rig is now `egress/test-egress.sh`, a suite in CI (Docker on the runner): 14 cases,
+including one allowed host (503 there, no internet) and checks that nothing reached the attacker, no
+PTR was looked up, and squid-denials reports every denial. The old config fails 3 of them; the old
+`squid-denials.sh` fails the new hung-up case in `test-squid-denials.sh` (13 pass).
+
+**Deploy (needs José's yes):** as ticket-bay-bot, back up `squid.conf`, `compose.yaml` and
+`~/.hermes/scripts/squid-denials.sh`, copy the new ones in, `docker compose up -d` in the egress
+folder (recreates squid on the new image; the log volume stays), then from the sandbox: `api.github.com`
+200, `example.com` 403, and a `CONNECT <some IP>:443` 403 with no PTR query.
+
+## 2026-11-19: skills-sync and squid fixes deployed (José said yes)
+
+**Before:** all five deployed files matched `main` (sha256). No agent run active; skills status `ok`,
+checkout `1a6af1f`, nothing new upstream. Files staged in `/root/deploy-review`, hashes matching the
+branch.
+
+**skills-sync** (16:26): `test-skills-update.sh` run on the VPS as `skills-sync` first: one case failed
+there only. Its absolute link pointed into the bot's home, which `skills-sync` can't read, so Python
+raised a permission error and the scan failed instead of naming the link (still not taken; the real
+guard behaves the same). The test now points at a path that exists nowhere: 29 pass on the Mac and
+the VPS, the UTF-7 cases included (glibc). Old scripts kept as `*.bak-review-20261119-162658` in
+`/usr/local/lib/skills-sync`. One run as `skills-sync`: `ok`, checkout unchanged (no new upstream
+commit, so no scan). The scan checked by hand as `skills-sync` with the real guard and system Python
+3.12, on fresh clones of the pin: pin against itself exit 0 (89 files); with a planted `scripts/sync.sh`
+reading `~/.ssh` and a link to `/etc/hostname`, exit 1 (`high ssh_dir_access`, `critical
+symlink_escape`, `high symlink_outside_repo`). `/opt/new` doesn't exist.
+
+**squid** (16:27): backups `*.bak-review-20261119-162741` (`squid.conf`, `compose.yaml`, and
+`squid-denials.sh` in `~/.hermes/scripts`). The pull of `7.2-26.04_edge` failed: a layer holds a file
+owned by UID 584792, and the bot's rootless Docker has 65,536 subordinate IDs (`231072:65536`), so it
+can't be unpacked. The deploy stopped before `compose up`; the old container kept running. The
+deployed `compose.yaml` was put back from its backup (6.13 pin), and `docker compose restart squid`
+picked up the new `squid.conf`: `dstdomain -n` in the container, `squid -k parse` clean. New
+`squid-denials.sh` in place.
+
+**Live, from the bot's sandbox (raw CONNECT to `egress:3128`):** `api.github.com` 200, `example.com`
+403, a public IP literal 403 with `HIER_NONE` (no lookup). The two denials are this test.
+
+**Not deployed: the image move.** The repo's `compose.yaml` pins 7.2-26.04; the VPS runs 6.13-25.04
+with the fixed config. Unblocking it needs a wider subordinate ID range for the bot (a host change and
+a rootless Docker restart): José's call, in the plan's Open list.
+
+**Image, second try (José said yes, 16:38).** The 26.04 `_edge` image is a chiseled build run by
+Pebble as UID 584792 (`/run`, `/var/log/squid`, `/var/spool/squid` owned by it; no shell, `find` or
+`head`). Widening the bot's subordinate IDs would also mean a rootless Docker restart, a log volume
+owned by `proxy`, and maybe no `cat` for `squid-denials.sh`. `6.6-24.04_edge` instead: a classic image
+(squid 6.14, Ubuntu 24.04.5 LTS, updated 2026-11-18), nothing above UID 65,535, pinned to
+`d9c34c5a…`. `test-egress.sh` 14 pass on it, the old config fails 3. On the VPS the image was pulled
+first (so a failure would change nothing), then `compose.yaml` installed and `compose up -d`: squid
+6.14, `-n` in the config, parse clean, the log volume kept (owner 13). From the sandbox again:
+`api.github.com` 200, `example.com` 403, a public IP 403 with `HIER_NONE`. The repo and the VPS now
+match.
