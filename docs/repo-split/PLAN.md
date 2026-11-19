@@ -39,12 +39,15 @@ Each step stops for José's yes before any commit, push, repo setting or SSH com
 
 | # | Step | Done when | Status |
 |---|---|---|---|
-| 1 | **Plan.** This file and the devlog, one PR. | Merged | in review |
-| 2 | **Tag.** `pre-split` on `main` after step 1, pushed. | The tag is on GitHub | todo |
-| 3 | **Bot repo.** Create `jrcopeti/ticket-bay-bot`, public and empty. Build the import from `pre-split`: the bot's files, with only the forced lines changed and a printed diff against the tag for review. Add the bot's `memory-diff.sh` and its test, `AGENTS.md`, `CLAUDE.md`, `.githooks/`, `.gitleaks.toml`, both workflows (bot jobs only), `docs/hardening/{PLAN,DEVLOG}.md` and `vps/host.md`. Push to `main`, then switch on the ruleset. | CI green (tests and gitleaks on the full history), ruleset active | todo |
-| 4 | **Tania without the bot.** Delete the bot's files. Move `vps/shared/` to `vps/tania/`. Remove the bot jobs from `tests.yml`. Pin the links, freeze the hardening PLAN, add `vps/host.md`, link the kill switch, and update `AGENTS.md`. Opened only after step 3 is green. | Merged, CI green, no link to a missing file | todo |
-| 5 | **VPS check.** Read-only over SSH: sha256 of every deployed script against its copy in either repo. | Every deployed script matches, or each difference is explained | todo |
+| 1 | **Plan.** This file and the devlog, one PR. | Merged | done (#21) |
+| 2 | **Tag.** `pre-split` on `main` after step 1, pushed. | The tag is on GitHub | done (`43a7b25`) |
+| 3 | **Bot repo.** Create `jrcopeti/ticket-bay-bot`, public and empty. Build the import from `pre-split`: the bot's files, with only the forced lines changed and a printed diff against the tag for review. Add the bot's `memory-diff.sh` and its test, `AGENTS.md`, `CLAUDE.md`, `.githooks/`, `.gitleaks.toml`, both workflows (bot jobs only), `docs/hardening/{PLAN,DEVLOG}.md` and `vps/host.md`. Push to `main`, then switch on the ruleset. | CI green (tests and gitleaks on the full history), ruleset active | done (`b2a060d`) |
+| 4 | **Tania without the bot.** Delete the bot's files. Move `vps/shared/` to `vps/tania/`. Remove the bot jobs from `tests.yml`. Pin the links, freeze the hardening PLAN, add `vps/host.md`, link the kill switch, and update `AGENTS.md`. Opened only after step 3 is green. | Merged, CI green, no link to a missing file | in review |
+| 5 | **VPS check.** Read-only over SSH: sha256 of every deployed script against its copy in either repo. | Every deployed script matches, or each difference is explained | done |
 
 ## Open
 
-- Nothing yet.
+- Six deployed scripts have never been in either repo. Tania's: `agent-hooks/guard-network.sh`. The
+  bot's: `bug-loop-pre.sh`, `pr-triage-pre.sh`, `mint-gh-token.sh`, `verify-tests.sh` and
+  `agent-hooks/guard-network.sh`. This predates the split. Bringing them in means reading each for
+  secrets first: José's call.

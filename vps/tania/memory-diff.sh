@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Daily, as a Hermes no-agent job (ticket-bay-bot: from pull-repos.sh; Tania: its own job): print what
-# the agent saved to its memory or skills since the last run. Memory and skill_manage stay on so it
-# learns; this is how José sees what it saved, and undoes a bad entry with the restore line it prints.
+# Twice a day, as a Hermes no-agent job after brain-triage: print what Tania saved to her memory or
+# skills since the last run. Memory and skill_manage stay on so she learns; this is how José sees what
+# she saved, and undoes a bad entry with the restore line it prints.
 # The snapshot repo is outside the sandbox's mounts.
 # Silent when nothing changed. The first run only takes the baseline.
 set -u
