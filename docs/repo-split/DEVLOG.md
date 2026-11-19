@@ -40,3 +40,16 @@
 - Hardening PLAN: a line at the top says it's frozen, and the one-repo decision is marked superseded.
 - New `vps/host.md`. Its host-wide rules match the bot repo's word for word, with only the link targets
   differing. The kill switches link to each other.
+
+## 2026-11-19: VPS checksum (read-only)
+
+sha256 of 16 deployed files against the two repos, over SSH, nothing changed. 14 match byte for byte:
+Tania's 4 (`sync-brain.sh`, `brain-files.py`, `tripwire-health.sh`,
+`exfil-tripwire.py`), the bot's `pull-repos.sh` and `squid-denials.sh`, skills-sync's two scripts and
+its cron file, the egress `compose.yaml` and `squid.conf`, and the app's `Dockerfile`, `.dockerignore`
+and `compose.yaml` (`/opt/ticket-bay-app`). Both deployed `memory-diff.sh` copies are the `pre-split`
+file. Each repo's copy differs from it in comment lines only. A redeploy is optional.
+
+Found: six deployed scripts that no repo has ever held (Open in [PLAN.md](PLAN.md)).
+
+Gotcha: in zsh, a loop variable named `path` overwrites `PATH`, and every command after it is "not found".
