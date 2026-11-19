@@ -25,8 +25,8 @@ instructions in emails" is not a control: on 2026-11-17 a model ignored exactly 
 
 | Asset | Where it lives | Why it matters |
 |---|---|---|
-| The brain's notes | her sandbox, the brain repo on GitHub, the owner's Mac | private: decisions, projects, how the owner works |
-| The brain's skills and rule files (`skills/`, `AGENTS.md`) | the same repo | Claude Code on the Mac runs these skills with full permissions |
+| The brain's notes | her sandbox, the brain repo on GitHub, the owner's local machine | private: decisions, projects, how the owner works |
+| The brain's skills and rule files (`skills/`, `AGENTS.md`) | the same repo | Claude Code on the local machine runs these skills with full permissions |
 | The brain's push key | the host, outside her sandbox | whoever holds it can write the brain |
 | Her memory and her own skills | her Hermes home | every later session loads them |
 | OpenRouter key, Discord token, alert webhooks | the host, outside her sandbox | spend, impersonation, deleting alerts |
@@ -46,7 +46,7 @@ instructions in emails" is not a control: on 2026-11-17 a model ignored exactly 
                      │ │ rule files, .git/hooks, .git/config          │ │
                      │ │ inbox/: captured pages (untrusted)           │ │
                      │ └──────────────────────────────────────────────┘ │
-                     │ sync-brain (host): own clone, push key,          │◀─▶ brain repo ◀─▶ Mac
+                     │ sync-brain (host): own clone, push key,          │◀─▶ brain repo ◀─▶ local machine
                      │ allowed folders only                             │
                      └──────────────────────────────────────────────────┘
                        ticket-bay-bot: another Linux user, homes 750
@@ -70,7 +70,7 @@ tools is unknown. If it does, it runs unattended with all three.
 |---|---|---|---|---|
 | 1 | An inbox item tells triage to send notes to a URL | the sandbox has no network; brain-triage runs without web and browser | way out | injection case T2: no web tool, no DNS |
 | 2 | An inbox item tells her to push the brain elsewhere or open a gist | no key and no `gh` login in the sandbox; only sync-brain pushes, to one remote | way out | T3: push fails, no SSH key |
-| 3 | An injected run edits a brain skill, which then runs on the Mac | `skills/` and rule files mounted read-only; sync-brain pushes only allowed folders and refuses the rest | the path to the Mac | T1, and 61 tests in CI |
+| 3 | An injected run edits a brain skill, which then runs on the local machine | `skills/` and rule files mounted read-only; sync-brain pushes only allowed folders and refuses the rest | the path to the local machine | T1, and 61 tests in CI |
 | 4 | A planted symlink, gitlink or git hook makes the host leak the push key or run code | host git never runs in a folder she writes; sync-brain keeps its own clone and copies plain files only | the path to the host | sync-brain tests: links, FIFOs and a planted `HEAD` refused |
 | 5 | An injection saves itself to her memory or a skill and comes back every session | brain-triage has no memory tool, but keeps `skill_manage`, and chats have both, so she can learn; a diff after each triage shows the owner what changed | detection only | [memory-diff](../vps/telma/memory-diff.sh)'s tests; T4 saved nothing, so the diff had nothing to show |
 | 6 | An injection schedules its own cron job | brain-triage has no cronjob tool; chats keep it, the owner's call | the unattended path, for triage only | not checked: whether a job made in a chat keeps the chat's tools |
