@@ -20,7 +20,7 @@ didn't get it.
 ## 1. Stop
 
 ```sh
-sudo -iu agent hermes gateway stop                          # chats and every cron job, sync-brain included
+sudo -iu agent hermes gateway stop --yes                    # chats and every cron job, sync-brain included; --yes interrupts live runs
 sudo systemctl --user -M agent@ disable hermes-gateway      # stays off after a reboot (linger is on)
 sudo -iu agent bash -c 'docker ps -aq --filter name=hermes- | xargs -r docker rm -f'
 ```
