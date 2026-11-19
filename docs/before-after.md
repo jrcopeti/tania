@@ -103,7 +103,8 @@ list the brain, and `sync-brain` refuses any change to `skills/`.
 The [threat model](threat-model.md#accepted-risks) lists what was accepted and why. In short:
 
 - Telma's chats hold all three legs, and a chat can create a cron job.
-- The tripwire catches only brain text copied whole; split, reworded or re-encoded text gets past it.
+- The tripwire catches only copied brain text (8 words in a row, or a short note whole); split,
+  reworded or re-encoded text gets past it.
 - Memory and skills stay writable on both agents, so an injection that lands persists until the
   owner reads the diff.
 - `web_extract` and Discord link previews send URLs to third parties.
