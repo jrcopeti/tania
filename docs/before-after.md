@@ -65,12 +65,12 @@ unattended job holds all three. The chats still do; the threat model says why th
 
 ## The worst path, before
 
-The Mac's capture, triage, lint and ask-brain skills are links into `~/brain/skills`. Before, the
-sandbox could write that folder, so one injected run could:
+The local machine's capture, triage, lint and ask-brain skills are links into `~/brain/skills`.
+Before, the sandbox could write that folder, so one injected run could:
 
 1. write a poisoned skill into the brain,
 2. have auto-sync push it,
-3. have the Mac pull it on the next capture,
+3. have the local machine pull it on the next capture,
 4. and have Claude Code, Codex or Cursor run it there with full permissions.
 
 After, `skills/` is read-only in Telma's sandbox, the bug loop runs on another Linux user that can't

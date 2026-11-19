@@ -38,6 +38,8 @@ Carried over from the frozen hardening plan:
 
 - Replace "José" with "the owner" across the docs, the frozen ones included (asked 2026-11-19). The
   threat model and `AGENTS.md` are done.
+- Replace "the Mac" with "the local machine" the same way (asked 2026-11-20). The threat model and
+  the before/after table are done; the hardening and rename docs and `vps/telma/` still say Mac.
 
 Decided:
 
