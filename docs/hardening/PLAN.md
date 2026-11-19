@@ -126,8 +126,9 @@ Each step is one branch and one PR. Steps that change a running agent need José
      adversarial tester, module by module. skills-sync audited and fixed, not deployed (devlog
      2026-11-19): the scan saw `git archive`'s copy, which upstream's `export-ignore` can trim, and
      only `skills/`, `shared/`, `tools/`. Now both commits are checked out with a throwaway index and
-     scanned whole; links that leave the repo block; trees over 50 MB aren't unpacked; a commit upstream force-pushed away during the wait is
-     never taken (José). Squid audited and fixed, not deployed: an IP address whose reverse DNS says
+     scanned whole; links that leave the repo block; trees over 50 MB or 5,000 files aren't unpacked; a commit upstream force-pushed away during
+     the wait is never taken (José). A second review found the scan read the old checkout's
+     `.gitattributes`: now a fresh checkout is scanned and the bot's folder rewritten to match. Squid audited and fixed, not deployed: an IP address whose reverse DNS says
      `github.com` got through (`dstdomain` without `-n`), and squid-denials skipped
      `TCP_DENIED_ABORTED`. Image moved off the end-of-life 25.04 build. Whole-platform trust: accepted
      risk (Decisions).

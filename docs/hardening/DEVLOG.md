@@ -1010,7 +1010,29 @@ one upstream kept can still be taken. Two tests; 24 pass.
 
 **Deploy (needs José's yes):** copy `skills-update.sh` and `scan-diff.py` to
 `/usr/local/lib/skills-sync/` (root-owned), back up the old ones, run once as `skills-sync`, expect
-`ok`.
+`ok`. The first update after that rewrites every file in `/opt/dmoka-skills`.
+
+
+**Second review (fresh agent on Sonnet, scoped to `4fa5b15`): four more, fixed in separate commits
+after the failing tests (`8bdf77f`).**
+- *Attributes:* `checkout-index` in `$R` read the current checkout's `.gitattributes`, `checkout` the
+  target's. A taken commit setting `*.md working-tree-encoding=UTF-7`, then one dropping it and adding
+  `curl … | bash`: scanned UTF-7 (the pipe escaped, nothing matched), delivered plain, and the base
+  refused it, so a regression. Now both commits are checked out fresh in a throwaway `clone --shared`
+  (no hooks, no templates, `.git` removed before the scan). After the bot's checkout, `read-tree
+  --empty` + `reset --hard` rewrites every file, since an incremental checkout leaves untouched files
+  with bytes an older `.gitattributes` made (tested: a commit that only adds UTF-7 rewrites them).
+- *Disk:* the cap summed blob bytes; one 1-byte blob under 30,000 names counted 0 MB and unpacked to
+  120 MB, twice. Now also at most 5,000 files (upstream has 88).
+- *Links:* `../../../new/skills/a/SKILL.md` left the repo but resolved back into the scan folder,
+  named `new`. The target is now judged as a path inside the repo first.
+- *Status (older bug):* upstream's file names went into the Discord status whole (39,322 characters,
+  `@everyone`, a mention, a markdown link). Now five findings at most, names cut to 80 characters and
+  reduced to `[A-Za-z0-9._/-]`.
+
+`test-skills-update.sh`: 29 pass; each new case failed before its fix. Real guard rerun: upstream's
+last 5 commits clean, the planted script and link still block. Not run end to end with the real guard
+(the VPS has Python ≥ 3.11; this Mac's `python3` is 3.9): the deploy check covers it.
 
 ## 2026-11-19: egress squid audited and fixed (not deployed)
 
