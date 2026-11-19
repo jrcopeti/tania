@@ -21,7 +21,8 @@ if [ ! -f "$STATE" ]; then printf '%s\n%s\n' "$total" "$first" > "$STATE"; exit 
 printf '%s\n%s\n' "$total" "$first" > "$STATE"
 # Squid's native format: time elapsed client code/status bytes method URL ...
 denied=$(printf '%s' "$log" | head -n "$total" | tail -n +$((seen + 1)) | while read -r ts _ _ code _ method url _; do
-  [[ $code == TCP_DENIED/* ]] || continue
+  # TCP_DENIED_ABORTED and the like: the client hung up before squid answered, still a denial.
+  [[ $code == TCP_DENIED[/_]* ]] || continue
   # In a code span: Discord doesn't preview it (which would finish the leak) or ping from it.
   echo "$(date -u -d "@${ts%.*}" '+%F %H:%M' 2>/dev/null || echo "$ts") UTC  $method \`${url//\`/}\`"
 done)

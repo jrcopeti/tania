@@ -1011,3 +1011,43 @@ one upstream kept can still be taken. Two tests; 24 pass.
 **Deploy (needs José's yes):** copy `skills-update.sh` and `scan-diff.py` to
 `/usr/local/lib/skills-sync/` (root-owned), back up the old ones, run once as `skills-sync`, expect
 `ok`.
+
+## 2026-11-19: egress squid audited and fixed (not deployed)
+
+Plan Open item 3, second module. A fresh agent attacked `vps/ticket-bay-bot/egress/` with a local
+rig: the repo's `squid.conf` in the pinned image on an internal Docker network, a fake resolver, a
+fake attacker server on 443 and a raw-socket client. Nothing left the Mac but image pulls.
+
+**Reverse DNS let an IP through.** A `dstdomain` ACL without `-n` looks up an IP literal's PTR and
+matches the name it gets back, without checking it resolves to that IP. `CONNECT 192.0.2.77:443` (test range),
+with that IP's PTR set to `github.com`, got `200 Connection established`, and a fake token sent down
+the tunnel reached the attacker server; the log line is `TCP_TUNNEL/200`, so no alert. Anyone who
+rents a server and sets its PTR (many hosts allow it) gets a way out. The same lookup leaks bytes on a
+denied request: an IPv6 literal's PTR query carries 16 bytes the attacker picks to the nameserver of
+that range. On the VPS squid sits on `tbb-outside` and uses the host's resolver, so this should hold
+there; not checked live. Fix: `dstdomain -n`: 403, no lookup.
+
+**Denials the alert missed.** When the client hangs up before squid answers, the line is
+`TCP_DENIED_ABORTED/403`, and `squid-denials.sh` matched only `TCP_DENIED/`. It reported 10 of 11.
+Now `TCP_DENIED[/_]*`, with a test.
+
+**Image.** `6.13-25.04_beta` is on Ubuntu 25.04 (end of life January 2026), and the `_beta` tags
+stopped updating in November 2025. Now `7.2-26.04_edge` (26.04 LTS, updated 2026-11-15), pinned to
+`42decc7f…`. Same config parses and passes.
+
+**Accepted risk (José):** the allowlist trusts whole platforms, so the bot can reach other people's
+accounts on them. Written in the plan's Decisions.
+
+**Hunted, held:** subdomains and `raw.githubusercontent.com`, port 22, plain HTTP, squid's manager
+page, `169.254.169.254` and `127.0.0.1`, no ICP/HTCP/SNMP/peers/ICAP/ssl-bump, `tbb-sandbox` internal
+with nothing published.
+
+**Tests.** The rig is now `egress/test-egress.sh`, a suite in CI (Docker on the runner): 14 cases,
+including one allowed host (503 there, no internet) and checks that nothing reached the attacker, no
+PTR was looked up, and squid-denials reports every denial. The old config fails 3 of them; the old
+`squid-denials.sh` fails the new hung-up case in `test-squid-denials.sh` (13 pass).
+
+**Deploy (needs José's yes):** as ticket-bay-bot, back up `squid.conf`, `compose.yaml` and
+`~/.hermes/scripts/squid-denials.sh`, copy the new ones in, `docker compose up -d` in the egress
+folder (recreates squid on the new image; the log volume stays), then from the sandbox: `api.github.com`
+200, `example.com` 403, and a `CONNECT <some IP>:443` 403 with no PTR query.
