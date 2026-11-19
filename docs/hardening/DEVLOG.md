@@ -13,7 +13,8 @@
 | `docs/step-3-egress` | 3 | merged (#7) |
 | `docs/step-4-supply-chain` | 4 | merged (#8) |
 | `docs/step-5-detection` | 5 | PR to open |
-| `fix/review-steps-0-4` | 0–4 review | PR to open |
+| `fix/review-steps-0-4` | 0–4 review | merged (#12) |
+| `fix/sync-brain-push-guard` | 0–4 review | PR to open |
 
 ## 2026-11-17: safety audit and plan
 
@@ -836,3 +837,60 @@ two older bugs in sync-brain, same on `main`, for the next branch: a sandbox loo
 
 Next, in order: this branch deployed; sync-brain audited, then fixed on one branch; the bot's job
 workdir moved off the clone and the app's base images pinned; `skills-sync/` and squid audited.
+
+## 2026-11-19: review fixes deployed (José said yes)
+
+- #12 merged (`0608732`). Copied to the VPS, each old copy kept as `*.bak-review-<time>`, owner and
+  mode unchanged: Tania's `sync-brain.sh` and `memory-diff.sh`, the bot's `pull-repos.sh` and
+  `memory-diff.sh`. sha256 of each matches the commit. No gateway restart: jobs read the scripts fresh.
+- The three suites on the VPS (git 2.56, in a temp folder): sync-brain 32/32, memory-diff 9/9,
+  pull-repos 2/2.
+- Both gateways run cron scripts with `LANG=C.UTF-8`, so the memory-diff cut can't split a character
+  there; dropped. Both job prompts fetch before branching (pr-triage's line read in full).
+- sync-brain's first scheduled run on the new script (10:25): `ok`, silent.
+- Still to see: the bot's memory-diff (07:55) and Tania's (21:30).
+
+## 2026-11-19: sync-brain audited and redesigned (not deployed)
+
+**Audit** (adversarial tester, all of `sync-brain.sh`): 13 breaks proved on top of the three known,
+all from one cause, host git running in a `.git` her sandbox writes. The worst: a root file named
+`HEAD` made the guard's `git diff` die quietly, and the push went ahead with a `skills/` change. Also
+a planted rebase state made the host write her `AGENTS.md` and `skills/`, `objects/info/alternates`
+pushed another host repo's objects, a FIFO in `.git` hung the job and held the lock, and the
+quarantine's `mv` moved the host's `~/.hermes` through a folder swapped for a link.
+
+**Redesign (José):** the host never runs git in a folder she writes.
+- [sync-brain.sh](../../vps/tania/sync-brain.sh) keeps its own clone in `~/.local/share/brain-push`.
+  Refs there: `refs/sync/github`, `refs/sync/given` (what her copy holds) and `refs/sync/pending`
+  (a refresh not finished yet; the next run finishes it before reading her files).
+- New [brain-files.py](../../vps/tania/brain-files.py): `export` copies her files in, opening each
+  folder relative to its parent with `O_NOFOLLOW`, so a link swapped in mid-run can't redirect it.
+  Plain files and folders only: links, FIFOs, devices, a `.git` or a `HEAD` (a bare repo) are refused;
+  so are sparse files over 1 MB (`SEEK_HOLE`) and files over 100 MB. `apply` writes GitHub's changes
+  back the same way, in place when the file exists, so a single-file mount like `AGENTS.md` shows it.
+- Her changes are one commit, replayed onto GitHub's `main` with `--onto` and no rename detection,
+  checked before and after. Refused: paths outside the allowlist, links, gitlinks, and her changes to
+  `.gitignore`, `.gitattributes` or `.gitmodules`. `git add -f`, so no ignore file hides anything.
+- Quarantine names are folded (NFKC, then casefold: `agentſ.md` opens as `AGENTS.md` on the Mac) and
+  cover Claude Code, Codex, Cursor, Gemini, Copilot, Windsurf and Cline as well as Hermes.
+- Alerts put her names and git's text in a code block. ssh gets connect and keepalive timeouts; a
+  run that finds the lock held for over an hour says "stuck".
+
+**Three more adversarial rounds** on the rewrite, the last one only on the newest code. Each found
+less, and only in what had just changed: an edit following a Mac rename into `skills/` after the
+check (a regression), a force-pushed commit replayed, a killed refresh turning the Mac's changes into
+hers, then replaying her own changes, size limits that blocked a Mac screenshot, a Mac `.gitignore`
+in `notes/` stalling her sync. All fixed, each with a test that failed first. José stopped it at four.
+
+**Tests:** [test-sync-brain.sh](../../vps/tania/test-sync-brain.sh) has 94, green on alpine:edge
+(git 2.56.1, as on the VPS) and on the Mac. The old script fails 24 of the first 60.
+
+**Changes for Tania:** her own `.git` is no longer updated, so `git log` in her sandbox looks stale.
+A file she edits during a refresh that the Mac also changed gets GitHub's version. While a refresh
+can't finish, every run alerts and nothing is pushed.
+
+**The old script on the VPS still works** (read-only look, José said yes, 12:22): her clone and
+GitHub's `main` are both at `82008fd` (José's 10:27 commit, pulled); the last 50 runs were all silent,
+none alerted; `git status` clean, quarantine empty. Her last push was 2026-11-18 21:05, after that
+evening's triage. Host for the deploy: ext4 (reports holes, so the sparse check works), Python 3.12.3,
+git 2.56.1.
