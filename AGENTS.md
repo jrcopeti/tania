@@ -3,7 +3,8 @@
 Showcase repo for two Hermes agents on one VPS: Tania (the brain) and ticket-bay-bot (bug loop and
 PR triage), split by trust boundary.
 
-- **Start here:** `docs/hardening/PLAN.md`, then `DEVLOG.md` beside it. Keep both current.
+- **Start here:** `docs/repo-split/PLAN.md`, then `DEVLOG.md` beside it. Keep both current. The
+  hardening history is in `docs/hardening/`.
 - **Running agents:** ask José before resuming, triggering (`hermes cron run`) or switching on any job,
   every time. After an interrupted command, check what partly ran before saying nothing ran: remote
   commands keep running.
