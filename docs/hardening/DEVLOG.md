@@ -16,7 +16,7 @@
 | `fix/review-steps-0-4` | 0–4 review | merged (#12) |
 | `fix/sync-brain-push-guard` | 0–4 review | merged (#13) |
 | `docs/sync-brain-deploy` | 0–4 review | PR to open |
-| `docs/gh-telemetry-and-runtime-bumps` | before step 6 | PR to open |
+| `docs/gh-telemetry-and-runtime-bumps` | before step 6 | PR #17 |
 
 ## 2026-11-17: safety audit and plan
 
@@ -1141,5 +1141,26 @@ opens could have her send the Next.js RCE request, giving code execution in the 
 bot trusts over MCP, with no brain text for the tripwire to see. The port stays reachable after the
 bump; only the bugs go.
 
-To do, with José's yes: merge #17, check out the merge commit in `/opt/ticket-bay-app/src`, rebuild
-and restart the app, check the bot's MCP tools answer and the app's `next` is 16.4.5.
+**Merging on the fork.** `main` needed 1 approval twice over: the ruleset `main` (no bypass) and the
+classic branch protection (enforce for admins). José can't approve his own PR, so nothing could be
+merged (#4, 6 Nov, predates the rule). José added himself to the ruleset's bypass list ("always")
+and unchecked "Require approvals" in the classic rule. The ruleset still needs a review from
+everyone else, the bot included. Changing the protection from here was refused by Claude Code's
+permission check, rightly: José's click.
+
+**pr-triage proof (José said yes, 17:17).** One `hermes cron run` of `pr-triage-morning`, `ok`, in a
+fresh sandbox: 11 tunnels to `api.github.com` and `github.com`, no `cafe.github.com` (still the 2
+from before). gh telemetry is closed.
+
+**VPS app rebuilt (José said yes, 17:24).** #17 merged as `e9da215`. The root-owned clone fetched
+and checked out at it; `Dockerfile` and `compose.yaml` replaced with the repo's (only the digest
+pins differed; backups `*.bak-bumps-*`, `.env` too). Image built as `ticket-bay-app` while the old
+app ran, then `TICKETBAY_COMMIT` set and `compose up -d`. In the container: `next` 16.4.5,
+`better-auth` 1.7.7, `@modelcontextprotocol/server` 2.3.0, `sharp` 0.35.5. Home page 200,
+`/api/mcp` lists the tools and `list_events` answers with seed data.
+
+**Gotchas:**
+- Postgres was recreated too: pinning `postgres:17` by digest changes the service config, even
+  with the same image. Data is on the `pg` volume and survived.
+- `docker build` warns it can't read commit info (`git rev-parse` in a root-owned clone run as
+  `ticket-bay-app`). Harmless: the tag carries the commit.

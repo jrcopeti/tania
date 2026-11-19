@@ -27,9 +27,11 @@ injection test suite passes against both agents.
   and Tania pulls them read-only. Tania never writes a brain skill: she leaves a note in the inbox instead.
   Her own Hermes skills (`~/.hermes/skills`) are another matter: see the next decision.
   Project skills stay in their project; ticket-bay-bot's skills come from `dmoka/skills`.
-- **No Renovate on the ticket-bay fork.** Upstream owns its dependency versions; updating them in the
-  fork makes it drift from the lessons. Renovate (proposes) + ticket-bay-bot (reviews) + José (merges)
-  is for a repo José owns, such as trip-ai.
+- **The ticket-bay fork gets security patches, not Renovate** (José, 2026-11-19). Upstream owns its
+  dependency versions, so routine updates stay off: the fork would drift from the lessons. A Dependabot
+  alert on what the VPS runs is fixed on the fork's `main` with the smallest version that closes it,
+  by hand, one PR (#17 did `next`, `better-auth` and the MCP SDK). Renovate (proposes) + ticket-bay-bot
+  (reviews) + José (merges) is for a repo José owns, such as trip-ai.
 - **The brain stays one repo.** Tania can't change `skills/` or `AGENTS.md`: they are mounted
   read-only in her sandbox, only `sync-brain` on the host holds the push key, and it refuses commits
   that touch those paths. Splitting out a `brain-skills` repo is a possible later ADR, not needed now.
@@ -95,11 +97,8 @@ Each step is one branch and one PR. Steps that change a running agent need José
 - ticket-bay-bot's test gate: Hermes stopped waiting for a hook after 30 s, so a red verdict came too late.
   Timeout raised to 300 s on 2026-11-18; check on the next bug-loop run that edits code.
 
-- Dependabot on the fork: patch it (José, 2026-11-19). PR jrcopeti/ticket-bay#17 bumps `next`,
-  `better-auth` and the MCP server SDK on the fork's `main`; merge, then rebuild the VPS app from it.
-  `zod` and `source-map-js` alerts stay open.
-- gh telemetry: `GH_TELEMETRY` and `DO_NOT_TRACK` deployed in the bot's `docker_env` on 2026-11-19.
-  Proof still to see: a pr-triage run with no new `cafe.github.com` line in squid's log.
+- `zod` (< 4.6.6) and `source-map-js` Dependabot alerts on the fork stay open (the critical `next`,
+  `better-auth` and MCP SDK ones were fixed and deployed on 2026-11-19, `e9da215`).
 - Step 4 proof still to see: the first real skills update or block (no upstream commit since the pin
   yet).
 
