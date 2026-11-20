@@ -25,7 +25,7 @@ does.
 | 1 | **README** | Written with the `crafting-effective-readmes` skill, "personal" (portfolio) template. Carries the "formerly" line from rename step 7. Shows Telma's brain work only (chat capture, ask-brain, triage summary), with screenshots from José (shot list below); one section introduces ticket-bay-bot and links its repo, which shows the bug loop. Links the threat model, ADRs, postmortem. | |
 | 2 | **Threat model** | [threat-model.md](../threat-model.md): the lethal trifecta per session, which leg each control cuts, and the accepted risks from the hardening plan's Decisions. | done (#33) |
 | 3 | **ADRs** | [docs/adr/](../adr/), short, one per decision the owner picked: why Telma exists, the two-agent split, one repo per agent, sync-brain's own clone, the exfil tripwire. | in review |
-| 4 | **Before/after table** | [before-after.md](../before-after.md), from [audit-before.md](../hardening/audit-before.md) and [audit-after.md](../hardening/audit-after.md). Telma's side only: rows about the shared agent before the split stay, bot-only rows are parked in the brain inbox for ticket-bay-bot's docs. | in review |
+| 4 | **Before/after table** | [before-after.md](../before-after.md), from [audit-before.md](../hardening/audit-before.md) and [audit-after.md](../hardening/audit-after.md). Telma's side only: rows about the shared agent before the split stay, bot-only rows are parked in the brain inbox for ticket-bay-bot's docs. | done (#34, #37) |
 
 ## Open
 
@@ -41,6 +41,9 @@ Carried over from the frozen hardening plan:
 - Replace "the Mac" with "the local machine" the same way (asked 2026-11-20). The threat model and
   the before/after table and the rename docs are done; the hardening docs and `vps/telma/` still
   say Mac.
+
+- ADR 1 mentions the course Telma started in without naming or linking it. The brain's showcase
+  intent asks for a link where possible: the owner to give it, or decide against.
 
 - Write the bot's before/after in ticket-bay-bot: its own rows and the overlaps, parked in the brain
   inbox (`2026-11-20-bot-rows-from-telma-before-after.md`, asked 2026-11-20).

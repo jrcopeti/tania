@@ -14,8 +14,8 @@ Split along the same line as the agents: `jrcopeti/telma` holds Telma's files an
 App stays on the ticket-bay fork only and is never installed on either repo: the bot must not edit
 its own controls.
 
-The bot repo starts with a fresh history. The hardening docs stay whole in this repo, frozen at the
-tag `pre-split`.
+The bot repo starts with a fresh history. The hardening docs, which cover both agents, stay in this
+repo; the tag `pre-split` holds the repo as it was before the split.
 
 ## Consequences
 

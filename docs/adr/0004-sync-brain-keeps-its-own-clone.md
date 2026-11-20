@@ -5,7 +5,7 @@ Status: accepted, 2026-11-19
 ## Context
 
 `sync-brain` pushes the brain to GitHub from the host, with a key Telma's sandbox can't see. It used
-to run git inside the brain folder her sandbox writes, `.git` included. An audit found 13 ways a
+to run git inside the brain folder her sandbox writes, `.git` included. An audit proved 13 more ways, on top of three already known, that a
 sandbox that can write `.git` could get a `skills/` change pushed, make host git write or move host
 files, leak another repo, or silence alerts. All of them came from host git running in that folder.
 
@@ -17,7 +17,7 @@ folders, and copies GitHub's changes back the same way.
 
 ## Consequences
 
-- The 13 attacks are closed as a class, instead of patched one at a time.
+- The 16 attacks are closed as a class, instead of patched one at a time.
 - `skills/` and rule files can't reach GitHub from her sandbox, which cuts the path to the
   [local machine's skills](../before-after.md#the-worst-path-before).
 - Checked by four adversarial rounds; 61 tests run in CI.

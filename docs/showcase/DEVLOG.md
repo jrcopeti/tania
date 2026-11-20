@@ -8,7 +8,7 @@
 | `docs/threat-model` | 2 | merged (#33) |
 | `docs/before-after` | 4 | merged (#34) |
 | `fix/threat-model-review` | 2 | merged (#35) |
-| `fix/before-after-review` | 4 | open (#37) |
+| `fix/before-after-review` | 4 | merged (#37) |
 | `docs/adrs` | 3 | open |
 
 ## 2026-11-19: plan
@@ -80,3 +80,8 @@
   hardening plan and the threat model.
 - ADR 1 says she started as the coding employee in an AI agent engineering course, without naming or
   linking it; the brain's showcase intent asks for a link to the course where possible.
+- `/code-review` on the branch: nine findings, all held. Fixed: ADR 2 said strangers' input no longer
+  reaches the brain (captured and chat pages still do) and dropped the unchecked chat-made cron job;
+  ADR 3 said the hardening docs are frozen (the tag is, the files were edited since); ADR 4's count
+  (13 on top of three known); ADR 5 left out the brain-folder trigger and browser tools, and named the
+  canary without saying what it is; plan step 4 and #37 marked merged; the course link moved to Open.
