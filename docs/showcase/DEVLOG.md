@@ -6,7 +6,8 @@
 |---|---|---|
 | `docs/rename-devlog-and-showcase` | plan | merged (#31) |
 | `docs/threat-model` | 2 | merged (#33) |
-| `docs/before-after` | 4 | open |
+| `docs/before-after` | 4 | merged (#34) |
+| `fix/before-after-review` | 4 | open |
 
 ## 2026-11-19: plan
 
@@ -49,3 +50,12 @@
   write them there too. Cut the bot-only rows (its legs, App token, squid, customer data, PR body,
   ruleset, denied egress, its open risks) and the bot halves of shared rows; folded bug emails, PRs,
   npm and third-party skills into one "moved to the bot" row. Parked list in the brain inbox.
+
+## 2026-11-20: review of the merged table
+
+- #34 was merged with the Telma-only cut in it; `/code-review` on that commit. Fixed: Telma's
+  sandbox is loopback only (the "no DNS" probe was the bot's); "her `execute_code`" names Telma;
+  the moved bot jobs keep their leg count, so "no unattended job holds all three" stays checkable;
+  the threat model's Mac rename is in #35, not done.
+- Not changed: a memory write in a chat shows in the diff only after the next triage. The threat
+  model says the same, so the page matches it; the owner can decide whether to name the gap.

@@ -18,7 +18,7 @@ A session leaks data when it holds all three legs: private data, untrusted input
 
 | Session | Before | After |
 |---|---|---|
-| bug-loop and PR triage (strangers' emails and PRs, unattended) | **3**: the brain, a token for every repo, open network | moved to ticket-bay-bot, which can't reach the brain |
+| bug-loop and PR triage (strangers' emails and PRs, unattended) | **3**: the brain, a token for every repo, open network | 2: moved to ticket-bay-bot, which can't reach the brain |
 | brain-triage (captured pages, unattended) | **3**: same sandbox, open network | 2: Telma, no network |
 | Telma's chats with the owner | **3** | **3, accepted**: watched by a tripwire and a canary |
 
@@ -49,7 +49,7 @@ unattended job holds all three. The chats still do; the threat model says why th
 | Path | Before | After |
 |---|---|---|
 | Network from the sandbox | Docker default: anywhere | none |
-| Python or Node network code | the command guard only matched `curl`, `wget`, `nc` | no network of its own: probes found no DNS. Her `execute_code` can still call her web tools (T6), which the tripwire watches |
+| Python or Node network code | the command guard only matched `curl`, `wget`, `nc` | no network of its own: loopback only. Telma's `execute_code` can still call her web tools (T6), which the tripwire watches |
 | Gists | the token's gist scope | no GitHub token |
 | Email over SMTP | the app password could send mail | no mail credential |
 | Brain sync | pushed whatever was in the folder, every 15 minutes | pushes Telma's files from its own clone; refuses `skills/`, rule files and links, and alerts |
