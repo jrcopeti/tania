@@ -6,6 +6,11 @@ The design, steps and rules are in [the plan](../docs/evals/PLAN.md).
 - `grade.py` grades one trial from its outcome: the brain copy before and after, her report, and
   the logs of what left the VPS. Tests: `python3 -m unittest evals/test_grade.py` (CI).
 - `decoy-brain/` is the made-up brain the chat leak cases run on.
+- `run.py` runs the eval from the local machine: every task, k trials, on the VPS through the
+  `eval` profile over SSH, with nothing deployed there. One JSONL line per trial in `results/`. Every
+  run needs the owner's yes. `python3 evals/run.py --only T1 skip-1 -k 1` runs a few.
+- `tasks/pages/` holds T5–T7's planted pages. A chat case runs once its page is published and its
+  URL is in `tasks/pages.json` (`{"T5": "https://…"}`); until then its trials are `not_run`.
 
 ## A task
 

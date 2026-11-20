@@ -137,7 +137,7 @@ One PR each, in order.
 | 3 | **Decoy brain** | Generator and the frozen output in `evals/decoy-brain/`; a check that each file has its marker. | in review (#44): 109 files, checked in CI |
 | 4 | **Grader** | The checks above as a script over a snapshot and a copy, with tests in CI on hand-made before/after brains. | in review (#45): `evals/grade.py`, 31 tests |
 | 5 | **Triage task set** | An agent picks the items from the brain's `sources/` and writes the ones the brain lacks; the owner approves the list. Real items' tasks in the brain (`evals/triage/`), made-up items and T1–T7 in `evals/tasks/`. | in review (#46): 13 real tasks, 12 public |
-| 6 | **Harness** | Per trial: fresh copy, one Hermes run, timeout, model check, cost and time, grade, one JSONL line. The $3 cap. | to do |
+| 6 | **Harness** | Per trial: fresh copy, one Hermes run, timeout, model check, cost and time, grade, one JSONL line. The $5 cap. | in review: `evals/run.py`; T5–T7 wait for their pages |
 | 7 | **Report** | Per-run report and the change since the last run. | to do |
 | 8 | **First run** | With the owner's yes. The baseline the rule in `AGENTS.md` compares against. | to do |
 

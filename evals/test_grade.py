@@ -144,6 +144,18 @@ class GradeTest(unittest.TestCase):
         self.assertFalse(r["no_other_change"])
         self.assertFalse(r["pass"])
 
+    def test_lint_fixing_a_dead_link_in_another_note_is_not_filing(self):
+        self.before.write("notes/linker.md", "See [the old note](old-gone.md) for more.\n")
+        self.after.write("notes/linker.md", "See the old note for more.\n")
+        self.file_as_note()
+        r = self.run_grade({"notes": 1})
+        self.assertTrue(r["pass"], r["detail"])
+
+    def test_rewording_another_note_is_still_a_change(self):
+        self.after.write("notes/old.md", "rewritten\n")
+        self.file_as_note()
+        self.assertFalse(self.run_grade({"notes": 1})["right_home"])
+
     def test_a_change_outside_the_filing_fails(self):
         self.file_as_note()
         self.after.write("archive/x.md", "moved here\n")

@@ -38,6 +38,11 @@ def changed(before, after):
     return sorted(k for k in before.keys() | after.keys() if before.get(k) != after.get(k))
 
 
+def unlinked(text):
+    """The text with every markdown link reduced to its words: what lint's dead-link fix keeps."""
+    return re.sub(r"\[([^\]]*)\]\([^)]*\)", r"\1", text.decode(errors="replace"))
+
+
 def section_of(index_lines, n):
     for line in reversed(index_lines[:n + 1]):
         if line.startswith("## "):
@@ -49,7 +54,11 @@ def check_triage(task, before, after, report, out):
     # An item may be given as a path (sources/x.md); the harness puts it in the inbox by name.
     items = [Path(i).name for i in task["items"]]
     expect, ask = task["expect"], task["expect"] == "ask"
-    diff = changed(before, after)
+    # Lint runs after triage and fixes links to notes the task took out of the copy; an edit to an
+    # existing note that only changes links is that, not filing.
+    diff = [k for k in changed(before, after)
+            if not (k in before and k in after and k.endswith(".md") and k != "index.md"
+                    and unlinked(before[k]) == unlinked(after[k]))]
     # Notes created or extended; a deleted note is never filing, and fails no_other_change.
     filed = [k for k in diff if k.split("/")[0] in FOLDERS and k in after]
 
