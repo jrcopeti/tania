@@ -53,22 +53,30 @@ Hermes moves down the chain when a model fails or times out. The free models sha
 request cap, so they are a backup, not a plan. The chain is the owner's choice; Hermes takes any
 list of models and providers.
 
-## Why she is safe to run
+## Built to be safe
 
 An agent that holds private notes, reads outside pages and can reach the internet can be talked
-into leaking the notes. That is the
-[lethal trifecta](docs/threat-model.md#the-lens-the-lethal-trifecta), and on 2026-11-17 a bug
-email got her earlier self to save an instruction to its memory
-([postmortem](docs/hardening/postmortem-2026-11-17-prompt-injection.md)).
+into leaking the notes: the [lethal trifecta](docs/threat-model.md#the-lens-the-lethal-trifecta).
+After a real prompt injection on 2026-11-17
+([postmortem](docs/hardening/postmortem-2026-11-17-prompt-injection.md)), Telma was audited and
+rebuilt around it:
 
-The controls since then are permissions, mounts and the network, not prompts:
+- **Split by trust boundary.** Strangers' bug emails moved to a second agent with no brain. Telma
+  never sees them.
+- **No way out for unattended work.** Triage runs in a rootless Docker sandbox with no network, so
+  a page in the inbox has nowhere to send notes.
+- **Her edits can't reach the owner's machine.** Skills and rule files are read-only to her, and
+  the brain is pushed by a host job from its own clone, allowed folders only. 61 tests in CI and
+  four adversarial review rounds back it.
+- **Watched where blocking would cost her usefulness.** Chats keep web and browser tools. A
+  tripwire posts to `#alerts` when a call off the host carries note text, and a canary in the
+  brain alerts when it's opened.
+- **Tested by attack.** An [injection suite](docs/hardening/injection-suite.md) and probes from
+  inside the sandbox.
 
-- Triage runs in a rootless Docker sandbox with no network, so a page in the inbox has no way out.
-- Only a host job pushes the brain, from its own clone, and never pushes her edits to `skills/` or
-  rule files.
-- In chats she still holds all three legs, and a reminder made in a chat can be given them too:
-  accepted risks. A tripwire posts to `#alerts` when a call off the host carries note text, and a
-  canary in the brain alerts when it's opened.
+Every control works outside the model, as a permission, a mount, a network rule or a hook, never
+a prompt. The [threat model](docs/threat-model.md) maps each threat to the control that stops it, and lists the
+trade-offs taken on purpose.
 
 > _Screenshot to come: `docs/assets/alert.png`, a canary or tripwire post in `#alerts`._
 

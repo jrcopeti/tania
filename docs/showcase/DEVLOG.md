@@ -115,3 +115,6 @@
   lookups, memory), with the brain as her main job; a Models section lists the main model and the
   fallback chain from the brain's model decision, and says the chain is the owner's pick and
   Hermes takes any list. The reminder example is neutral on purpose: no health detail.
+- Owner's review: the safety section read as a list of flaws. Rewritten as "Built to be safe":
+  what was done after the injection (split, no network for triage, read-only skills, tripwire and
+  canary, injection suite), with the accepted risks left to the threat model's link.
