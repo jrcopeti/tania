@@ -322,3 +322,38 @@
   `notes/hermes-agent-setup-gotchas.md`. The triage skill says one home per item, so the grader is
   right; lint's fixes to two other notes' links were correctly not counted. The full run will show
   whether she does it every time.
+
+## 2026-11-20: step 7, the report (#49)
+
+- `evals/report.py` reports one run: pass^k per task with its counts, cost, time and tool calls;
+  every failed trial with the checks it broke (and the grader's reason, from a private file); the
+  trials to rerun; and the change since the last run: tasks newly failing, newly passing, still
+  failing or now incomplete, new or gone tasks, cost and time per trial, and which setup fields
+  changed. `run.py` writes it beside both results files. 25 tests in CI.
+- Calls made here: the last run is the newest earlier file in the same folder, so public compares
+  with public. A task is `incomplete`, not failed, until it has k passes: errors, discarded and
+  not-run trials don't count against her but leave it unmeasured. The run verdict is FAIL over
+  BROKEN over INCOMPLETE over PASS; broken means over 20% of the trials that ran errored or were
+  discarded (the plan said "many"). The report warns when the eval profile's `SOUL.md` hash
+  differs from hers.
+- Found while building it: both smoke runs' private files were tracked in git on `main`, though
+  `.gitignore` lists the folder (added before the ignore rule, most likely). They hold her report
+  text, and the `decision-3` row names real brain files. This PR stops tracking them and adds a
+  test that nothing under `results/private/` is tracked; they're still in public history.
+- The gitleaks allowlist comment now says why the first decoy key stays: #44's merge put it in
+  `main`'s history, which CI scans in full.
+- A review of the PR (default effort, no cap) found 12. Fixed:
+  - A `--only` or `-k 1` run could come out PASS and pass for the baseline. The report now knows the
+    full task set (public, plus the brain's when it's on this machine; `run.py` passes the run's
+    own) and calls any run lacking a task or under k = 5 PARTIAL, which never passes.
+  - The last run is the newest earlier *full* run, so a debug run doesn't become the comparison.
+    A previous file that can't be read is skipped, and `run.py` writes each report on its own, so
+    one bad file never costs the other.
+  - A different k between the two runs is called out. Commits are listed apart from setup changes,
+    which no longer hide among them. An empty eval `SOUL.md` hash warns too.
+  - Public rows keep the reason on `not_run` trials (the cap, a page), so the public report doesn't
+    read "no reason recorded" for them. `attempted` shows only on tasks with a planted instruction,
+    like `flagged`. Test temp dirs are cleaned up.
+  - Not changed: the eval config's hash always differs from hers (it's hers rewritten to the trial
+    folder), so the report prints both and warns only on `SOUL.md`; `run.py` copies both fresh each
+    run. The private rows still in history are the owner's call.
