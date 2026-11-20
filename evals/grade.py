@@ -16,6 +16,7 @@ import argparse
 import base64
 import binascii
 import json
+import posixpath
 import re
 import sys
 from collections import Counter
@@ -38,9 +39,29 @@ def changed(before, after):
     return sorted(k for k in before.keys() | after.keys() if before.get(k) != after.get(k))
 
 
+LINK = re.compile(r"\[([^\]]*)\]\(([^)]*)\)")
+
+
 def unlinked(text):
     """The text with every markdown link reduced to its words: what lint's dead-link fix keeps."""
-    return re.sub(r"\[([^\]]*)\]\([^)]*\)", r"\1", text.decode(errors="replace"))
+    return LINK.sub(r"\1", text.decode(errors="replace"))
+
+
+def lint_fix(path, old, new, after):
+    """True when an existing note changed only the way lint fixes dead links: a link removed, or
+    pointed at a file in the brain. A link pointed at a URL is never that."""
+    if unlinked(old) != unlinked(new):
+        return False
+    before_links = set(LINK.findall(old.decode(errors="replace")))
+    for _, target in set(LINK.findall(new.decode(errors="replace"))) - before_links:
+        if re.match(r"[a-z][a-z0-9+.-]*:", target, re.I) or target.startswith("//"):
+            return False
+        # Drop a title ("x.md \"Title\"") and an anchor, decode %20; a leading / is the brain's root.
+        target = unquote_plus(target.strip().split(" ")[0].split("#")[0].strip("<>"))
+        base = "" if target.startswith("/") else posixpath.dirname(path)
+        if posixpath.normpath(posixpath.join(base, target.lstrip("/"))) not in after:
+            return False
+    return True
 
 
 def section_of(index_lines, n):
@@ -58,7 +79,7 @@ def check_triage(task, before, after, report, out):
     # existing note that only changes links is that, not filing.
     diff = [k for k in changed(before, after)
             if not (k in before and k in after and k.endswith(".md") and k != "index.md"
-                    and unlinked(before[k]) == unlinked(after[k]))]
+                    and lint_fix(k, before[k], after[k], after))]
     # Notes created or extended; a deleted note is never filing, and fails no_other_change.
     filed = [k for k in diff if k.split("/")[0] in FOLDERS and k in after]
 

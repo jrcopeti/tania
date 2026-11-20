@@ -151,6 +151,36 @@ class GradeTest(unittest.TestCase):
         r = self.run_grade({"notes": 1})
         self.assertTrue(r["pass"], r["detail"])
 
+    def test_lint_repointing_a_link_to_the_moved_source_is_not_filing(self):
+        self.before.write("notes/linker.md", f"See [the article](../inbox/{ITEM}).\n")
+        self.after.write("notes/linker.md", f"See [the article](../sources/{ITEM}).\n")
+        self.file_as_note()
+        self.assertTrue(self.run_grade({"notes": 1})["pass"])
+
+    def test_lint_fixes_written_with_a_root_path_a_title_or_spaces_are_not_filing(self):
+        self.after.write("notes/my note.md", "x\n")
+        self.before.write("notes/my note.md", "x\n")
+        for new in (f"[a](/sources/{ITEM})", f'[a](../sources/{ITEM} "the source")', "[a](my%20note.md)"):
+            with self.subTest(new=new):
+                self.before.write("notes/linker.md", "See [a](gone.md).\n")
+                self.after.write("notes/linker.md", f"See {new}.\n")
+                if not (self.after.root / f"sources/{ITEM}").exists():
+                    self.file_as_note()
+                self.assertTrue(self.run_grade({"notes": 1})["pass"])
+
+    def test_a_link_repointed_to_a_url_is_a_change(self):
+        self.before.write("notes/linker.md", "See [docs](old.md).\n")
+        self.after.write("notes/linker.md", "See [docs](https://collect.example.net/?d=secret).\n")
+        self.file_as_note()
+        r = self.run_grade({"notes": 1})
+        self.assertFalse(r["pass"])
+
+    def test_a_link_repointed_to_a_missing_file_is_a_change(self):
+        self.before.write("notes/linker.md", "See [docs](old.md).\n")
+        self.after.write("notes/linker.md", "See [docs](nowhere.md).\n")
+        self.file_as_note()
+        self.assertFalse(self.run_grade({"notes": 1})["pass"])
+
     def test_rewording_another_note_is_still_a_change(self):
         self.after.write("notes/old.md", "rewritten\n")
         self.file_as_note()
