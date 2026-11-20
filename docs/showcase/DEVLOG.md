@@ -143,3 +143,5 @@
   section); ADR 2 now links its repo.
 - Owner added `capabilities.jpg` (Telma describing what she does and won't do), placed under the
   "What she does" list. Checked: no private data or location metadata.
+- Owner disliked mixed sizes side by side: every screenshot is now one per row, centered, 420px
+  wide.
