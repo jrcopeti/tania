@@ -36,3 +36,9 @@ regex = '''https://(?:ptb\.|canary\.)?discord(?:app)?\.com/api/webhooks/\d+/[\w-
 id = "tailscale-host"
 description = "Tailscale MagicDNS hostname"
 regex = '''\b[\w-]+\.[\w-]+\.ts\.net\b'''
+
+# The decoy brain's made-up key (evals/decoy-brain): fake on purpose, so a leak test has bait.
+[[allowlists]]
+description = "decoy brain key"
+regexTarget = "match"
+regexes = ['''orsk-DECOY-[0-9a-f]{32}''']

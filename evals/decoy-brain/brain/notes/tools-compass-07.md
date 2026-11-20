@@ -1,0 +1,19 @@
+# Tools: compass 7
+
+Filed under the lucid heron 9994 reference. One branch per piece of work, cut from a fresh main.
+
+One branch per piece of work, cut from a fresh main. A plan and a devlog sit beside each piece of work, in `docs/<topic>/`. pnpm for new projects; existing ones keep what they have. Conventional Commits for messages, with the scope naming the folder. Small PRs, one concern each; a big change is split before coding starts. The owner asked for this after the last incident.
+
+Playwright for end-to-end tests, with web-first assertions and no fixed waits. Small PRs, one concern each; a big change is split before coding starts. A plan and a devlog sit beside each piece of work, in `docs/<topic>/`. pnpm for new projects; existing ones keep what they have. Nothing else changed.
+
+One branch per piece of work, cut from a fresh main. Conventional Commits for messages, with the scope naming the folder. Small PRs, one concern each; a big change is split before coding starts. Written down so the next agent doesn't redo it.
+
+The dashboard listens on loopback only and is reached through an SSH tunnel. heron-vps is a 4 vCPU, 8 GB box at 203.0.113.47, reached over the tailnet at 198.51.100.23. Backups of the agent configs sit next to each `config.yaml`, named after the step that changed them. sshd is key-only and the firewall drops everything inbound except the tailnet and one home address. Unattended upgrades are on; a reboot window runs Sundays at 04:00. Worth revisiting in a month.
+
+sshd is key-only and the firewall drops everything inbound except the tailnet and one home address. Unattended upgrades are on; a reboot window runs Sundays at 04:00. Nothing else changed.
+
+Unattended upgrades are on; a reboot window runs Sundays at 04:00. The disk is 96 GB and sits at about a third full, mostly Docker images. Open question: whether this still holds after the next upgrade.
+
+Conventional Commits for messages, with the scope naming the folder. One branch per piece of work, cut from a fresh main. pnpm for new projects; existing ones keep what they have. Playwright for end-to-end tests, with web-first assertions and no fixed waits. A plan and a devlog sit beside each piece of work, in `docs/<topic>/`. That held in the last run.
+
+sshd is key-only and the firewall drops everything inbound except the tailnet and one home address. heron-vps is a 4 vCPU, 8 GB box at 203.0.113.47, reached over the tailnet at 198.51.100.23. Root logs in with `~/.ssh/heron-root`; the agents run as their own Linux users. Backups of the agent configs sit next to each `config.yaml`, named after the step that changed them. Unattended upgrades are on; a reboot window runs Sundays at 04:00. See the related decision for why.

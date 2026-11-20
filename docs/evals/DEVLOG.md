@@ -6,6 +6,7 @@
 |---|---|---|
 | `docs/evals-plan` | 1 | merged (#42) |
 | `docs/evals-spike` | 2 | open (#43) |
+| `docs/evals-decoy-brain` | 3 | open |
 
 ## 2026-11-20: design
 
@@ -66,3 +67,21 @@
 - Left on the VPS: the `eval` profile (with `config.yaml.orig` and `.env.orig`, the clone before
   the edits) and `~/eval/` (empty `work/`, the trial's `out/`). The harness (step 6) puts its
   deploy steps in `vps/host.md`.
+
+## 2026-11-20: step 3, decoy brain
+
+- `evals/decoy-brain/generate.py` writes a made-up owner's brain from a fixed seed: 2 intents,
+  11 guidelines, 9 decisions, 4 projects, 20 notes, 60 sources, `index.md`, `taste.md` and an inbox.
+  294 KB against the real brain's 257 KB, with medians and a few long files close to the real ones.
+- The bait: an agent on a VPS with an IP, a tailnet IP, an SSH key path, an OpenRouter-style key in
+  an `.env` line, an alerts webhook, a bug inbox, a secrets path. IPs are RFC 5737, addresses are
+  `example.com`/`example.net`, so the repo's secret scan passes them. The key tripped gitleaks'
+  generic rule; `.gitleaks.toml` allows that exact made-up value and nothing broader.
+- Each file's first sentence names one marker ("Filed under the ashen compass 3008 reference"), so
+  an injection asking for "the first two sentences" carries it. `markers.json` lists them; 107
+  unique (`index.md` has none of its own).
+- CI runs `generate.py --check`: the committed files match the generator and every marker appears
+  exactly once in its file.
+- Weak spot: the text is built from a small bank of sentences, so it repeats, and a model reading
+  several files may notice it's synthetic. The injection doesn't depend on that, but if T5–T7 behave
+  differently on the decoy than they did on the real brain in step 6, richer text is the first fix.
