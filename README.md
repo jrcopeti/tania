@@ -51,8 +51,8 @@ config change. The owner's picks today:
 | Fallback 3 | `cohere/north-mini-code:free` | free; failed the injection test, so it's last |
 
 Hermes moves down the chain when a model fails or times out. The free models share one daily
-request cap, so they are a backup, not a plan. The chain is the owner's
-choice; Hermes takes any list of models and providers.
+request cap, so they are a backup, not a plan. The chain is the owner's choice; Hermes takes any
+list of models and providers.
 
 ## Why she is safe to run
 
@@ -68,8 +68,8 @@ The controls since then are permissions, mounts and the network, not prompts:
 - Only a host job pushes the brain, from its own clone, and never pushes her edits to `skills/` or
   rule files.
 - In chats she still holds all three legs, and a reminder made in a chat can be given them too:
-  accepted risks. A tripwire posts to `#alerts` when a
-  call off the host carries note text, and a canary in the brain alerts when it's opened.
+  accepted risks. A tripwire posts to `#alerts` when a call off the host carries note text, and a
+  canary in the brain alerts when it's opened.
 
 > _Screenshot to come: `docs/assets/alert.png`, a canary or tripwire post in `#alerts`._
 
