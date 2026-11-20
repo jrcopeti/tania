@@ -45,10 +45,9 @@ config change. The owner's picks today:
 
 | Role | Model | Why |
 |---|---|---|
-| Main | `deepseek/deepseek-v4.1-flash` | cheap ($0.30/M in, $1.20/M out), 1M context, tool calling, and it passed the real prompt-injection test twice |
+| Main | `deepseek/deepseek-v4.1-flash` | cheap and effective ($0.30/M in, $1.20/M out), 1M context, tool calling, and it passed the real prompt-injection test twice |
 | Fallback 1 | `inclusionai/ling-3.2-flash:free` | free |
 | Fallback 2 | `baidu/ernie-5.5-flash-preview:free` | free |
-| Fallback 3 | `cohere/north-mini-code:free` | free; failed the injection test, so it's last |
 
 Hermes moves down the chain when a model fails or times out. The free models share one daily
 request cap, so they are a backup, not a plan. The chain is the owner's choice; Hermes takes any
