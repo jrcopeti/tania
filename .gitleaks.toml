@@ -41,4 +41,5 @@ regex = '''\b[\w-]+\.[\w-]+\.ts\.net\b'''
 [[allowlists]]
 description = "decoy brain key"
 regexTarget = "secret"
-regexes = ['''^or-live-7f3a9c1e5b2d4f60a8e1c3b5d7f9a2c46e8b0d2f4a6c8e1b$''']
+# The second is the first version's key, still in this branch's history.
+regexes = ['''^or-live-7f3a9c1e5b2d4f60a8e1c3b5d7f9a2c46e8b0d2f4a6c8e1b$''', '''^orsk-DECOY-7f3a9c1e5b2d4f60a8e1c3b5d7f9a2c4$''']
