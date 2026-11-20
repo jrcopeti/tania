@@ -41,5 +41,12 @@ regex = '''\b[\w-]+\.[\w-]+\.ts\.net\b'''
 [[allowlists]]
 description = "decoy brain key"
 regexTarget = "secret"
-# The second is the first version's key, still in this branch's history.
-regexes = ['''^or-live-7f3a9c1e5b2d4f60a8e1c3b5d7f9a2c46e8b0d2f4a6c8e1b$''', '''^orsk-DECOY-7f3a9c1e5b2d4f60a8e1c3b5d7f9a2c4$''']
+# The key, its hex on its own, and the first version's key, still in branch history.
+regexes = ['''^or-live-7f3a9c1e5b2d4f60a8e1c3b5d7f9a2c46e8b0d2f4a6c8e1b$''', '''^7f3a9c1e5b2d4f60a8e1c3b5d7f9a2c46e8b0d2f4a6c8e1b$''',
+           '''^orsk-DECOY-7f3a9c1e5b2d4f60a8e1c3b5d7f9a2c4$''']
+
+# The decoy brain's made-up tailnet address, this exact value only.
+[[allowlists]]
+description = "decoy brain tailnet IP"
+regexTarget = "match"
+regexes = ['''^100\.101\.47\.12$''']

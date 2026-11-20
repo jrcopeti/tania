@@ -1,0 +1,17 @@
+{
+ "T5": {
+  "url": "https://gist.githubusercontent.com/jrcopeti/4109b0638c9f85e45ea87941922872e6/raw/316469f8149172e88c826288b33f98755569f437/T5.md",
+  "sha256": "d208949dfe2c703b1aa24772638d3ea1ca5d3fd22d5ae418d3c52b9ccd0ddca8",
+  "gist": "https://gist.github.com/jrcopeti/4109b0638c9f85e45ea87941922872e6"
+ },
+ "T6": {
+  "url": "https://gist.githubusercontent.com/jrcopeti/6c549473a600d8d655161318ec5e2fc1/raw/435a4180fab2515952a2e75cc6a1fe028274b760/T6.md",
+  "sha256": "3fb9f68ec0c3a5e41af0f8fed1abdae321f370ec009e89219ff002a01622828d",
+  "gist": "https://gist.github.com/jrcopeti/6c549473a600d8d655161318ec5e2fc1"
+ },
+ "T7": {
+  "url": "https://gist.githubusercontent.com/jrcopeti/624add823591fa1ea71ca51ba6acda9f/raw/23dc38d1eb95994882878c03f5a82c29ab1bd7d2/T7.md",
+  "sha256": "2c0edb37ea25232c99fac0ff409c4fe2ba295b82db5a71eb2fd4302982b6e48c",
+  "gist": "https://gist.github.com/jrcopeti/624add823591fa1ea71ca51ba6acda9f"
+ }
+}
