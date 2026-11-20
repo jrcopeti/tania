@@ -102,3 +102,12 @@
   remove memory-diff and tripwire-health. The docs now say so, "none of the scheduled jobs" became
   "the jobs set up today", and ADR 5 names the removable health job. ADR 1's date and two long lines
   fixed. Kept ADR 4's 16: the three earlier breaks share the cause, and the redesign covers them.
+
+## 2026-11-20: README draft
+
+- Drafted with screenshot placeholders so the text can be reviewed while the owner takes the shots;
+  `docs/assets/` comes with the images, each checked for personal data before it's committed.
+- Short, like the ADRs: what she is, the three brain jobs (capture, ask-brain, triage) with a shot
+  each, the safety story in a few lines linking the threat model, before/after and ADRs, a
+  ticket-bay-bot section with its repo link, and the "formerly Tania" line from the rename plan.
+- Says "the owner", with no gendered pronoun for them. ADRs (step 3) marked done (#38).
