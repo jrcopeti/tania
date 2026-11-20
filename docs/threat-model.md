@@ -60,10 +60,11 @@ instructions in emails" is not a control: on 2026-11-17 a model ignored exactly 
 | Chats with the owner on Discord | pages she opens | the brain | web and browser tools on the host | **3, accepted** |
 | sync-brain, memory-diff, tripwire-health | memory-diff relays what she saved to memory or skills, which an injection can write | the push key (sync-brain); her memory | the brain repo; Discord, the owner's server | no model in the loop |
 
-None of the scheduled jobs holds all three legs. The chats do; see [Accepted risks](#accepted-risks).
-A chat can also create a cron job that holds all three: checked on 2026-11-20 against Hermes's code.
-The chat's `cronjob` tool sets the job's toolsets, and nothing limits them to the chat's. A job that
-sets none gets Hermes's cron default, which includes web and browser.
+The jobs set up today don't hold all three legs. The chats do, and a chat can change that; see
+[Accepted risks](#accepted-risks). Checked on 2026-11-20 against Hermes's code: the chat's `cronjob`
+tool can create, change, pause, run or remove any of her jobs, and sets their toolsets with nothing
+limiting them to the chat's. A job that sets none gets Hermes's cron default, which includes web and
+browser.
 
 ## Threats and controls
 
@@ -95,10 +96,11 @@ The cases T1 to T7 are in [injection-suite.md](hardening/injection-suite.md), th
 - **`web_extract` sends every URL to a third party** (keyless Exa) when no web backend is set.
 - **Memory and her own skills stay writable.** An injection that lands can persist until the owner reads
   the diff.
-- **A chat can schedule an unattended job with all three legs.** The `cronjob` tool lets the job ask
-  for web and browser, and Hermes's only cap for cron, `agent.disabled_toolsets`, would take them
-  from the chats too. Only the model's judgement stands in the way. Taking `cronjob` out of chats
-  would close it; the owner keeps it, for reminders.
+- **A chat can rewrite her schedule.** The `cronjob` tool can create a job with web and browser,
+  give them to brain-triage, or pause or remove memory-diff and tripwire-health, which are cron jobs
+  too. Hermes's only cap for cron, `agent.disabled_toolsets`, would take web from the chats as well.
+  Only the model's judgement stands in the way. Not checked: whether the tripwire fires inside cron
+  runs. Taking `cronjob` out of chats would close it; the owner keeps it, for reminders.
 - **Triage could still file a capture as a guideline.** The triage skill forbids it, but that is a
   prompt, and her model did it once. Open: see the [showcase plan](showcase/PLAN.md).
 

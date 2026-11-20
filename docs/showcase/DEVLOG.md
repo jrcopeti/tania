@@ -96,3 +96,9 @@
   job with all three legs.
 - The owner's call: no fix, mark it checked. Threat model, before/after and ADR 2 now say so, and
   list it as an accepted risk. Not checked: whether the tripwire hook fires inside cron runs.
+- `/code-review` after the update: seven findings, six held. The chat's `cronjob` tool can also
+  update, pause, run and remove any job (checked on the VPS: `_JOB_ACTIONS` in
+  `tools/cronjob_tools.py`, no check on who made the job), so a chat can give brain-triage web or
+  remove memory-diff and tripwire-health. The docs now say so, "none of the scheduled jobs" became
+  "the jobs set up today", and ADR 5 names the removable health job. ADR 1's date and two long lines
+  fixed. Kept ADR 4's 16: the three earlier breaks share the cause, and the redesign covers them.

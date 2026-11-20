@@ -1,11 +1,11 @@
 # 1. Telma keeps the brain
 
-Status: accepted, 2026-11-17 (narrowed to the brain only on 2026-11-18)
+Status: accepted (narrowed to the brain only on 2026-11-17, see [ADR 2](0002-two-agents-split-by-trust-boundary.md))
 
 ## Context
 
-The owner keeps a second brain: a git repo of markdown notes, decisions and guidelines that their coding
-agents read before they work. Notes arrive all day, from a chat, a link or the end of a coding
+The owner keeps a second brain: a git repo of markdown notes, decisions and guidelines that their
+coding agents read before they work. Notes arrive all day, from a chat, a link or the end of a coding
 session, and land unsorted in `inbox/`. Sorting them into the right place is the work that gets
 skipped.
 
