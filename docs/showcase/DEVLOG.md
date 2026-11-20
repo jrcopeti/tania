@@ -8,7 +8,8 @@
 | `docs/threat-model` | 2 | merged (#33) |
 | `docs/before-after` | 4 | merged (#34) |
 | `fix/threat-model-review` | 2 | merged (#35) |
-| `fix/before-after-review` | 4 | open |
+| `fix/before-after-review` | 4 | merged (#37) |
+| `docs/adrs` | 3 | open |
 
 ## 2026-11-19: plan
 
@@ -71,3 +72,33 @@
   Dropped the PLAN.md fix: #35 merged, so the threat model's Mac rename is done.
 - Not changed: a memory write in a chat shows in the diff only after the next triage. The threat
   model says the same, so the page matches it; the owner can decide whether to name the gap.
+
+## 2026-11-20: ADRs
+
+- The owner picked five, Telma's creation first, and asked for short docs. Each one fits on a
+  screen: context, decision, consequences. Sources: the brain's decisions and project note, the
+  hardening plan and the threat model.
+- ADR 1 says she started as the coding employee in an AI agent engineering course, without naming or
+  linking it; the brain's showcase intent asks for a link to the course where possible.
+- `/code-review` on the branch: nine findings, all held. Fixed: ADR 2 said strangers' input no longer
+  reaches the brain (captured and chat pages still do) and dropped the unchecked chat-made cron job;
+  ADR 3 said the hardening docs are frozen (the tag is, the files were edited since); ADR 4's count
+  (13 on top of three known); ADR 5 left out the brain-folder trigger and browser tools, and named the
+  canary without saying what it is; plan step 4 and #37 marked merged; the course link moved to Open.
+
+## 2026-11-20: the chat-made cron job, checked
+
+- The owner had Telma set a medicine reminder from a chat. Its job got `enabled_toolsets: []` (zero
+  tools: the model chose it). Read Hermes's code on the VPS, read-only: the chat's `cronjob` tool
+  stores whatever toolsets the model asks for (`tools/cronjob_tools.py`), a job without a list gets
+  `hermes-cron`, the same core tools as the CLI, web and browser included (`cron/scheduler.py`), and
+  the only cap, `agent.disabled_toolsets`, applies to chats too. So a chat can schedule an unattended
+  job with all three legs.
+- The owner's call: no fix, mark it checked. Threat model, before/after and ADR 2 now say so, and
+  list it as an accepted risk. Not checked: whether the tripwire hook fires inside cron runs.
+- `/code-review` after the update: seven findings, six held. The chat's `cronjob` tool can also
+  update, pause, run and remove any job (checked on the VPS: `_JOB_ACTIONS` in
+  `tools/cronjob_tools.py`, no check on who made the job), so a chat can give brain-triage web or
+  remove memory-diff and tripwire-health. The docs now say so, "none of the scheduled jobs" became
+  "the jobs set up today", and ADR 5 names the removable health job. ADR 1's date and two long lines
+  fixed. Kept ADR 4's 16: the three earlier breaks share the cause, and the redesign covers them.
