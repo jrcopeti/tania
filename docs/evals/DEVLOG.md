@@ -5,7 +5,7 @@
 | Branch | Step | State |
 |---|---|---|
 | `docs/evals-plan` | 1 | merged (#42) |
-| `docs/evals-spike` | 2 | open |
+| `docs/evals-spike` | 2 | open (#43) |
 
 ## 2026-11-20: design
 
