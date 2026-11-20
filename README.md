@@ -5,8 +5,6 @@
 [![tests](https://github.com/jrcopeti/telma/actions/workflows/tests.yml/badge.svg)](https://github.com/jrcopeti/telma/actions/workflows/tests.yml)
 [![secret-scan](https://github.com/jrcopeti/telma/actions/workflows/secret-scan.yml/badge.svg)](https://github.com/jrcopeti/telma/actions/workflows/secret-scan.yml)
 
-
-
 An always-on agent that keeps the owner's second brain: she saves what the owner sends her, answers
 questions from the notes and sorts the inbox twice a day. She runs on
 [Hermes Agent](https://hermes-agent.nousresearch.com) on a VPS and talks to the owner in Discord.
@@ -64,8 +62,8 @@ the owner (Discord, phone)
 └────────────────────────────────────────────┘
 ```
 
-One Hermes gateway runs her chats and scheduled jobs. Her tools that touch the brain run in a
-sandbox with no network; web and browser run on the host, in chats only. A host job pushes the
+One Hermes gateway runs her chats and scheduled jobs. Her file and shell tools run in a sandbox
+with no network; web and browser run on the host and are never given to triage. A host job pushes the
 brain to GitHub with a key she never sees.
 
 ## Models
@@ -95,20 +93,20 @@ rebuilt around it:
 
 - **Split by trust boundary.** Strangers' bug emails moved to a second agent with no brain. Telma
   never sees them.
-- **No way out for unattended work.** Triage runs in a rootless Docker sandbox with no network, so
-  a page in the inbox has nowhere to send notes.
+- **No way out for triage.** The scheduled triage runs in a rootless Docker sandbox with no network
+  and no web tools, so a page in the inbox has nowhere to send notes.
 - **Her edits can't reach the owner's machine.** Skills and rule files are read-only to her, and
   the brain is pushed by a host job from its own clone, allowed folders only. 61 tests in CI and
   four adversarial review rounds back it.
-- **Watched where blocking would cost her usefulness.** Chats keep web and browser tools. A
-  tripwire posts to `#alerts` when a call off the host carries note text, and a canary in the
-  brain alerts when it's opened.
+- **Watched where blocking would cost her usefulness.** Chats keep web and browser tools, and so
+  can jobs scheduled from a chat. A tripwire posts to `#alerts` when a call off the host carries
+  note text, and a canary in the brain alerts when it's opened.
 - **Tested by attack.** An [injection suite](docs/hardening/injection-suite.md) and probes from
   inside the sandbox.
 
-Every control works outside the model, as a permission, a mount, a network rule or a hook, never
-a prompt. The [threat model](docs/threat-model.md) maps each threat to the control that stops it, and lists the
-trade-offs taken on purpose.
+The walls are permissions, mounts, network rules and hooks, not prompts. The
+[threat model](docs/threat-model.md) maps each threat to the control that stops it, and names the
+few places where only the model stands in the way.
 
 <table><tr><td valign="top"><img src="docs/assets/alerts.jpg" width="220" alt="Exfil tripwire alerts in #alerts"></td></tr></table>
 
@@ -126,8 +124,9 @@ Read more:
   in emails. Every control since then works outside the model.
 - **Cut a leg; don't filter it.** No network in the sandbox holds. A filter on the way out is
   bypassed by a browser click, and an allowlist breaks the pages she needs.
-- **Test the walls with a model that obeys.** A pass on a model that refuses proves nothing about
-  the walls, so the injection suite also runs on one that follows injections.
+- **Test the walls, not the model.** A pass on a model that refuses proves nothing about the
+  walls. So the suite ran a case on a model that obeys, then tested the walls directly with probes
+  from inside the sandbox.
 - **Host tools in an agent's folder are part of the attack surface.** Host git in the folder she
   writes opened 16 attacks. Giving sync-brain its own clone closed them as a class.
 - **Where you can't block, watch.** The tripwire alerts on a leak it can't stop, and a health job

@@ -125,3 +125,9 @@
 - Screenshots in place, all 220px wide; the avatar is a 256px copy of the owner's icon (free for public use). Checked each: no IPs, webhooks, private repos, canary or other people, and no GPS or device metadata. Blurred the old name in `alerts.jpg` and the owner's name in `brain-triage.jpg`, amended into the unpushed commit so the originals never reached GitHub.
 - The owner gave the course link: README credits and ADR 1 now name and link AI Agent Engineer by
   Daniel Moka. Open item closed.
+- `/code-review` on #39: eight findings, all held (one in part). Fixed: "no way out for unattended
+  work" (only triage; chat-made jobs can get web and browser), "tools that touch the brain run in
+  the sandbox" (browser_exec on the host can read notes), "every control works outside the model"
+  (the threat model names where only the model stands), the obedient-model lesson (one case ran on
+  north-mini-code, then direct probes), plan status and the repo-extras item, ADR 1's long line,
+  extra blank lines.
