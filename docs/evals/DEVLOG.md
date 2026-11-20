@@ -323,7 +323,7 @@
   right; lint's fixes to two other notes' links were correctly not counted. The full run will show
   whether she does it every time.
 
-## 2026-11-20: step 7, the report
+## 2026-11-20: step 7, the report (#49)
 
 - `evals/report.py` reports one run: pass^k per task with its counts, cost, time and tool calls;
   every failed trial with the checks it broke (and the grader's reason, from a private file); the
