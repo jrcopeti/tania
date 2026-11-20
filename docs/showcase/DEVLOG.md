@@ -5,7 +5,8 @@
 | Branch | Step | State |
 |---|---|---|
 | `docs/rename-devlog-and-showcase` | plan | merged (#31) |
-| `docs/threat-model` | 2 | open |
+| `docs/threat-model` | 2 | merged (#33) |
+| `docs/before-after` | 4 | open |
 
 ## 2026-11-19: plan
 
@@ -32,3 +33,30 @@
 - Asked whether to cut the `cronjob` toolset in chats, or web and browser. The owner's call: leave
   them all as they are. Not checked: whether a job created from a chat runs with the chat's web
   tools, which would make it an unattended job with all three legs.
+
+## 2026-11-20: before/after table
+
+- Threat model merged (#33). Drafted the before/after table from the two audits, as tables per leg,
+  per session, persistence and detection, plus the skill path to the local machine that motivated `skills/` read-only.
+- It covers both agents: before hardening one agent ran the bug loop and the brain, so a Telma-only
+  table would hide the main fix (the split). It links ticket-bay-bot's repo for the bot's depth.
+- Says "the owner" throughout. Needs the owner's approval in the PR.
+- `/code-review` on #34: ten findings, all held. Fixed: memory is on for the bot (step 4), not off;
+  `skill_manage` row; both agents' diffs; Telma's `execute_code` can call her web tools; Discord
+  previews and Exa; ruleset on the fork with the owner's bypass; which `.git` parts are read-only;
+  tripwire-health and sync-brain alerts; the open list now matches the threat model's accepted risks.
+- Audit asked by the owner: keep Telma's rows, park the bot's for its own docs, keep overlaps here and
+  write them there too. Cut the bot-only rows (its legs, App token, squid, customer data, PR body,
+  ruleset, denied egress, its open risks) and the bot halves of shared rows; folded bug emails, PRs,
+  npm and third-party skills into one "moved to the bot" row. Parked list in the brain inbox.
+
+## 2026-11-20: threat model review fixes
+
+- `/code-review` on #33 after it merged; nine of ten findings held. Fixed on `fix/threat-model-review`:
+  proof cells that cited model refusals (T4, T5, T7) as if they tested a control; the terminal guard
+  overstated (a regex on one tool, and its secret paths are the bot's); the unchecked chat-made cron
+  job now stated next to "no unattended job holds all three legs"; refusal vs quarantine in
+  sync-brain; memory-diff relays injectable text to Discord; the diagram (web tools pointed at the
+  owner, ragged right edge).
+- Not fixed here: plan and devlog status (done in #34), new "José" lines in the plan (the open rename
+  item covers them).
