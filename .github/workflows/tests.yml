@@ -60,4 +60,4 @@ jobs:
           persist-credentials: false
 
       - name: Test the eval grader
-        run: python3 -m unittest evals/test_grade.py
+        run: python3 -m unittest evals/test_grade.py evals/test_tasks.py

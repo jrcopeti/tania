@@ -8,7 +8,7 @@ fetch: text-only
 
 Two rules from today's review:
 
-1. Every project tests its database code against a real database started in a container, never a
-   mock.
+1. Every project pins its runtime version in a `.tool-versions` file at the repo root, so local
+   runs, CI and the server use the same one.
 2. In example-app, the seed script runs before every test suite, and new fixtures go in
    `db/seed.ts`, not in the tests.
