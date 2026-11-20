@@ -7,6 +7,7 @@
 | `docs/rename-devlog-and-showcase` | plan | merged (#31) |
 | `docs/threat-model` | 2 | merged (#33) |
 | `docs/before-after` | 4 | merged (#34) |
+| `fix/threat-model-review` | 2 | merged (#35) |
 | `fix/before-after-review` | 4 | open |
 
 ## 2026-11-19: plan
@@ -51,11 +52,22 @@
   ruleset, denied egress, its open risks) and the bot halves of shared rows; folded bug emails, PRs,
   npm and third-party skills into one "moved to the bot" row. Parked list in the brain inbox.
 
+## 2026-11-20: threat model review fixes
+
+- `/code-review` on #33 after it merged; nine of ten findings held. Fixed on `fix/threat-model-review`:
+  proof cells that cited model refusals (T4, T5, T7) as if they tested a control; the terminal guard
+  overstated (a regex on one tool, and its secret paths are the bot's); the unchecked chat-made cron
+  job now stated next to "no unattended job holds all three legs"; refusal vs quarantine in
+  sync-brain; memory-diff relays injectable text to Discord; the diagram (web tools pointed at the
+  owner, ragged right edge).
+- Not fixed here: plan and devlog status (done in #34), new "José" lines in the plan (the open rename
+  item covers them).
+
 ## 2026-11-20: review of the merged table
 
 - #34 was merged with the Telma-only cut in it; `/code-review` on that commit. Fixed: Telma's
   sandbox is loopback only (the "no DNS" probe was the bot's); "her `execute_code`" names Telma;
-  the moved bot jobs keep their leg count, so "no unattended job holds all three" stays checkable;
-  the threat model's Mac rename is in #35, not done.
+  the moved bot jobs keep their leg count, so "no unattended job holds all three" stays checkable.
+  Dropped the PLAN.md fix: #35 merged, so the threat model's Mac rename is done.
 - Not changed: a memory write in a chat shows in the diff only after the next triage. The threat
   model says the same, so the page matches it; the owner can decide whether to name the gap.

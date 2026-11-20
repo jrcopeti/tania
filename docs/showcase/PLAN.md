@@ -37,9 +37,10 @@ Carried over from the frozen hardening plan:
   host.
 
 - Replace "José" with "the owner" across the docs, the frozen ones included (asked 2026-11-19). The
-  threat model and `AGENTS.md` are done.
-- Replace "the Mac" with "the local machine" the same way (asked 2026-11-20). The before/after table
-  is done, the threat model is in #35 (open); the hardening and rename docs and `vps/telma/` still say Mac.
+  threat model, `AGENTS.md` and the rename docs are done.
+- Replace "the Mac" with "the local machine" the same way (asked 2026-11-20). The threat model and
+  the before/after table and the rename docs are done; the hardening docs and `vps/telma/` still
+  say Mac.
 
 - Write the bot's before/after in ticket-bay-bot: its own rows and the overlaps, parked in the brain
   inbox (`2026-11-20-bot-rows-from-telma-before-after.md`, asked 2026-11-20).
