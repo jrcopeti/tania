@@ -47,8 +47,6 @@ Carried over from the frozen hardening plan:
   the before/after table and the rename docs are done; the hardening docs and `vps/telma/` still
   say Mac.
 
-- ADR 1 mentions the course Telma started in without naming or linking it. The brain's showcase
-  intent asks for a link where possible: the owner to give it, or decide against.
 
 - Write the bot's before/after in ticket-bay-bot: its own rows and the overlaps, parked in the brain
   inbox (`2026-11-20-bot-rows-from-telma-before-after.md`, asked 2026-11-20).

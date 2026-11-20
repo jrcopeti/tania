@@ -123,3 +123,5 @@
   SECURITY.md, no description or topics (community profile 0%). The owner chose MIT for everything,
   `guard-network.sh` included, and asked for all of it in this PR.
 - Screenshots in place, all 220px wide; the avatar is a 256px copy of the owner's icon (free for public use). Checked each: no IPs, webhooks, private repos, canary or other people, and no GPS or device metadata. Blurred the old name in `alerts.jpg` and the owner's name in `brain-triage.jpg`, amended into the unpushed commit so the originals never reached GitHub.
+- The owner gave the course link: README credits and ADR 1 now name and link AI Agent Engineer by
+  Daniel Moka. Open item closed.

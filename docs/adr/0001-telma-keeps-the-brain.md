@@ -9,8 +9,8 @@ coding agents read before they work. Notes arrive all day, from a chat, a link o
 session, and land unsorted in `inbox/`. Sorting them into the right place is the work that gets
 skipped.
 
-Telma started as the coding employee in an AI agent engineering course: an always-on agent that
-reads bug emails and opens pull requests. The brain was one of her jobs.
+Telma started as the coding employee in [AI Agent Engineer](https://aiagentengineer.dev/), Daniel
+Moka's course: an always-on agent that reads bug emails and opens pull requests. The brain was one of her jobs.
 
 ## Decision
 

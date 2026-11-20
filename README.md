@@ -5,7 +5,7 @@
 [![tests](https://github.com/jrcopeti/telma/actions/workflows/tests.yml/badge.svg)](https://github.com/jrcopeti/telma/actions/workflows/tests.yml)
 [![secret-scan](https://github.com/jrcopeti/telma/actions/workflows/secret-scan.yml/badge.svg)](https://github.com/jrcopeti/telma/actions/workflows/secret-scan.yml)
 
-![Telma Icon](/docs/assets/telma-icon.jpg)
+
 
 An always-on agent that keeps the owner's second brain: she saves what the owner sends her, answers
 questions from the notes and sorts the inbox twice a day. She runs on
@@ -154,7 +154,8 @@ The tests run in CI, and gitleaks scans the full history on every push.
 ## Credits
 
 Built on [Hermes Agent](https://github.com/NousResearch/hermes-agent) by Nous Research. Telma
-started as the coding employee in an AI agent engineering course.
+started as the coding employee in [AI Agent Engineer](https://aiagentengineer.dev/), Daniel Moka's
+course.
 
 A personal project: issues are welcome, pull requests aren't expected. To report a security
 problem, see [SECURITY.md](SECURITY.md).
