@@ -24,7 +24,7 @@ does.
 |---|---|---|---|
 | 1 | **README** | Written with the `crafting-effective-readmes` skill, "personal" (portfolio) template. Carries the "formerly" line from rename step 7. Shows Telma's brain work only (chat capture, ask-brain, triage summary), with screenshots from José (shot list below); one section introduces ticket-bay-bot and links its repo, which shows the bug loop. Links the threat model, ADRs, postmortem. | |
 | 2 | **Threat model** | [threat-model.md](../threat-model.md): the lethal trifecta per session, which leg each control cuts, and the accepted risks from the hardening plan's Decisions. | done (#33) |
-| 3 | **ADRs** | One per lasting decision José picks, for example the two-agent split, the repo split, sync-brain never running git in a sandbox folder, the exfil tripwire. | |
+| 3 | **ADRs** | [docs/adr/](../adr/), short, one per decision the owner picked: why Telma exists, the two-agent split, one repo per agent, sync-brain's own clone, the exfil tripwire. | in review |
 | 4 | **Before/after table** | [before-after.md](../before-after.md), from [audit-before.md](../hardening/audit-before.md) and [audit-after.md](../hardening/audit-after.md). Telma's side only: rows about the shared agent before the split stay, bot-only rows are parked in the brain inbox for ticket-bay-bot's docs. | in review |
 
 ## Open

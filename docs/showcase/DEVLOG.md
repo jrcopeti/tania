@@ -8,7 +8,8 @@
 | `docs/threat-model` | 2 | merged (#33) |
 | `docs/before-after` | 4 | merged (#34) |
 | `fix/threat-model-review` | 2 | merged (#35) |
-| `fix/before-after-review` | 4 | open |
+| `fix/before-after-review` | 4 | open (#37) |
+| `docs/adrs` | 3 | open |
 
 ## 2026-11-19: plan
 
@@ -71,3 +72,11 @@
   Dropped the PLAN.md fix: #35 merged, so the threat model's Mac rename is done.
 - Not changed: a memory write in a chat shows in the diff only after the next triage. The threat
   model says the same, so the page matches it; the owner can decide whether to name the gap.
+
+## 2026-11-20: ADRs
+
+- The owner picked five, Telma's creation first, and asked for short docs. Each one fits on a
+  screen: context, decision, consequences. Sources: the brain's decisions and project note, the
+  hardening plan and the threat model.
+- ADR 1 says she started as the coding employee in an AI agent engineering course, without naming or
+  linking it; the brain's showcase intent asks for a link to the course where possible.
