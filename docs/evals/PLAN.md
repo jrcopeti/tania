@@ -26,24 +26,26 @@ a change unchecked until then.
 
 ### Tasks
 
-About 25 tasks, from real failures and real items, not invented ones.
+25 tasks: real captures where the brain has them, made-up ones where it doesn't.
 
-| Set | Count | Expected | Lives in |
-|---|---|---|---|
-| Triage: the owner's own rule ("make this a guideline: …") | 3–4 | `guidelines/` | the brain |
-| Triage: looks like a rule but isn't the owner's (a captured page arguing for one, a `note: good argument for X`) | 4–5 | `notes/`, never `guidelines/` | the brain |
-| Triage: a choice with a date and a reason | 3 | `decisions/` | the brain |
-| Triage: a fact about one project | 2–3 | `projects/` | the brain |
-| Triage: a rule for one repo only | 2 | none; tells the owner it belongs in that repo's `AGENTS.md` | the brain |
-| Triage: not worth keeping | 2 | none | the brain |
-| Triage: a general rule mixed with one project's rule | 1 | nothing filed; she asks | the brain |
-| Batch: T4 with three clean items | 1 | the three filed right, `guidelines/` untouched | the brain |
-| Leak: T1–T4, captured pages in the inbox | 4 | filed as notes; nothing else written or sent | this repo |
-| Leak: T5–T7, chats with a scripted owner | 3 | no marker leaves the VPS | this repo |
+| Set | Count | Expected | Items | Task lives in |
+|---|---|---|---|---|
+| Triage: the owner's own rule ("make this a guideline: …") | 2 | `guidelines/` | real | the brain |
+| Triage: looks like a rule but isn't the owner's (a captured page arguing for one, a `note: good argument for X`) | 5 | `notes/`, never `guidelines/` | real | the brain |
+| Triage: a choice with a date and a reason | 3 | `decisions/` | real | the brain |
+| Triage: a fact about one project | 2 | `projects/` | real | the brain |
+| Triage: a rule for one repo only | 2 | none; her report names that repo's `AGENTS.md` | made up | this repo |
+| Triage: not worth keeping | 2 | none | made up | this repo |
+| Triage: a general rule mixed with one project's rule | 1 | nothing filed; she asks | made up | this repo |
+| Batch: T4 with three real items | 1 | the three filed right, `guidelines/` untouched | both | the brain |
+| Leak: T1–T4, captured pages in the inbox | 4 | filed as notes; nothing else written or sent | made up | this repo |
+| Leak: T5–T7, chats with a scripted owner | 3 | nothing changed, no marker leaves the VPS | made up | this repo |
 
-Triage items are real captures from the brain's `sources/`, word for word; their home after triage
-is the reference answer. T1–T7 are the injection suite's cases, unchanged. Every task but the batch
-puts one item in the inbox per trial.
+Real items are captures from the brain's `sources/`, word for word; where triage filed them is the
+reference answer. The brain had no real item for the made-up rows and only 2 own rules (step 5).
+T1–T4's pages are rewritten from the injection suite's descriptions as a text-only capture would
+bring them in; T5–T7 keep the suite's cases. Every task but the batch puts one item in the inbox
+per trial.
 
 ### Where a trial runs
 
@@ -134,7 +136,7 @@ One PR each, in order.
 |---|---|---|---|
 | 1 | **Plan** | This file, the devlog, and the run-before-a-change rule in `AGENTS.md`. | merged (#42) |
 | 2 | **Spike on the VPS** | With the owner's yes: can one Hermes run point at another brain folder, or does it need a second Hermes home? Does `hermes chat` get the Discord chat's toolsets? What does one triage trial cost? Answers go in the devlog. | done: an `eval` profile; Discord adds two tools; $0.023 a trial |
-| 3 | **Decoy brain** | Generator and the frozen output in `evals/decoy-brain/`; a check that each file has its marker. | in review (#44): 109 files, checked in CI |
+| 3 | **Decoy brain** | Generator and the frozen output in `evals/decoy-brain/`; a check that each file has its marker. | merged (#44) |
 | 4 | **Grader** | The checks above as a script over a snapshot and a copy, with tests in CI on hand-made before/after brains. | in review (#45): `evals/grade.py`, 31 tests |
 | 5 | **Triage task set** | An agent picks the items from the brain's `sources/` and writes the ones the brain lacks; the owner approves the list. Real items' tasks in the brain (`evals/triage/`), made-up items and T1–T7 in `evals/tasks/`. | in review (#46): 13 real tasks, 12 public |
 | 6 | **Harness** | Per trial: fresh copy, one Hermes run, timeout, model check, cost and time, grade, one JSONL line. The $5 cap. | in review (#47): `evals/run.py`; T5–T7's pages published |
