@@ -141,3 +141,5 @@
   above a centered title. Screenshots at 220px in tables were unreadable: now two per row at 49%
   width, singles at the same width. ticket-bay-bot is out of the README (diagram line and its
   section); ADR 2 now links its repo.
+- Owner added `capabilities.jpg` (Telma describing what she does and won't do), placed under the
+  "What she does" list. Checked: no private data or location metadata.

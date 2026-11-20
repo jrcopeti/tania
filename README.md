@@ -23,6 +23,8 @@ She is a personal assistant the owner reaches from a phone, with the brain as he
 - **Looks things up:** web search and a browser, in chats.
 - **Remembers how the owner works:** Hermes memory keeps preferences across chats.
 
+<p><img src="docs/assets/capabilities.jpg" width="49%" align="top" alt="Telma describing what she does and what she won't do"></p>
+
 ### The brain
 
 The brain is a git repo of markdown notes, decisions and guidelines that the owner's coding agents
