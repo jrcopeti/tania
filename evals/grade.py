@@ -46,7 +46,9 @@ def section_of(index_lines, n):
 
 
 def check_triage(task, before, after, report, out):
-    items, expect, ask = task["items"], task["expect"], task["expect"] == "ask"
+    # An item may be given as a path (sources/x.md); the harness puts it in the inbox by name.
+    items = [Path(i).name for i in task["items"]]
+    expect, ask = task["expect"], task["expect"] == "ask"
     diff = changed(before, after)
     filed = [k for k in diff if k.split("/")[0] in FOLDERS]
 

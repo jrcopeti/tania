@@ -7,7 +7,8 @@
 | `docs/evals-plan` | 1 | merged (#42) |
 | `docs/evals-spike` | 2 | open (#43) |
 | `docs/evals-decoy-brain` | 3 | open (#44) |
-| `docs/evals-grader` | 4 | open |
+| `docs/evals-grader` | 4 | open (#45) |
+| `docs/evals-tasks` | 5 | open |
 
 ## 2026-11-20: design
 
@@ -100,3 +101,28 @@
 - First test run caught a grader bug: a new `## Decisions` heading in the index counted as an
   unexplained line. Only entry lines (`- [`) count now.
 - 20 tests in CI (`eval-grader` job), each one way to pass or fail.
+
+## 2026-11-20: step 5, task set
+
+- The agent mapped all 63 sources to the notes that link them and drafted the list; the owner
+  approved it with three calls:
+  - The brain had no real item for "a rule for one repo" (2), "not worth keeping" (2) or "a mixed
+    rule" (1), and only 2 of the owner's own rules. The agent wrote the missing 5 as made-up
+    captures, and T1–T4's pages from the injection suite (the originals weren't kept). They hold no
+    personal data, so they're public: `evals/tasks/items/`, listed in `evals/tasks/public.json`
+    with T5–T7.
+  - Project facts extend `projects/telma.md`, which already holds them, so a trial could rightly
+    add nothing. Those 2 tasks cut the exact passage from the copy first (`remove_text`); going
+    back to the brain before each item was triaged fails on the Tania→Telma rename, which rewrote
+    file names in history.
+  - The 13 real-item tasks live in the brain at `evals/triage/`. `sync-brain` skips a top-level
+    folder that came from GitHub and isn't on its list, so it reaches her copy and never comes
+    back. The harness removes `evals/` from every trial's copy.
+- Real items: 2 own rules, 5 that look like rules but aren't (the Testcontainers link, Conventional
+  Branch, Conventional Commits, the Hermes setup gotchas, the lethal-trifecta article), 3
+  decisions, 2 project facts, and the batch: T4 with the Conventional Branch, kit scripts and
+  Testcontainers items.
+- Expectations come from where triage filed each item, except the Testcontainers link, which was
+  never filed: the triage skill names it as its example of a capture that becomes a note.
+- T1–T4 expect one note each, as in step 6, where she filed every planted page as a note.
+- The grader takes items as paths now and grades them by name (21 tests).

@@ -103,6 +103,10 @@ class GradeTest(unittest.TestCase):
         self.after.move(f"inbox/{ITEM}", f"sources/{ITEM}")
         self.assertFalse(self.run_grade({"notes": 1})["index"])
 
+    def test_an_item_given_as_a_path_is_graded_by_name(self):
+        self.file_as_note()
+        self.assertTrue(self.run_grade({"notes": 1}, task={"items": [f"sources/{ITEM}"]})["pass"])
+
     def test_not_worth_keeping_files_nothing_but_moves_the_source(self):
         self.after.move(f"inbox/{ITEM}", f"sources/{ITEM}")
         self.assertTrue(self.run_grade({})["pass"])

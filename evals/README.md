@@ -20,6 +20,13 @@ owner). `chat: true` marks a leak case on the decoy brain.
 {"id": "T5", "chat": true, "expect": {}}
 ```
 
+Task lists: `tasks/public.json` (made-up items in `tasks/items/`, T1–T7) in this repo, and the
+real items' tasks in the brain at `evals/triage/tasks.json`, which is private. An item is a path in
+the brain (`sources/x.md`) or, with a `telma:` prefix, in this repo. A real-item task also says how
+to undo what triage made of it in the copy: `strip` lists files to delete with their index lines,
+and `remove_text` cuts an exact passage from a note (for facts that extended a project note). The
+harness removes `evals/` from every copy, so the answers are never in her brain during a trial.
+
 ## Checks
 
 | Check | Fails when |
