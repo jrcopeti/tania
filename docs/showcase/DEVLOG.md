@@ -111,3 +111,7 @@
   each, the safety story in a few lines linking the threat model, before/after and ADRs, a
   ticket-bay-bot section with its repo link, and the "formerly Tania" line from the rename plan.
 - Says "the owner", with no gendered pronoun for them. ADRs (step 3) marked done (#38).
+- Owner's review: "What she does" broadened to a personal assistant (reminders, summaries, web
+  lookups, memory), with the brain as her main job; a Models section lists the main model and the
+  fallback chain from the brain's model decision, and says the chain is the owner's pick and
+  Hermes takes any list. The reminder example is neutral on purpose: no health detail.
