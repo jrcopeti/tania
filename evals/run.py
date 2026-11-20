@@ -10,7 +10,8 @@ pointed at the trial folder, so the run tests the setup she has now. Each trial:
 that start, one Hermes run, then the copy, her report and her tool calls come back here to be
 graded. One JSONL line per trial in evals/results/<date>-<commit>.jsonl, public: no report text, and
 no grader details for tasks on the real brain. The full rows go to evals/results/private/, which
-git ignores. Stops at the cost cap; the rest are marked not_run.
+git ignores. Stops at the cost cap; the rest are marked not_run. Ends with report.py's report,
+written beside each results file and printed from the private one.
 Every run needs the owner's yes (docs/evals/PLAN.md, Rules).
 """
 import argparse
@@ -27,6 +28,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 from grade import PROTECTED, flat, grade, tripwire  # noqa: E402
+from report import write as write_report  # noqa: E402
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parent
@@ -360,7 +362,9 @@ def main(argv=None):
         out, private = HERE / "results" / name, HERE / "results/private" / name
         private.parent.mkdir(parents=True, exist_ok=True)
         run_all(tasks, a.k, pages, tmp, stamp, out, private)
-        print(out)
+        write_report(out)
+        print("\n" + write_report(private), end="")
+        print(out.with_suffix(".md"))
     finally:
         shutil.rmtree(tmp, ignore_errors=True)  # the pinned copy of the real brain
         vps(remove_container() + f"rm -rf {WORK}\n", check=False)

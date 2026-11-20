@@ -14,6 +14,13 @@ The design, steps and rules are in [the plan](../docs/evals/PLAN.md).
   trial in `results/`, with no report text, and no grader details for tasks on the real brain; full
   rows go only to `results/private/` (git ignores it). Every run needs the owner's yes.
   `python3 evals/run.py --only T1 skip-1 -k 1` runs a few.
+- `report.py` reports a run: pass^k per task, every failed trial with the checks it broke, trials to
+  rerun, and the change since the last run in the same folder (verdicts, cost, time, setup). The run
+  is FAIL if any task fails, BROKEN if over 20% of the trials that ran errored or were discarded,
+  INCOMPLETE if a task has fewer than k passes, else PASS. `run.py` writes it beside each results
+  file as `<run>.md`. `python3 evals/report.py` reports the newest public run; pass a private file for
+  the grader's reasons, `--since` to pick the run to compare with. Exits 0 only on PASS. Tests:
+  `evals/test_report.py` (CI).
 - `tasks/pages/` holds T5–T7's planted pages. A chat case runs once its page is published and its
   URL and the file's SHA-256 are in `tasks/pages.json` (`{"T5": {"url": "https://…", "sha256": "…"}}`);
   until then, or once the file changes after publishing, its trials are `not_run`.

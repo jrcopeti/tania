@@ -322,3 +322,23 @@
   `notes/hermes-agent-setup-gotchas.md`. The triage skill says one home per item, so the grader is
   right; lint's fixes to two other notes' links were correctly not counted. The full run will show
   whether she does it every time.
+
+## 2026-11-20: step 7, the report
+
+- `evals/report.py` reports one run: pass^k per task with its counts, cost, time and tool calls;
+  every failed trial with the checks it broke (and the grader's reason, from a private file); the
+  trials to rerun; and the change since the last run: tasks newly failing, newly passing, still
+  failing or now incomplete, new or gone tasks, cost and time per trial, and which setup fields
+  changed. `run.py` writes it beside both results files. 21 tests in CI.
+- Calls made here: the last run is the newest earlier file in the same folder, so public compares
+  with public. A task is `incomplete`, not failed, until it has k passes: errors, discarded and
+  not-run trials don't count against her but leave it unmeasured. The run verdict is FAIL over
+  BROKEN over INCOMPLETE over PASS; broken means over 20% of the trials that ran errored or were
+  discarded (the plan said "many"). The report warns when the eval profile's `SOUL.md` hash
+  differs from hers.
+- Found while building it: both smoke runs' private files were tracked in git on `main`, though
+  `.gitignore` lists the folder (added before the ignore rule, most likely). They hold her report
+  text, and the `decision-3` row names real brain files. This PR stops tracking them and adds a
+  test that nothing under `results/private/` is tracked; they're still in public history.
+- The gitleaks allowlist comment now says why the first decoy key stays: #44's merge put it in
+  `main`'s history, which CI scans in full.
