@@ -4,7 +4,7 @@
 
 | Branch | Step | State |
 |---|---|---|
-| `docs/evals-plan` | 1 | in review |
+| `docs/evals-plan` | 1 | open (#42) |
 
 ## 2026-11-20: design
 
