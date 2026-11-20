@@ -45,3 +45,7 @@
   `skill_manage` row; both agents' diffs; Telma's `execute_code` can call her web tools; Discord
   previews and Exa; ruleset on the fork with the owner's bypass; which `.git` parts are read-only;
   tripwire-health and sync-brain alerts; the open list now matches the threat model's accepted risks.
+- Audit asked by the owner: keep Telma's rows, park the bot's for its own docs, keep overlaps here and
+  write them there too. Cut the bot-only rows (its legs, App token, squid, customer data, PR body,
+  ruleset, denied egress, its open risks) and the bot halves of shared rows; folded bug emails, PRs,
+  npm and third-party skills into one "moved to the bot" row. Parked list in the brain inbox.
