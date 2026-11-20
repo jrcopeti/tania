@@ -14,7 +14,8 @@ to its memory ([postmortem](../hardening/postmortem-2026-11-17-prompt-injection.
 Split it into two agents on the same server, one on each side of the trust boundary:
 
 - **Telma** keeps the brain and talks to the owner.
-- **ticket-bay-bot** runs the bug loop and PR triage. It has no brain and no memory of the owner.
+- **[ticket-bay-bot](https://github.com/jrcopeti/ticket-bay-bot)** runs the bug loop and PR
+  triage. It has no brain and no memory of the owner.
 
 Each has its own Linux user, Docker sandbox, Hermes home, Discord bot and model key.
 
