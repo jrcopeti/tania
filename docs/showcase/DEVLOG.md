@@ -131,3 +131,9 @@
   (the threat model names where only the model stands), the obedient-model lesson (one case ran on
   north-mini-code, then direct probes), plan status and the repo-extras item, ADR 1's long line,
   extra blank lines.
+- Owner's correction: "no way out for unattended work" was right. Checked Telma's jobs on the VPS
+  (read-only): brain-triage has terminal, file, skills and todo only; sync-brain, memory-diff and
+  tripwire-health are no-agent scripts; the chat-made reminder has zero toolsets and is paused.
+  Reverted that bullet and the "jobs scheduled from a chat" clause. Kept "file and shell tools run
+  in the sandbox": `browser_exec` runs Python as a subprocess of her host process (read in
+  `tools/browser_use_cli.py`); reading a note that way was not tested.

@@ -93,14 +93,14 @@ rebuilt around it:
 
 - **Split by trust boundary.** Strangers' bug emails moved to a second agent with no brain. Telma
   never sees them.
-- **No way out for triage.** The scheduled triage runs in a rootless Docker sandbox with no network
-  and no web tools, so a page in the inbox has nowhere to send notes.
+- **No way out for unattended work.** Triage runs in a rootless Docker sandbox with no network, so
+  a page in the inbox has nowhere to send notes.
 - **Her edits can't reach the owner's machine.** Skills and rule files are read-only to her, and
   the brain is pushed by a host job from its own clone, allowed folders only. 61 tests in CI and
   four adversarial review rounds back it.
-- **Watched where blocking would cost her usefulness.** Chats keep web and browser tools, and so
-  can jobs scheduled from a chat. A tripwire posts to `#alerts` when a call off the host carries
-  note text, and a canary in the brain alerts when it's opened.
+- **Watched where blocking would cost her usefulness.** Chats keep web and browser tools. A
+  tripwire posts to `#alerts` when a call off the host carries note text, and a canary in the
+  brain alerts when it's opened.
 - **Tested by attack.** An [injection suite](docs/hardening/injection-suite.md) and probes from
   inside the sandbox.
 
