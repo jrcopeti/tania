@@ -20,10 +20,10 @@ Each has its own Linux user, Docker sandbox, Hermes home, Discord bot and model 
 
 ## Consequences
 
-- No unattended job holds all three legs of the
+- None of the scheduled jobs holds all three legs of the
   [lethal trifecta](../threat-model.md#the-lens-the-lethal-trifecta). Strangers' emails and PRs no
   longer reach the brain. Telma still reads outside pages: captured ones in triage, which has no
   network, and the ones she opens in chats.
 - Telma's chats still hold all three, an [accepted risk](../threat-model.md#accepted-risks). A chat
-  can create a cron job, and whether that job keeps the chat's web tools is not checked yet.
+  can also create a cron job with web and browser, which would hold all three; also accepted.
 - Two agents to run, update and watch.

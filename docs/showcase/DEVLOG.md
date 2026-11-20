@@ -85,3 +85,14 @@
   ADR 3 said the hardening docs are frozen (the tag is, the files were edited since); ADR 4's count
   (13 on top of three known); ADR 5 left out the brain-folder trigger and browser tools, and named the
   canary without saying what it is; plan step 4 and #37 marked merged; the course link moved to Open.
+
+## 2026-11-20: the chat-made cron job, checked
+
+- The owner had Telma set a medicine reminder from a chat. Its job got `enabled_toolsets: []` (zero
+  tools: the model chose it). Read Hermes's code on the VPS, read-only: the chat's `cronjob` tool
+  stores whatever toolsets the model asks for (`tools/cronjob_tools.py`), a job without a list gets
+  `hermes-cron`, the same core tools as the CLI, web and browser included (`cron/scheduler.py`), and
+  the only cap, `agent.disabled_toolsets`, applies to chats too. So a chat can schedule an unattended
+  job with all three legs.
+- The owner's call: no fix, mark it checked. Threat model, before/after and ADR 2 now say so, and
+  list it as an accepted risk. Not checked: whether the tripwire hook fires inside cron runs.

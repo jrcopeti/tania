@@ -22,8 +22,9 @@ A session leaks data when it holds all three legs: private data, untrusted input
 | brain-triage (captured pages, unattended) | **3**: same sandbox, open network | 2: Telma, no network |
 | Telma's chats with the owner | **3** | **3, accepted**: watched by a tripwire and a canary |
 
-Before, every job shared the same legs, so the weakest input reached the strongest data. After, no
-unattended job holds all three. The chats still do; the threat model says why that is accepted.
+Before, every job shared the same legs, so the weakest input reached the strongest data. After, none
+of the scheduled jobs holds all three. The chats still do, and a chat can create a job that does;
+the threat model says why both are accepted.
 
 ## Private data
 
@@ -75,7 +76,7 @@ list the brain, and `sync-brain` refuses any change to `skills/`.
 |---|---|---|
 | `memory` | on for every job; poisoned once | on in Telma's chats, so she learns; off for brain-triage. A diff goes to the owner |
 | `skill_manage` | on for every job | on for brain-triage and Telma's chats; the same diff covers it |
-| `cronjob` | on: an injected run could schedule itself | off for brain-triage; on in Telma's chats (the owner's call) |
+| `cronjob` | on: an injected run could schedule itself | off for brain-triage; on in Telma's chats (the owner's call), and a job made there can get web and browser |
 | Root cron jobs | the skills pull | none |
 
 ## Detection and response
@@ -93,7 +94,7 @@ list the brain, and `sync-brain` refuses any change to `skills/`.
 
 The [threat model](threat-model.md#accepted-risks) lists what was accepted and why. In short:
 
-- Telma's chats hold all three legs, and a chat can create a cron job.
+- Telma's chats hold all three legs, and a chat can create a cron job that does too.
 - The tripwire catches only copied brain text (8 words in a row, or a short note whole); split,
   reworded or re-encoded text gets past it.
 - Memory and skills stay writable, so an injection that lands persists until the owner reads the

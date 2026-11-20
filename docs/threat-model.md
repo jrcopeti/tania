@@ -60,9 +60,10 @@ instructions in emails" is not a control: on 2026-11-17 a model ignored exactly 
 | Chats with the owner on Discord | pages she opens | the brain | web and browser tools on the host | **3, accepted** |
 | sync-brain, memory-diff, tripwire-health | memory-diff relays what she saved to memory or skills, which an injection can write | the push key (sync-brain); her memory | the brain repo; Discord, the owner's server | no model in the loop |
 
-No unattended job holds all three legs. The chats do; see [Accepted risks](#accepted-risks). One gap
-is not checked: a chat can create a cron job, and whether that job keeps the chat's web and browser
-tools is unknown. If it does, it runs unattended with all three.
+None of the scheduled jobs holds all three legs. The chats do; see [Accepted risks](#accepted-risks).
+A chat can also create a cron job that holds all three: checked on 2026-11-20 against Hermes's code.
+The chat's `cronjob` tool sets the job's toolsets, and nothing limits them to the chat's. A job that
+sets none gets Hermes's cron default, which includes web and browser.
 
 ## Threats and controls
 
@@ -73,7 +74,7 @@ tools is unknown. If it does, it runs unattended with all three.
 | 3 | An injected run edits a brain skill, which then runs on the local machine | `skills/` and rule files mounted read-only; sync-brain pushes only allowed folders and refuses the rest | the path to the local machine | T1, and 61 tests in CI |
 | 4 | A planted symlink, gitlink or git hook makes the host leak the push key or run code | host git never runs in a folder she writes; sync-brain keeps its own clone and copies plain files only | the path to the host | sync-brain tests: links, FIFOs and a planted `HEAD` refused |
 | 5 | An injection saves itself to her memory or a skill and comes back every session | brain-triage has no memory tool, but keeps `skill_manage`, and chats have both, so she can learn; a diff after each triage shows the owner what changed | detection only | [memory-diff](../vps/telma/memory-diff.sh)'s tests; T4 saved nothing, so the diff had nothing to show |
-| 6 | An injection schedules its own cron job | brain-triage has no cronjob tool; chats keep it, the owner's call | the unattended path, for triage only | not checked: whether a job made in a chat keeps the chat's tools |
+| 6 | An injection schedules its own cron job | brain-triage has no cronjob tool; chats keep it, the owner's call | the unattended path, for triage only | checked 2026-11-20: a job made in a chat can get web and browser (accepted, see below) |
 | 7 | A shell command reads secrets or dumps the environment | secrets are not in the sandbox. A terminal guard also blocks `printenv` and raw network tools, but it is a regex on one tool, and Python gets past it | private data | step 6 probes found no long-lived secret |
 | 8 | In a chat, a page tells her to put a note in a URL and open it | none: this is the accepted risk; the exfil tripwire posts to `#alerts` | detection only | T5 and T7: the model refused, so the tripwire was not tested; T6: it fired on URLs taken from notes. No case has put note text in a URL past the model |
 | 9 | In a chat, a page tells her to open every link in the brain | a canary link in the brain alerts when anything opens it | detection only | T6: the canary fired |
@@ -93,7 +94,11 @@ The cases T1 to T7 are in [injection-suite.md](hardening/injection-suite.md), th
 - **Discord link previews are a way out** no VPS rule closes. The canary sees them (`Discordbot`).
 - **`web_extract` sends every URL to a third party** (keyless Exa) when no web backend is set.
 - **Memory and her own skills stay writable.** An injection that lands can persist until the owner reads
-  the diff. A chat can also create a cron job.
+  the diff.
+- **A chat can schedule an unattended job with all three legs.** The `cronjob` tool lets the job ask
+  for web and browser, and Hermes's only cap for cron, `agent.disabled_toolsets`, would take them
+  from the chats too. Only the model's judgement stands in the way. Taking `cronjob` out of chats
+  would close it; the owner keeps it, for reminders.
 - **Triage could still file a capture as a guideline.** The triage skill forbids it, but that is a
   prompt, and her model did it once. Open: see the [showcase plan](showcase/PLAN.md).
 
