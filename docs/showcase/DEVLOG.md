@@ -49,3 +49,14 @@
   write them there too. Cut the bot-only rows (its legs, App token, squid, customer data, PR body,
   ruleset, denied egress, its open risks) and the bot halves of shared rows; folded bug emails, PRs,
   npm and third-party skills into one "moved to the bot" row. Parked list in the brain inbox.
+
+## 2026-11-20: threat model review fixes
+
+- `/code-review` on #33 after it merged; nine of ten findings held. Fixed on `fix/threat-model-review`:
+  proof cells that cited model refusals (T4, T5, T7) as if they tested a control; the terminal guard
+  overstated (a regex on one tool, and its secret paths are the bot's); the unchecked chat-made cron
+  job now stated next to "no unattended job holds all three legs"; refusal vs quarantine in
+  sync-brain; memory-diff relays injectable text to Discord; the diagram (web tools pointed at the
+  owner, ragged right edge).
+- Not fixed here: plan and devlog status (done in #34), new "José" lines in the plan (the open rename
+  item covers them).
