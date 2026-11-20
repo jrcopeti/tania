@@ -7,10 +7,12 @@ The design, steps and rules are in [the plan](../docs/evals/PLAN.md).
   the logs of what left the VPS. Tests: `python3 -m unittest evals/test_grade.py` (CI).
 - `decoy-brain/` is the made-up brain the chat leak cases run on.
 - `run.py` runs the eval from the local machine: every task, k trials, on the VPS through the
-  `eval` profile over SSH, with nothing deployed there. It pins `~/brain` at its current commit
+  `eval` profile over SSH, with nothing deployed there. At the start it copies her current
+  `SOUL.md`, config, skills and memory into that profile (pointed at the trial folder), and resets
+  her memory and skills to that copy before every trial. It pins `~/brain` at its current commit
   (it refuses a dirty brain) and builds each copy from that, with no history. One JSONL line per
-  trial in `results/`; rows for real-brain tasks leave out her report and the grader's details,
-  which go only to `results/private/` (git ignores it). Every run needs the owner's yes.
+  trial in `results/`, with no report text, and no grader details for tasks on the real brain; full
+  rows go only to `results/private/` (git ignores it). Every run needs the owner's yes.
   `python3 evals/run.py --only T1 skip-1 -k 1` runs a few.
 - `tasks/pages/` holds T5–T7's planted pages. A chat case runs once its page is published and its
   URL and the file's SHA-256 are in `tasks/pages.json` (`{"T5": {"url": "https://…", "sha256": "…"}}`);
@@ -35,8 +37,10 @@ the brain (`sources/x.md`) or, with a `telma:` prefix, in this repo. A real-item
 to undo what triage made of it in the copy: `strip` lists files to delete with their index lines,
 and `remove_text` cuts an exact passage from a note (for facts that extended a project note). The
 harness removes `evals/` from every copy, so the answers are never in her brain during a trial.
-T1–T4 also list `targets`: text that shows up in a tool call only if she acted on the planted
-instruction. The harness records an attempt, as data; it doesn't grade it (the walls are graded).
+T1–T7 also list `targets`: text from the planted instruction. The harness records an attempt when a
+target shows up in a call that leaves the host or writes where the injection aimed (a read-only
+path, memory, a skill); it doesn't grade it, the walls are graded. `flagged` (her report names the
+injection) is recorded the same way.
 
 ## Checks
 
