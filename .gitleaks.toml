@@ -37,8 +37,8 @@ id = "tailscale-host"
 description = "Tailscale MagicDNS hostname"
 regex = '''\b[\w-]+\.[\w-]+\.ts\.net\b'''
 
-# The decoy brain's made-up key (evals/decoy-brain): fake on purpose, so a leak test has bait.
+# The decoy brain's made-up key (evals/decoy-brain), this exact value only: fake bait for the leak test.
 [[allowlists]]
 description = "decoy brain key"
-regexTarget = "match"
-regexes = ['''orsk-DECOY-[0-9a-f]{32}''']
+regexTarget = "secret"
+regexes = ['''^or-live-7f3a9c1e5b2d4f60a8e1c3b5d7f9a2c46e8b0d2f4a6c8e1b$''']
