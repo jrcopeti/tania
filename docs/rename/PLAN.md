@@ -1,5 +1,7 @@
 # Rename: Tania becomes Telma
 
+**Done 2026-11-20.** Two small items left in Open.
+
 **Goal:** the agent that keeps José's brain is called Telma everywhere the name is read today: both
 repos, the brain, her persona on the VPS, and the names José types (repo, folder, SSH alias).
 
@@ -55,12 +57,11 @@ merges them.
 | 5b | **Her role in `SOUL.md`.** Rewrite it around the brain: `SOUL.md` predated hardening step 2, so after `/new` she still called herself José's coding employee. | A new chat describes her as the brain's keeper | Done 2026-11-19 |
 | 6 | **Brain.** Full rewrite, filenames included, between sync-brain runs and with no brain-triage running. Then the lint skill. | Lint clean, `grep -ri tania` empty | Done 2026-11-19 |
 | 7 | **José.** Discord bot display name, Contabo panel label, README line, the OpenRouter key's name if it names her. Remove the offline `tania-box` machine in the Tailscale admin console. | Done | Done 2026-11-19 but the README line, which waits for the README ([showcase plan](../showcase/PLAN.md)) |
-| 8 | **Final check.** The grep in "Done when". | Empty | Waits on the backups in Open |
+| 8 | **Final check.** The grep in "Done when". | Empty | Done 2026-11-20: only the planned exceptions match; backups deleted |
 
 Details, gotchas and backups for each step are in [DEVLOG.md](DEVLOG.md).
 
 ## Open
 
-- After the 2026-11-20 09:00 triage and the 09:30 memory-diff run clean: delete the
-  `*.bak-rename-*` copies, and the older backups that name her (listed in [DEVLOG.md](DEVLOG.md)).
-  Then step 8.
+- The README's "formerly Tania" line, with the README ([showcase plan](../showcase/PLAN.md)).
+- `agent-sandbox:3-pre-rename` goes once her sandbox container is next recreated.

@@ -10,8 +10,9 @@
 | `docs/rename-step-4` | 4, 5, 5b | merged (#28) |
 | `docs/rename-step-6` | 6 | merged (#29) |
 | `docs/rename-step-7` | 7 | merged (#30) |
-| `docs/rename-new-done` | 5, 5b | PR to open |
+| `docs/rename-new-done` | 5, 5b | merged (#32) |
 | `docs/rename-devlog-and-showcase` | this devlog, VPS check and fixes | merged (#31) |
+| `docs/rename-step-8` | 8, backups | PR to open |
 
 ## 2026-11-19: plan and SSH alias
 
@@ -136,3 +137,40 @@ prettier). History and backups are as listed above.
 After `/new`, a new chat describes her role as written in `SOUL.md`: "keeper of your second brain".
 She captures to `inbox/`, answers from the notes, triages at 09:00 and 21:00, and doesn't touch code
 or projects. Step 5b is done.
+
+## 2026-11-20: step 8, backups deleted and final check (José said yes)
+
+The 09:00 brain-triage and the 09:30 memory-diff ran clean (José checked Discord). Triage filed the
+rename's inbox item as a decision and its source; both keep the old name, as planned.
+
+Backups deleted on the VPS:
+
+- The 13 copies made in step 5: the `*.bak-rename-20261119-205327` set (her scripts and hooks, the
+  bot's two hooks, `SOUL.md`, her `.gitconfig`, root's `authorized_keys`, the skill's copy) and
+  `SOUL.md.bak-role-*`.
+- The older ones listed above: `config.yaml.tania` in the bot's home, the 10 `jobs.json.bak-*`
+  copies in both Hermes homes and root's, both `pr-triage-prompt.txt.bak-*`, the bot's
+  `memory-diff.sh.bak-rename-*`, root's `probe-tania.sh` and `tania-backups/`, and `rename-backups/`
+  with its three files (the old `tailscale serve` config, the deploy key's `.pub`, the
+  `pr-review-http.service` unit).
+
+Kept on the Mac in `~/incident/` first, because no other copy existed: the version of her
+`untrusted-input-handling` skill that described the canary (2026-11-18, before José's edit; the
+memory-diff history starts after it), and the step-6 sandbox probe script. Both copied byte for byte
+(sha256 checked) under names without the old one.
+
+Not deleted: `agent-sandbox:3-pre-rename`. Docker refused: her running sandbox container still uses
+it, because the night's fix set `user.name` inside the container instead of recreating it. It can go
+once that container is next recreated. Other `*.bak-*` files from the hardening steps remain; none
+names her.
+
+Final check:
+
+- sha256 of all 9 deployed files matches `main` in their repo: her six scripts and hooks, her sandbox
+  `Dockerfile`, the bot's two hooks.
+- `grep -ri tania` is empty in the bot repo, in her live `SOUL.md`, `memories/`, `skills/` and
+  `agent-hooks/`, and in the brain except the rename's decision and source. In this repo it finds
+  only the plan and this devlog. The README line comes with the README.
+- CI green on `main` in both repos.
+
+The rename is done.
