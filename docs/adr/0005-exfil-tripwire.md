@@ -5,8 +5,8 @@ Status: accepted, 2026-11-19
 ## Context
 
 In chats Telma holds all three legs: the brain, pages she opens, and web and browser tools that run
-on the host and need any site. No allowlist can cut that way out. The fix that would, a third agent for web work
-with no brain, costs too much for now.
+on the host and need any site. No allowlist can cut that way out. The fix that would, a third
+agent for web work with no brain, costs too much for now.
 
 ## Decision
 
