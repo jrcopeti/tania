@@ -339,8 +339,8 @@ def page_problem(task, pages):
 
 def public_row(row, chat):
     """Public rows carry no report text: her answers can quote real brain files. Grader details stay
-    only for the chat cases, which run on the decoy."""
-    return {k: v for k, v in row.items() if k != "report" and (chat or k != "why")}
+    only for the chat cases, which run on the decoy, and for trials that never ran (the cap, a page)."""
+    return {k: v for k, v in row.items() if k != "report" and (chat or k != "why" or row["status"] == "not_run")}
 
 
 def main(argv=None):
@@ -352,6 +352,7 @@ def main(argv=None):
     try:
         brain_commit, real_tasks = pin_brain(tmp / "pinned")
         tasks = json.loads((HERE / "tasks/public.json").read_text()) + real_tasks
+        full = {t["id"] for t in tasks}
         if a.only:
             tasks = [t for t in tasks if t["id"] in a.only]
         pages_file = HERE / "tasks/pages.json"
@@ -362,9 +363,14 @@ def main(argv=None):
         out, private = HERE / "results" / name, HERE / "results/private" / name
         private.parent.mkdir(parents=True, exist_ok=True)
         run_all(tasks, a.k, pages, tmp, stamp, out, private)
-        write_report(out)
-        print("\n" + write_report(private), end="")
-        print(out.with_suffix(".md"))
+        reports = {}
+        for f in (out, private):  # one failing must not cost the other
+            try:
+                reports[f] = write_report(f, full)
+            except (OSError, ValueError, KeyError, TypeError) as e:
+                print(f"no report for {f.name}: {type(e).__name__}: {e}")
+        print("\n" + reports.get(private, ""), end="")
+        print(out.with_suffix(".md") if out in reports else out)
     finally:
         shutil.rmtree(tmp, ignore_errors=True)  # the pinned copy of the real brain
         vps(remove_container() + f"rm -rf {WORK}\n", check=False)

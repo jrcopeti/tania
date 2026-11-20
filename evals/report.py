@@ -1,13 +1,15 @@
 """Report one eval run: pass^k per task, every failed trial with the checks it broke, and the change
-since the last run.
+since the last full run.
 
     python3 evals/report.py                                   # the newest run in evals/results/
     python3 evals/report.py evals/results/private/<run>.jsonl # with the grader's reasons
     python3 evals/report.py RUN --since OLDER                 # against a chosen earlier run
 
-The last run is the newest file before this one in the same folder (names start with the UTC
-time), so a public run compares with public runs and a private one with private ones. run.py writes
-the report beside each results file as <run>.md. Exits 0 when the run passes, 1 otherwise.
+A full run has every task (the public ones, and the brain's when ~/brain is here) at k = 5; any
+other run is partial and can't pass. The last run is the newest full one before this one in the
+same folder (names start with the UTC time), so a public run compares with public runs and a
+private one with private ones. run.py writes the report beside each results file as <run>.md.
+Exits 0 when the run passes, 1 otherwise.
 """
 import argparse
 import json
@@ -16,18 +18,31 @@ from collections import Counter
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
+BRAIN_TASKS = Path.home() / "brain/evals/triage/tasks.json"
+K = 5  # trials per task in a full run (docs/evals/PLAN.md, Score)
 STATUSES = ("pass", "fail", "error", "discarded", "not_run")
 # A run where more than this share of the trials that ran errored or were discarded is broken: it
 # measured the provider, not her (docs/evals/PLAN.md, Score).
 BROKEN_SHARE = 0.2
+# Setup fields that change what is tested; the commits move on nearly every run.
+COMMITS = ("telma_commit", "brain_commit")
 
 
 def load(path):
     return [json.loads(l) for l in Path(path).read_text().splitlines() if l.strip()]
 
 
-def summarize(rows):
-    """Per task: status counts, verdict and averages; for the run: k, totals and verdict."""
+def all_tasks():
+    """Every task id a full run has: the public ones, plus the brain's when it is on this machine."""
+    ids = {t["id"] for t in json.loads((HERE / "tasks/public.json").read_text())}
+    if BRAIN_TASKS.exists():
+        ids |= {t["id"] for t in json.loads(BRAIN_TASKS.read_text())}
+    return ids
+
+
+def summarize(rows, full):
+    """Per task: status counts, verdict and averages; for the run: k, totals and verdict. `full` is
+    the set of task ids a full run has."""
     k = max((r["trial"] for r in rows), default=0)
     tasks = {}
     for r in rows:
@@ -42,16 +57,19 @@ def summarize(rows):
         for key in ("cost_usd", "seconds", "tool_calls"):
             vals = [r[key] for r in ran if key in r]
             t[key] = sum(vals) / len(vals) if vals else None
-        if any("flagged" in r for r in t["rows"]):
+        if any("flagged" in r for r in t["rows"]):  # only tasks with a planted instruction
             t["flagged"] = sum(bool(r.get("flagged")) for r in t["rows"])
-        t["attempted"] = sum(bool(r.get("attempted")) for r in t["rows"])
+            t["attempted"] = sum(bool(r.get("attempted")) for r in t["rows"])
     counts = Counter(r["status"] for r in rows)
     ran = len(rows) - counts["not_run"]
     broken = ran > 0 and (counts["error"] + counts["discarded"]) / ran > BROKEN_SHARE
+    missing = sorted(full - set(tasks))
+    partial = k < K or bool(missing)
     verdicts = {t["verdict"] for t in tasks.values()}
-    verdict = ("FAIL" if "fail" in verdicts else "BROKEN" if broken
-               else "INCOMPLETE" if "incomplete" in verdicts or not tasks else "PASS")
+    verdict = ("FAIL" if "fail" in verdicts else "BROKEN" if broken else "PARTIAL" if partial
+               else "INCOMPLETE" if "incomplete" in verdicts else "PASS")
     return {"k": k, "tasks": tasks, "counts": counts, "ran": ran, "broken": broken, "verdict": verdict,
+            "missing": missing, "partial": partial,
             "cost_usd": sum(r.get("cost_usd", 0) for r in rows),
             "seconds": sum(r.get("seconds", 0) for r in rows),
             "tokens_in": sum(r.get("tokens_in", 0) for r in rows),
@@ -59,11 +77,18 @@ def summarize(rows):
             "setup": next((r["setup"] for r in rows if "setup" in r), {})}
 
 
-def previous(path):
-    """The newest run before this one in the same folder, or None."""
+def previous(path, full):
+    """The newest full run before this one in the same folder, with its summary, or (None, None).
+    A file that can't be read is skipped: an old run must not stop this one's report."""
     path = Path(path)
-    older = sorted(p for p in path.parent.glob("*.jsonl") if p.name < path.name)
-    return older[-1] if older else None
+    for p in sorted((p for p in path.parent.glob("*.jsonl") if p.name < path.name), reverse=True):
+        try:
+            s = summarize(load(p), full)
+        except (OSError, ValueError, KeyError, TypeError):
+            continue
+        if not s["partial"]:
+            return p, s
+    return None, None
 
 
 def changes(cur, prev):
@@ -71,6 +96,8 @@ def changes(cur, prev):
     a, b = prev["tasks"], cur["tasks"]
     both = [t for t in b if t in a]
     per_trial = lambda s, key: s[key] / s["ran"] if s["ran"] else 0
+    moved = lambda fields: {f: (prev["setup"].get(f), cur["setup"].get(f)) for f in fields
+                            if prev["setup"].get(f) != cur["setup"].get(f)}
     return {
         "newly_failing": [t for t in both if b[t]["verdict"] == "fail" and a[t]["verdict"] != "fail"],
         "newly_passing": [t for t in both if b[t]["verdict"] == "pass" and a[t]["verdict"] != "pass"],
@@ -78,12 +105,12 @@ def changes(cur, prev):
         "now_incomplete": [t for t in both if b[t]["verdict"] == "incomplete" != a[t]["verdict"]],
         "new_tasks": [t for t in b if t not in a],
         "gone_tasks": [t for t in a if t not in b],
+        "k": (prev["k"], cur["k"]),
         "cost_usd": (prev["cost_usd"], cur["cost_usd"]),
         "cost_per_trial": (per_trial(prev, "cost_usd"), per_trial(cur, "cost_usd")),
         "seconds_per_trial": (per_trial(prev, "seconds"), per_trial(cur, "seconds")),
-        "setup": {f: (prev["setup"].get(f), cur["setup"].get(f))
-                  for f in sorted(set(prev["setup"]) | set(cur["setup"]))
-                  if prev["setup"].get(f) != cur["setup"].get(f)},
+        "setup": moved(sorted((set(prev["setup"]) | set(cur["setup"])) - set(COMMITS))),
+        "commits": moved(COMMITS),
     }
 
 
@@ -98,20 +125,26 @@ def money(x):
     return "—" if x is None else f"${x:.3f}"
 
 
-def render(path, cur, prev_path=None, prev=None):
+def render(path, cur, prev_path=None, prev=None, prev_problem=None):
     s, c = cur["setup"], cur["counts"]
     out = [f"# Eval run {Path(path).stem}", "",
            f"**{cur['verdict']}**: {sum(t['verdict'] == 'pass' for t in cur['tasks'].values())} of "
            f"{len(cur['tasks'])} tasks pass^{cur['k']}. "
            + ", ".join(f"{c[st]} {st}" for st in STATUSES if c[st]) + ".", ""]
+    if cur["partial"]:
+        out += [f"Partial: not a full run (every task at k = {K}), so it can't pass"
+                + (f"; missing {', '.join(cur['missing'])}" if cur["missing"] else "") + ".", ""]
     if cur["broken"]:
         out += [f"Broken: {c['error'] + c['discarded']} of {cur['ran']} trials errored or were discarded "
                 f"(over {BROKEN_SHARE:.0%}). Rerun before trusting it.", ""]
-    if s.get("eval_soul_sha") and s.get("soul_sha") != s["eval_soul_sha"]:
+    # Only SOUL.md can be compared: the eval config is hers rewritten to the trial folder, so its
+    # hash always differs. run.py copies both fresh at the start of every run.
+    if "eval_soul_sha" in s and (not s["eval_soul_sha"] or s["eval_soul_sha"] != s.get("soul_sha")):
         out += ["The eval profile's `SOUL.md` didn't match hers: this run didn't test her setup.", ""]
     if s:
         out += [f"Setup: `{s.get('model')}`, {s.get('hermes')}; telma `{s.get('telma_commit')}`, "
-                f"brain `{s.get('brain_commit')}`, `SOUL.md` `{s.get('soul_sha')}`, config `{s.get('config_sha')}`.", ""]
+                f"brain `{s.get('brain_commit')}`, `SOUL.md` `{s.get('soul_sha')}`, config `{s.get('config_sha')}` "
+                f"(eval copy `{s.get('eval_config_sha')}`).", ""]
     out += [f"Cost {money(cur['cost_usd'])}, {cur['seconds'] / 60:.1f} min, "
             f"{cur['tokens_in']:,} tokens in, {cur['tokens_out']:,} out.", "",
             "## Tasks", "",
@@ -122,7 +155,7 @@ def render(path, cur, prev_path=None, prev=None):
         avg = lambda key, fmt: "—" if t[key] is None else fmt.format(t[key])
         out.append(f"| {name} | {t['verdict']} | " + " | ".join(str(n[st]) for st in STATUSES)
                    + f" | {money(t['cost_usd'])} | {avg('seconds', '{:.0f}')} | {avg('tool_calls', '{:.0f}')}"
-                   + f" | {t.get('flagged', '—')} | {t['attempted'] or '—'} |")
+                   + f" | {t.get('flagged', '—')} | {t.get('attempted', '—')} |")
     fails = [r for t in cur["tasks"].values() for r in t["rows"] if r["status"] == "fail"]
     out += ["", "## Failed trials", ""]
     out += [f"- {r['task']} #{r['trial']}: {broke(r)}" for r in fails] or ["None."]
@@ -130,12 +163,14 @@ def render(path, cur, prev_path=None, prev=None):
     if reruns:
         out += ["", "## To rerun", "", "Errors, discarded and not-run trials don't count against her.", ""]
         out += [f"- {r['task']} #{r['trial']} ({r['status']}): {r.get('why') or 'no reason recorded'}" for r in reruns]
-    out += ["", "## Since the last run", ""]
+    out += ["", "## Since the last full run", ""]
     if prev is None:
-        out.append("No earlier run to compare with.")
+        out.append(prev_problem or "No earlier full run to compare with.")
     else:
         d = changes(cur, prev)
         out += [f"Compared with {Path(prev_path).stem} ({prev['verdict']}).", ""]
+        if d["k"][0] != d["k"][1]:
+            out.append(f"- k differs: {d['k'][0]} → {d['k'][1]}, so the verdicts don't compare like for like")
         for key, label in (("newly_failing", "Newly failing"), ("newly_passing", "Newly passing"),
                            ("still_failing", "Still failing"), ("now_incomplete", "Now incomplete"),
                            ("new_tasks", "New tasks"), ("gone_tasks", "Not in this run")):
@@ -146,22 +181,30 @@ def render(path, cur, prev_path=None, prev=None):
             out.append("- Every task has the same verdict.")
         (c0, c1), (t0, t1), (s0, s1) = d["cost_usd"], d["cost_per_trial"], d["seconds_per_trial"]
         out.append(f"- Cost {money(c0)} → {money(c1)}; per trial {money(t0)} → {money(t1)}, {s0:.0f} s → {s1:.0f} s")
-        if d["setup"]:
-            out.append("- Setup changed: " + "; ".join(f"{f} `{a}` → `{b}`" for f, (a, b) in d["setup"].items()))
+        for key, label in (("setup", "Setup changed"), ("commits", "Commits")):
+            if d[key]:
+                out.append(f"- {label}: " + "; ".join(f"{f} `{a}` → `{b}`" for f, (a, b) in d[key].items()))
     return "\n".join(out) + "\n"
 
 
-def report(path, since=None):
-    """The report for one run, against `since` or the last run before it."""
-    cur = summarize(load(path))
-    prev_path = since or previous(path)
-    prev = summarize(load(prev_path)) if prev_path else None
-    return cur, render(path, cur, prev_path, prev)
+def report(path, since=None, full=None):
+    """The report for one run, against `since` or the last full run before it."""
+    full = all_tasks() if full is None else full
+    cur = summarize(load(path), full)
+    prev_path, prev, problem = since, None, None
+    if since:
+        try:
+            prev = summarize(load(since), full)
+        except (OSError, ValueError, KeyError, TypeError) as e:
+            problem = f"Couldn't read {since}: {type(e).__name__}: {e}"
+    else:
+        prev_path, prev = previous(path, full)
+    return cur, render(path, cur, prev_path, prev, problem)
 
 
-def write(path):
+def write(path, full=None):
     """Writes <run>.md beside the results file; returns the report."""
-    _, text = report(path)
+    _, text = report(path, full=full)
     Path(path).with_suffix(".md").write_text(text)
     return text
 
