@@ -1,5 +1,8 @@
 # Telma
 
+[![tests](https://github.com/jrcopeti/telma/actions/workflows/tests.yml/badge.svg)](https://github.com/jrcopeti/telma/actions/workflows/tests.yml)
+[![secret-scan](https://github.com/jrcopeti/telma/actions/workflows/secret-scan.yml/badge.svg)](https://github.com/jrcopeti/telma/actions/workflows/secret-scan.yml)
+
 An always-on agent that keeps the owner's second brain: she saves what the owner sends her, answers
 questions from the notes and sorts the inbox twice a day. She runs on
 [Hermes Agent](https://hermes-agent.nousresearch.com) on a VPS and talks to the owner in Discord.
@@ -37,6 +40,29 @@ link to each one. If the brain has nothing, she says so.
 general note, updates the index, checks for dead links and posts what she filed and where.
 
 > _Screenshot to come: `docs/assets/triage.png`, a brain-triage post in Discord._
+
+## How she runs
+
+```
+the owner (Discord, phone)
+        │
+        ▼
+┌─────────────────── VPS ────────────────────┐
+│ Hermes: Telma                              │──▶ web + browser (chats only)
+│   chats · reminders · triage at 9 and 21   │
+│   exfil tripwire hook                      │──▶ #alerts
+│ ┌───────────────── sandbox ──────────────┐ │
+│ │ rootless Docker, no network            │ │
+│ │ the brain: skills and rules read-only  │ │
+│ └────────────────────────────────────────┘ │
+│ sync-brain: own clone, push key, allowlist │──▶ brain repo ◀─▶ local machine
+│ ticket-bay-bot: another user, own sandbox  │
+└────────────────────────────────────────────┘
+```
+
+One Hermes gateway runs her chats and scheduled jobs. Her tools that touch the brain run in a
+sandbox with no network; web and browser run on the host, in chats only. A host job pushes the
+brain to GitHub with a key she never sees.
 
 ## Models
 
@@ -88,6 +114,19 @@ Read more:
 - [Decisions](docs/adr/): why she exists, the two-agent split, one repo per agent, sync-brain's own
   clone, the exfil tripwire.
 
+## Lessons
+
+- **A prompt is not a control.** The model that was injected had been told to ignore instructions
+  in emails. Every control since then works outside the model.
+- **Cut a leg; don't filter it.** No network in the sandbox holds. A filter on the way out is
+  bypassed by a browser click, and an allowlist breaks the pages she needs.
+- **Test the walls with a model that obeys.** A pass on a model that refuses proves nothing about
+  the walls, so the injection suite also runs on one that follows injections.
+- **Host tools in an agent's folder are part of the attack surface.** Host git in the folder she
+  writes opened 16 attacks. Giving sync-brain its own clone closed them as a class.
+- **Where you can't block, watch.** The tripwire alerts on a leak it can't stop, and a health job
+  alerts when the tripwire goes quiet.
+
 ## ticket-bay-bot
 
 Telma shares the VPS with one other agent. ticket-bay-bot reads bug emails from strangers
@@ -105,3 +144,15 @@ no memory of the owner, its own Linux user, sandbox and credentials, and its own
 | [`docs/`](docs/) | threat model, before/after, decisions, and the plans and devlogs of each piece of work |
 
 The tests run in CI, and gitleaks scans the full history on every push.
+
+## Credits
+
+Built on [Hermes Agent](https://github.com/NousResearch/hermes-agent) by Nous Research. Telma
+started as the coding employee in an AI agent engineering course.
+
+A personal project: issues are welcome, pull requests aren't expected. To report a security
+problem, see [SECURITY.md](SECURITY.md).
+
+## License
+
+[MIT](LICENSE)

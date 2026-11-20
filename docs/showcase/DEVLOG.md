@@ -118,3 +118,7 @@
 - Owner's review: the safety section read as a list of flaws. Rewritten as "Built to be safe":
   what was done after the injection (split, no network for triage, read-only skills, tripwire and
   canary, injection suite), with the accepted risks left to the threat model's link.
+- Research on similar self-hosted agent repos (Odysseus, Missy, NabaOS, Alvin Bot): they state trust
+  assumptions, name prompt injection and give a private way to report. This repo had no LICENSE, no
+  SECURITY.md, no description or topics (community profile 0%). The owner chose MIT for everything,
+  `guard-network.sh` included, and asked for all of it in this PR.

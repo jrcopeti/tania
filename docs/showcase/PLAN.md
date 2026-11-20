@@ -29,6 +29,11 @@ does.
 
 ## Open
 
+- Repo extras asked by the owner (2026-11-20), in the README PR: MIT `LICENSE` for the whole repo
+  (the owner's call: the kit-derived file was changed and is theirs), `SECURITY.md` with private
+  vulnerability reporting switched on, repo description and topics, and in the README a diagram,
+  CI badges, Lessons, Credits and License.
+
 Carried over from the frozen hardening plan:
 
 - Should Telma's triage file into `guidelines/` directly, or into a proposals folder José promotes?
