@@ -134,7 +134,7 @@ One PR each, in order.
 | 1 | **Plan** | This file, the devlog, and the run-before-a-change rule in `AGENTS.md`. | merged (#42) |
 | 2 | **Spike on the VPS** | With the owner's yes: can one Hermes run point at another brain folder, or does it need a second Hermes home? Does `hermes chat` get the Discord chat's toolsets? What does one triage trial cost? Answers go in the devlog. | done: an `eval` profile; Discord adds two tools; $0.023 a trial |
 | 3 | **Decoy brain** | Generator and the frozen output in `evals/decoy-brain/`; a check that each file has its marker. | done: 108 files, 294 KB, checked in CI |
-| 4 | **Grader** | The checks above as a script over a snapshot and a copy, with tests in CI on hand-made before/after brains. | to do |
+| 4 | **Grader** | The checks above as a script over a snapshot and a copy, with tests in CI on hand-made before/after brains. | done: `evals/grade.py`, 20 tests |
 | 5 | **Triage task set** | An agent picks the items from the brain's `sources/` to fill the table; the owner approves the list. Stored in the brain. | to do |
 | 6 | **Harness** | Per trial: fresh copy, one Hermes run, timeout, model check, cost and time, grade, one JSONL line. The $3 cap. | to do |
 | 7 | **Report** | Per-run report and the change since the last run. | to do |
