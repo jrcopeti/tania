@@ -102,3 +102,38 @@
   remove memory-diff and tripwire-health. The docs now say so, "none of the scheduled jobs" became
   "the jobs set up today", and ADR 5 names the removable health job. ADR 1's date and two long lines
   fixed. Kept ADR 4's 16: the three earlier breaks share the cause, and the redesign covers them.
+
+## 2026-11-20: README draft
+
+- Drafted with screenshot placeholders so the text can be reviewed while the owner takes the shots;
+  `docs/assets/` comes with the images, each checked for personal data before it's committed.
+- Short, like the ADRs: what she is, the three brain jobs (capture, ask-brain, triage) with a shot
+  each, the safety story in a few lines linking the threat model, before/after and ADRs, a
+  ticket-bay-bot section with its repo link, and the "formerly Tania" line from the rename plan.
+- Says "the owner", with no gendered pronoun for them. ADRs (step 3) marked done (#38).
+- Owner's review: "What she does" broadened to a personal assistant (reminders, summaries, web
+  lookups, memory), with the brain as her main job; a Models section lists the main model and the
+  fallback chain from the brain's model decision, and says the chain is the owner's pick and
+  Hermes takes any list. The reminder example is neutral on purpose: no health detail.
+- Owner's review: the safety section read as a list of flaws. Rewritten as "Built to be safe":
+  what was done after the injection (split, no network for triage, read-only skills, tripwire and
+  canary, injection suite), with the accepted risks left to the threat model's link.
+- Research on similar self-hosted agent repos (Odysseus, Missy, NabaOS, Alvin Bot): they state trust
+  assumptions, name prompt injection and give a private way to report. This repo had no LICENSE, no
+  SECURITY.md, no description or topics (community profile 0%). The owner chose MIT for everything,
+  `guard-network.sh` included, and asked for all of it in this PR.
+- Screenshots in place, all 220px wide; the avatar is a 256px copy of the owner's icon (free for public use). Checked each: no IPs, webhooks, private repos, canary or other people, and no GPS or device metadata. Blurred the old name in `alerts.jpg` and the owner's name in `brain-triage.jpg`, amended into the unpushed commit so the originals never reached GitHub.
+- The owner gave the course link: README credits and ADR 1 now name and link AI Agent Engineer by
+  Daniel Moka. Open item closed.
+- `/code-review` on #39: eight findings, all held (one in part). Fixed: "no way out for unattended
+  work" (only triage; chat-made jobs can get web and browser), "tools that touch the brain run in
+  the sandbox" (browser_exec on the host can read notes), "every control works outside the model"
+  (the threat model names where only the model stands), the obedient-model lesson (one case ran on
+  north-mini-code, then direct probes), plan status and the repo-extras item, ADR 1's long line,
+  extra blank lines.
+- Owner's correction: "no way out for unattended work" was right. Checked Telma's jobs on the VPS
+  (read-only): brain-triage has terminal, file, skills and todo only; sync-brain, memory-diff and
+  tripwire-health are no-agent scripts; the chat-made reminder has zero toolsets and is paused.
+  Reverted that bullet and the "jobs scheduled from a chat" clause. Kept "file and shell tools run
+  in the sandbox": `browser_exec` runs Python as a subprocess of her host process (read in
+  `tools/browser_use_cli.py`); reading a note that way was not tested.
