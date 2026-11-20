@@ -1,7 +1,11 @@
+<img src="docs/assets/telma-avatar.jpg" width="120" align="right" alt="Telma">
+
 # Telma
 
 [![tests](https://github.com/jrcopeti/telma/actions/workflows/tests.yml/badge.svg)](https://github.com/jrcopeti/telma/actions/workflows/tests.yml)
 [![secret-scan](https://github.com/jrcopeti/telma/actions/workflows/secret-scan.yml/badge.svg)](https://github.com/jrcopeti/telma/actions/workflows/secret-scan.yml)
+
+![Telma Icon](/docs/assets/telma-icon.jpg)
 
 An always-on agent that keeps the owner's second brain: she saves what the owner sends her, answers
 questions from the notes and sorts the inbox twice a day. She runs on
@@ -29,17 +33,17 @@ nobody does.
 
 **Capture.** Say "save this" with a link, a snippet or a decision, and she writes it to the inbox.
 
-> _Screenshot to come: `docs/assets/capture.png`, a "save this" chat and her reply._
+<table><tr><td valign="top"><img src="docs/assets/capture-1.jpg" width="220" alt="Asking Telma to save a link"></td><td valign="top"><img src="docs/assets/capture-2.jpg" width="220" alt="She opens a thread for it"></td><td valign="top"><img src="docs/assets/capture-3.jpg" width="220" alt="She reads the capture skill and the page"></td><td valign="top"><img src="docs/assets/capture-4.jpg" width="220" alt="Her reply: saved to the inbox"></td></tr></table>
 
 **Ask the brain.** Ask "what does my brain say about X?" and she answers from the notes, with a
 link to each one. If the brain has nothing, she says so.
 
-> _Screenshot to come: `docs/assets/ask-brain.png`, a question and her answer with links._
+<table><tr><td valign="top"><img src="docs/assets/ask-1.jpg" width="220" alt="Asking what the brain says about mocking the database"></td><td valign="top"><img src="docs/assets/ask-2.jpg" width="220" alt="She reads the ask-brain skill and searches the notes"></td><td valign="top"><img src="docs/assets/ask-3.jpg" width="220" alt="Her answer, with a link to each note"></td></tr></table>
 
 **Triage.** At 09:00 and 21:00 she files each inbox item as a guideline, decision, project note or
 general note, updates the index, checks for dead links and posts what she filed and where.
 
-> _Screenshot to come: `docs/assets/triage.png`, a brain-triage post in Discord._
+<table><tr><td valign="top"><img src="docs/assets/brain-triage.jpg" width="220" alt="A brain-triage post: what she filed and where"></td></tr></table>
 
 ## How she runs
 
@@ -75,6 +79,8 @@ config change. The owner's picks today:
 | Fallback 1 | `inclusionai/ling-3.2-flash:free` | free |
 | Fallback 2 | `baidu/ernie-5.5-flash-preview:free` | free |
 
+<table><tr><td valign="top"><img src="docs/assets/new-session.jpg" width="220" alt="A new session shows the model and provider"></td></tr></table>
+
 Hermes moves down the chain when a model fails or times out. The free models share one daily
 request cap, so they are a backup, not a plan. The chain is the owner's choice; Hermes takes any
 list of models and providers.
@@ -104,7 +110,7 @@ Every control works outside the model, as a permission, a mount, a network rule 
 a prompt. The [threat model](docs/threat-model.md) maps each threat to the control that stops it, and lists the
 trade-offs taken on purpose.
 
-> _Screenshot to come: `docs/assets/alert.png`, a canary or tripwire post in `#alerts`._
+<table><tr><td valign="top"><img src="docs/assets/alerts.jpg" width="220" alt="Exfil tripwire alerts in #alerts"></td></tr></table>
 
 Read more:
 
