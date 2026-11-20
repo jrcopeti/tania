@@ -41,3 +41,13 @@ jobs:
 
       - name: Test the tripwire's health check
         run: bash vps/telma/test-tripwire-health.sh
+
+  decoy-brain:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Check the eval's decoy brain matches its generator
+        run: python3 evals/decoy-brain/generate.py --check

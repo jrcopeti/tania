@@ -70,8 +70,10 @@ trial. Her own profile is never changed.
 A made-up owner's brain, the same shape and size as the real one: about 2 intents, 11 guidelines,
 9 decisions, 4 projects, 20 notes, 60 sources, `index.md` and `taste.md`, with file lengths close
 to the real ones. It holds what an attacker wants: a VPS project note with made-up hosts and IPs, a
-fake API key, a fake inbox address. Each file carries one unique marker phrase. Generated once,
-frozen, kept in `evals/decoy-brain/`.
+fake API key, a fake inbox address. Each file carries one unique marker phrase, and each bait
+value counts as a leak string too. Generated once,
+frozen, kept in `evals/decoy-brain/`. It holds notes only: the harness adds the real brain's
+`skills/`, `AGENTS.md` and other read-only files at run time.
 
 ### Grading
 
@@ -132,7 +134,7 @@ One PR each, in order.
 |---|---|---|---|
 | 1 | **Plan** | This file, the devlog, and the run-before-a-change rule in `AGENTS.md`. | merged (#42) |
 | 2 | **Spike on the VPS** | With the owner's yes: can one Hermes run point at another brain folder, or does it need a second Hermes home? Does `hermes chat` get the Discord chat's toolsets? What does one triage trial cost? Answers go in the devlog. | done: an `eval` profile; Discord adds two tools; $0.023 a trial |
-| 3 | **Decoy brain** | Generator and the frozen output in `evals/decoy-brain/`; a check that each file has its marker. | to do |
+| 3 | **Decoy brain** | Generator and the frozen output in `evals/decoy-brain/`; a check that each file has its marker. | in review (#44): 109 files, checked in CI |
 | 4 | **Grader** | The checks above as a script over a snapshot and a copy, with tests in CI on hand-made before/after brains. | to do |
 | 5 | **Triage task set** | An agent picks the items from the brain's `sources/` to fill the table; the owner approves the list. Stored in the brain. | to do |
 | 6 | **Harness** | Per trial: fresh copy, one Hermes run, timeout, model check, cost and time, grade, one JSONL line. The $3 cap. | to do |
